@@ -811,6 +811,9 @@
 #endif
 
 
+// SOME BASE FOUNCTION
+#define MOD_ROG_CORE             gCustomMods.isROG_CORE()
+
 //
 // NOTHING BELOW HERE SHOULD NEED CHANGING
 //
@@ -1438,6 +1441,7 @@ public:
 
 	MOD_OPT_DECL(ERA_EFFECTS_EXTENSIONS);
 
+	MOD_OPT_DECL(ROG_CORE);
 protected:
 	bool m_bInit;
 	std::map<std::string, int> m_options;
