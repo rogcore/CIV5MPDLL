@@ -25856,6 +25856,30 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 			iValue = GetPromotionValue(iTemp, getDomainType() == DOMAIN_SEA ? 1 : 0, iFlavorOffDef, lowPriority);
 		}
 
+		if (iValue == 0)
+		{
+			iTemp = 0;
+
+			for (iI = 0; iI < NUM_DOMAIN_TYPES; iI++)
+			{
+				iTemp += pkPromotionInfo->GetDomainAttackPercent(iI);
+			}
+
+			iValue = GetPromotionValue(iTemp, getDomainType() == DOMAIN_SEA ? 1 : 0, iFlavorOffDef, lowPriority);
+		}
+
+		if (iValue == 0)
+		{
+			iTemp = 0;
+
+			for (iI = 0; iI < NUM_DOMAIN_TYPES; iI++)
+			{
+				iTemp += pkPromotionInfo->GetDomainDefensePercent(iI);
+			}
+
+			iValue = GetPromotionValue(iTemp, getDomainType() == DOMAIN_SEA ? 1 : 0, iFlavorOffDef, lowPriority);
+		}
+
 		// Unknown promotion? Always give at least a random priority with some flavor
 		if (iValue == 0)
 		{
@@ -26259,6 +26283,8 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 		iValue += iTemp + iFlavorDefense * 2;
 	}
 
+
+
 	for(iI = 0; iI < GC.getNumTerrainInfos(); iI++)
 	{
 		const TerrainTypes eTerrain = static_cast<TerrainTypes>(iI);
@@ -26477,6 +26503,43 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 		}
 		else if((AI_getUnitAIType() == UNITAI_ATTACK) ||
 		        (AI_getUnitAIType() == UNITAI_DEFENSE))
+		{
+			iValue += iTemp;
+		}
+		else
+		{
+			iValue += (iTemp / 2);
+		}
+	}
+
+
+	for (iI = 0; iI < NUM_DOMAIN_TYPES; iI++)
+	{
+		iTemp = pkPromotionInfo->GetDomainAttackPercent(iI);
+		if (AI_getUnitAIType() == UNITAI_COUNTER)
+		{
+			iValue += (iTemp * 2);
+		}
+		else if ((AI_getUnitAIType() == UNITAI_ATTACK) ||
+			(AI_getUnitAIType() == UNITAI_DEFENSE))
+		{
+			iValue += iTemp;
+		}
+		else
+		{
+			iValue += (iTemp / 2);
+		}
+	}
+
+	for (iI = 0; iI < NUM_DOMAIN_TYPES; iI++)
+	{
+		iTemp = pkPromotionInfo->GetDomainDefensePercent(iI);
+		if (AI_getUnitAIType() == UNITAI_COUNTER)
+		{
+			iValue += (iTemp * 2);
+		}
+		else if ((AI_getUnitAIType() == UNITAI_ATTACK) ||
+			(AI_getUnitAIType() == UNITAI_DEFENSE))
 		{
 			iValue += iTemp;
 		}
