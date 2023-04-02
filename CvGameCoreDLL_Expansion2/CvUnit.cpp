@@ -12092,6 +12092,12 @@ bool CvUnit::canBuildRoute() const
 				{
 					return true;
 				}
+#if defined(MOD_ROG_CORE)
+				if (thisBuildInfo->getTechObsolete() != NO_TECH && !pTeamTechs->HasTech((TechTypes)(thisBuildInfo->getTechObsolete())))
+				{
+					return true;
+				}
+#endif
 			}
 		}
 	}
@@ -19650,6 +19656,57 @@ bool CvUnit::IsNearEnemyCitadel(int& iCitadelDamage)
 
 	return false;
 }
+
+
+#if defined(MOD_ROG_CORE)
+//	--------------------------------------------------------------------------------
+// Citadel
+bool CvUnit::IsNearOurCitadel(int& iCitadelHeal)
+{
+	VALIDATE_OBJECT
+
+		int iCitadelRange = 1;
+
+	CvPlot* pLoopPlot;
+
+	ImprovementTypes eImprovement;
+	int iHeal;
+
+	// Look around this Unit to see if there's an adjacent Citadel
+	for (int iX = -iCitadelRange; iX <= iCitadelRange; iX++)
+	{
+		for (int iY = -iCitadelRange; iY <= iCitadelRange; iY++)
+		{
+			pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iX, iY, iCitadelRange);
+
+			if (pLoopPlot != NULL)
+			{
+				eImprovement = pLoopPlot->getImprovementType();
+
+				// Citadel here?
+				if (eImprovement != NO_IMPROVEMENT && !pLoopPlot->IsImprovementPillaged())
+				{
+					iHeal = GC.getImprovementInfo(eImprovement)->GetNearbyFriendHeal();
+					if (iHeal != 0)
+					{
+						if (pLoopPlot->getOwner() != NO_PLAYER)
+						{
+							if (getTeam() == pLoopPlot->getTeam())
+							{
+								iCitadelHeal = iHeal;
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return false;
+}
+#endif
+
 
 //	--------------------------------------------------------------------------------
 /// Great General close enough to give us a bonus?
