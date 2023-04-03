@@ -146,8 +146,10 @@ public:
 #endif
 
 
+
 	int GetDomainAttackPercent(int i) const;
 	int GetDomainDefensePercent(int i) const;
+
 
 
 	int GetUpgradeDiscount() const;
@@ -414,8 +416,10 @@ protected:
 #endif
 
 
+
 	int* m_piDomainAttackPercent;
 	int* m_piDomainDefensePercent;
+
 
 
 	bool m_bCannotBeChosen;
@@ -598,6 +602,7 @@ public:
 	int GetUnitClassDefenseMod(UnitClassTypes eUnitClass) const;
 
 	PromotionTypes ChangePromotionAfterCombat(PromotionTypes eIndex);
+
 
 
 

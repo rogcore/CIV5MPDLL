@@ -141,7 +141,6 @@ void CvUnitCombat::GenerateMeleeCombatInfo(CvUnit& kAttacker, CvUnit* pkDefender
 
 
 
-
 		int iAttackerTotalDamageInflicted = iAttackerDamageInflicted + pkCity->getDamage();
 		int iDefenderTotalDamageInflicted = iDefenderDamageInflicted + kAttacker.getDamage();
 
@@ -2516,6 +2515,7 @@ void CvUnitCombat::GenerateNuclearCombatInfo(CvUnit& kAttacker, CvPlot& plot, Cv
 			args->Push(plot.getY());
 			args->Push(bWar);
 			args->Push(bBystander);
+
 
 			bool bResult;
 			LuaSupport::CallHook(pkScriptSystem, "NuclearDetonation", args.get(), bResult);
