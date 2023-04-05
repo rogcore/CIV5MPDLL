@@ -26377,6 +26377,7 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 		iValue += iTemp + iFlavorDefense * 2;
 	}
 
+
 #if defined(MOD_ROG_CORE)
 	iTemp = pkPromotionInfo->GetMeleeDefenseMod();
 	if (iTemp != 0)
@@ -26397,6 +26398,7 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 		iValue += iTemp + iFlavorDefense * 2;
 	}
 #endif
+
 
 
 
