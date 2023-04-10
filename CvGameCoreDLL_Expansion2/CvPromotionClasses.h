@@ -127,6 +127,7 @@ public:
 	int GetGoldenAgeMod() const;
 	int GetRangedSupportFireMod() const;
 
+
 	int GetMeleeDefenseMod() const;
 #endif
 
@@ -397,6 +398,7 @@ protected:
 	int m_iGoldenAgeMod;
 
 	int m_iRangedSupportFireMod;
+
 	int m_iMeleeDefenseMod;
 #endif
 
