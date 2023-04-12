@@ -866,12 +866,13 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 
 	Method(GetMinorFriendCount);
 	Method(GetMinorAllyCount);
+
 #if defined(MOD_ROG_CORE)
-	Method(GetNumCities);
+	Method(GetNumOriginalCapital);
 #endif
 
 #if defined(MOD_API_LUA_EXTENSIONS)
-	Method(GetNumOriginalCapital);
+	Method(GetNumPuppetCities);
 #endif
 
 
