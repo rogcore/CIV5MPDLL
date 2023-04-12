@@ -866,14 +866,9 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 
 	Method(GetMinorFriendCount);
 	Method(GetMinorAllyCount);
-#if defined(MOD_ROG_CORE)
-	Method(GetNumCities);
-#endif
-
 #if defined(MOD_API_LUA_EXTENSIONS)
-	Method(GetNumOriginalCapital);
+	Method(GetNumPuppetCities);
 #endif
-
 
 	Method(Units);
 	Method(GetNumUnits);
@@ -7972,14 +7967,6 @@ int CvLuaPlayer::lGetNumCities(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvPlayerAI::getNumCities);
 }
-
-#if defined(MOD_ROG_CORE)
-int CvLuaPlayer::lGetNumOriginalCapital(lua_State* L)
-{
-	return BasicLuaMethod(L, &CvPlayerAI::CountAllOriginalCapitalCity);
-}
-#endif
-
 #if defined(MOD_API_LUA_EXTENSIONS)
 //------------------------------------------------------------------------------
 //int getNumCities();
@@ -10360,8 +10347,6 @@ int CvLuaPlayer::lGetPolicyBuildingClassYieldModifier(lua_State* L)
 
 	return 0;
 }
-
-
 
 //------------------------------------------------------------------------------
 int CvLuaPlayer::lGetPolicyBuildingClassYieldChange(lua_State* L)

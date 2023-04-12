@@ -142,12 +142,6 @@ public:
 #endif
 
 #if defined(MOD_ROG_CORE)
-	int GetHPHealedIfDefeatEnemyGlobal() const;
-	int GetNumOriginalCapitalAttackMod() const;
-	int GetNumOriginalCapitalDefenseMod() const;
-#endif
-
-#if defined(MOD_ROG_CORE)
 	UnitClassTypes GetCombatBonusFromNearbyUnitClass() const;
 	int GetNearbyUnitClassBonusRange() const;
 	int GetNearbyUnitClassBonus() const;
@@ -429,11 +423,6 @@ protected:
 	int* m_piDomainAttackPercent;
 	int* m_piDomainDefensePercent;
 
-#if defined(MOD_ROG_CORE)
-	int m_iHPHealedIfDefeatEnemyGlobal;
-	int m_iNumOriginalCapitalAttackMod;
-	int m_iNumOriginalCapitalDefenseMod;
-#endif
 
 
 	bool m_bCannotBeChosen;

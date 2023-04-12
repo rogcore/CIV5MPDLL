@@ -476,11 +476,6 @@ public:
 	int GetYieldPerTurnFromTraits(YieldTypes eYield) const;
 #endif
 
-
-#if defined(MOD_ROG_CORE)
-	void DoHealGlobal(int iValue);
-#endif
-
 	// Faith
 	int GetTotalFaithPerTurn() const;
 	int GetFaithPerTurnFromCities() const;
@@ -1831,11 +1826,6 @@ public:
 	int CountAllTerrain(TerrainTypes iTerrainType);
 	int CountAllWorkedTerrain(TerrainTypes iTerrainType);
 #endif
-
-#if defined(MOD_ROG_CORE)
-	int CountAllOriginalCapitalCity();
-#endif
-
 
 	// for serialization
 	virtual void Read(FDataStream& kStream);
