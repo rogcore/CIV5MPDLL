@@ -363,7 +363,6 @@ protected:
 #endif
 
 
-
 	static int lGetRangedAttackModifier(lua_State* L);
 	static int lCityAttackModifier(lua_State* L);
 	static int lCityDefenseModifier(lua_State* L);

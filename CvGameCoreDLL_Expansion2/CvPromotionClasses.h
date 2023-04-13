@@ -403,6 +403,7 @@ protected:
 	int m_iGoldenAgeMod;
 
 	int m_iRangedSupportFireMod;
+
 	int m_iMeleeDefenseMod;
 #endif
 

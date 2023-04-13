@@ -1,3 +1,4 @@
+
 /*	-------------------------------------------------------------------------------------------------------
 	© 1991-2012 Take-Two Interactive Software and its subsidiaries.  Developed by Firaxis Games.  
 	Sid Meier's Civilization V, Civ, Civilization, 2K Games, Firaxis Games, Take-Two Interactive Software 
@@ -27099,4 +27100,5 @@ FDataStream& operator>>(FDataStream& loadFrom, CvUnit& writeTo)
 	writeTo.read(loadFrom);
 	return loadFrom;
 }
+
 
