@@ -699,23 +699,12 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 	{
 		PromotionTypes ePromotionEmbarkation = kPlayer.GetEmbarkationPromotion();
 
-		bool bGivePromotion = false;
-
-		// Civilians get it for free
-		if(getDomainType() == DOMAIN_LAND)
-		{
-			if(!IsCombatUnit())
-				bGivePromotion = true;
-		}
-
-		// Can the unit get this? (handles water units and such)
-		if(!bGivePromotion && ::IsPromotionValidForUnitCombatType(ePromotionEmbarkation, getUnitType()))
-			bGivePromotion = true;
-
+		bool bGivePromotion = getDomainType() == DOMAIN_LAND && (
+			!IsCombatUnit() || ::IsPromotionValidForUnitCombatType(ePromotionEmbarkation, getUnitType())
 #ifdef MOD_TRAITS_CAN_FOUND_COAST_CITY
-		if (!bGivePromotion && bIsWaterCity && getDomainType() == DOMAIN_LAND)
-			bGivePromotion = true;
+			|| (bIsWaterCity)
 #endif
+			);
 
 		// Some case that gives us the promotion?
 		if (bGivePromotion)
@@ -6201,7 +6190,18 @@ void CvUnit::DoAttrition()
 		{
 			strAppendText =  GetLocalizedText("TXT_KEY_MISC_YOU_UNIT_WAS_DAMAGED_ATTRITION");
 #if defined(MOD_API_UNIT_STATS)
+	#ifdef MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY
+			if (MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY && AI_getUnitAIType() == UNITAI_SETTLE && GET_MY_PLAYER().GetCanFoundMountainCity())
+			{
+				// Do nothing, Inca's Settle should not get mountains damage taken at the end of the turn
+			}
+			else
+			{
+				changeDamage(50, NO_PLAYER, -1, 0.0, &strAppendText);
+			}		
+	#else
 			changeDamage(50, NO_PLAYER, -1, 0.0, &strAppendText);
+	#endif
 #else
 			changeDamage(50, NO_PLAYER, 0.0, &strAppendText);
 #endif
@@ -7132,7 +7132,7 @@ bool CvUnit::canChangeTradeUnitHomeCityAt(const CvPlot* pPlot, int iX, int iY) c
 #if defined(MOD_BUGFIX_MINOR)
 		// The path finder permits routes between cities on lakes,
 		// so we'd better allow cargo ships to be relocated there!
-		if (!pToCity->isCoastal(0))
+		if (!pToCity->isCoastal(0) && !pToPlot->isWater())
 #else
 		if (!pToCity->isCoastal())
 #endif
