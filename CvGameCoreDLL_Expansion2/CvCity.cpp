@@ -11880,7 +11880,8 @@ int CvCity::getDomainFreeExperienceFromGreatWorksGlobal(DomainTypes eIndex) cons
 	{
 		if (pLoopCity != NULL)
 		{
-			iGreatWorks += pLoopCity->GetCityBuildings()->GetNumGreatWorks(CvTypes::getGREAT_WORK_SLOT_LITERATURE());
+			iGreatWorks += pLoopCity->GetCityCulture()->GetNumGreatWorks();
+			//iGreatWorks += pLoopCity->GetCityBuildings()->GetNumGreatWorks(CvTypes::getGREAT_WORK_SLOT_LITERATURE());
 		}
 	}
 	iXP += (iGreatWorks * iMod);
