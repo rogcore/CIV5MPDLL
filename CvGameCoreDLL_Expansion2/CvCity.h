@@ -753,6 +753,10 @@ public:
 
 	int getDomainFreeExperienceFromGreatWorks(DomainTypes eIndex) const;
 	
+#if defined(MOD_ROG_CORE)
+	int getDomainFreeExperienceFromGreatWorksGlobal(DomainTypes eIndex) const;
+#endif
+
 	int getDomainProductionModifier(DomainTypes eIndex) const;
 	void changeDomainProductionModifier(DomainTypes eIndex, int iChange);
 
@@ -1167,6 +1171,9 @@ protected:
 	std::vector<int> m_aiBaseYieldRateFromReligion;
 	FAutoVariable<std::vector<int>, CvCity> m_aiYieldRateModifier;
 	FAutoVariable<std::vector<int>, CvCity> m_aiYieldPerPop;
+
+
+
 
 #if defined(MOD_ROG_CORE)
 	std::map<int, int> m_aiYieldPerPopInEmpire;

@@ -4203,13 +4203,28 @@ int CvCity::getProductionExperience(UnitTypes eUnit)
 		CvUnitEntry* pkUnitInfo = GC.getUnitInfo(eUnit);
 		if(pkUnitInfo)
 		{
-			if(pkUnitInfo->GetUnitCombatType() != NO_UNITCOMBAT)
+			DomainTypes eDomain = (DomainTypes)pkUnitInfo->GetDomainType();
+			UnitCombatTypes eUnitCombat = (UnitCombatTypes)(pkUnitInfo->GetUnitCombatType());
+			//if(pkUnitInfo->GetUnitCombatType() != NO_UNITCOMBAT)
+			//{
+				//iExperience += getUnitCombatFreeExperience((UnitCombatTypes)(pkUnitInfo->GetUnitCombatType()));
+				//iExperience += kOwner.getUnitCombatFreeExperiences((UnitCombatTypes) pkUnitInfo->GetUnitCombatType());
+			//}
+			//iExperience += getDomainFreeExperience((DomainTypes)(pkUnitInfo->GetDomainType()));
+			//iExperience += getDomainFreeExperienceFromGreatWorks((DomainTypes)(pkUnitInfo->GetDomainType()));
+
+			if (eUnitCombat != NO_UNITCOMBAT)
 			{
-				iExperience += getUnitCombatFreeExperience((UnitCombatTypes)(pkUnitInfo->GetUnitCombatType()));
-				iExperience += kOwner.getUnitCombatFreeExperiences((UnitCombatTypes) pkUnitInfo->GetUnitCombatType());
+				iExperience += getUnitCombatFreeExperience(eUnitCombat);
+				iExperience += kOwner.getUnitCombatFreeExperiences(eUnitCombat);
 			}
-			iExperience += getDomainFreeExperience((DomainTypes)(pkUnitInfo->GetDomainType()));
-			iExperience += getDomainFreeExperienceFromGreatWorks((DomainTypes)(pkUnitInfo->GetDomainType()));
+			if (eDomain != NO_DOMAIN)
+			{
+				iExperience += getDomainFreeExperience(eDomain);
+				iExperience += getDomainFreeExperienceFromGreatWorks(eDomain);
+				iExperience += getDomainFreeExperienceFromGreatWorksGlobal(eDomain);
+				iExperience += kOwner.GetDomainFreeExperience(eDomain);
+			}
 
 			iExperience += getSpecialistFreeExperience();
 		}
@@ -11844,7 +11859,40 @@ int CvCity::getDomainFreeExperienceFromGreatWorks(DomainTypes eIndex) const
 	return iXP;
 }
 
+#if defined(MOD_ROG_CORE)
+//	--------------------------------------------------------------------------------
+int CvCity::getDomainFreeExperienceFromGreatWorksGlobal(DomainTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
 
+	int iMod = GET_PLAYER(getOwner()).GetDomainFreeExperiencePerGreatWorkGlobal(eIndex);
+	if (iMod <= 0)
+	{
+		return iMod;
+	}
+
+	int iXP = 0;
+	int iLoop = 0;
+	int iGreatWorks = 0;
+	for (const CvCity* pLoopCity = GET_PLAYER(getOwner()).firstCity(&iLoop); pLoopCity != NULL; pLoopCity = GET_PLAYER(getOwner()).nextCity(&iLoop))
+	{
+		if (pLoopCity != NULL)
+		{
+			iGreatWorks += pLoopCity->GetCityBuildings()->GetNumGreatWorks(CvTypes::getGREAT_WORK_SLOT_LITERATURE());
+		}
+	}
+	iXP += (iGreatWorks * iMod);
+
+	if (iXP > 150)
+	{
+		iXP = 150;
+	}
+
+	return iXP;
+}
+#endif
 //	--------------------------------------------------------------------------------
 int CvCity::getDomainProductionModifier(DomainTypes eIndex) const
 {
