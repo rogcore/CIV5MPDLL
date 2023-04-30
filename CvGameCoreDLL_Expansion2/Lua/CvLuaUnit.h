@@ -428,14 +428,6 @@ protected:
 	static int lGetNumWonderAttackMod(lua_State* L);
 
 	static int lIsNoResourcePunishment(lua_State* L);
-
-	static int lGetCurrentHitPointAttackMod(lua_State* L);
-	static int lGetCurrentHitPointDefenseMod(lua_State* L);
-
-
-	static int lGetNearNumEnemyAttackMod(lua_State* L);
-	static int lGetNearNumEnemyDefenseMod(lua_State* L);
-	static int lGetNumEnemyAdjacent(lua_State* L);
 #endif
 
 
