@@ -786,6 +786,8 @@
 
 #define MOD_ERA_EFFECTS_EXTENSIONS                  gCustomMods.isERA_EFFECTS_EXTENSIONS()
 
+#define MOD_IMPROVEMENTS_UPGRADE                    gCustomMods.isIMPROVEMENTS_UPGRADE()
+
 #endif // ACHIEVEMENT_HACKS
 
 
@@ -1193,6 +1195,10 @@ enum BattleTypeTypes
 #define GAMEEVENT_UnitMoveInto					"UnitMoveInto",					"iiiiiii"
 #define GAMEEVENT_UnitDoTurn					"UnitDoTurn",					"iiii"
 
+#define GAMEEVENT_OnImprovementUpgrade			"OnImprovementUpgrade",			"iiiiii"
+#define GAMEEVENT_OnImprovementDowngrade		"OnImprovementDowngrade",		"iiiiii"
+#define GAMEEVENT_GetImprovementXPPerTurn		"GetImprovementXPPerTurn",		        "iiiiii"
+
 
 // Serialization wrappers
 #define MOD_SERIALIZE
@@ -1526,6 +1532,8 @@ public:
 	MOD_OPT_DECL(EVENTS_UNIT_CAN_RANGEATTACK);
 	MOD_OPT_DECL(EVENTS_UNIT_MOVE);
 	MOD_OPT_DECL(EVENTS_UNIT_DO_TURN);
+
+	MOD_OPT_DECL(IMPROVEMENTS_UPGRADE);
 protected:
 	bool m_bInit;
 	std::map<std::string, int> m_options;
