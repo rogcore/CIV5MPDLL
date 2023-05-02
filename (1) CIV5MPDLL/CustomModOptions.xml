@@ -1015,6 +1015,10 @@
     <!-- function plot:SetXP(iVal, bDoUpdate) return XP; -->
     <!-- Table changes: Improvement_Upgrade_Downgrade.sql -->
     <Row Class="5" Name="IMPROVEMENTS_UPGRADE" Value="0"/>
+
+    <Row Class="6" Name="GLOBAL_UNLIMITED_ONE_TURN_GROWTH" Value="0"/>
+    <Row Class="6" Name="GLOBAL_UNLIMITED_ONE_TURN_PRODUCTION" Value="0"/>
+    <Row Class="6" Name="GLOBAL_UNLIMITED_ONE_TURN_CULTURE" Value="0"/>
   </CustomModOptions>
 
   <CustomModPostDefines>
