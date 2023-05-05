@@ -532,6 +532,8 @@ int CustomMods::getOption(string sOption, int defValue) {
 		MOD_OPT_CACHE(GLOBAL_UNLIMITED_ONE_TURN_CULTURE);
 		MOD_OPT_CACHE(GLOBAL_WAR_CASUALTIES);
 
+		
+		MOD_OPT_CACHE(GLOBAL_UNIT_EXTRA_ATTACK_DEFENSE_EXPERENCE);
 		m_bInit = true;
 	}
 
