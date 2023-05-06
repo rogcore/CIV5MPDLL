@@ -18022,6 +18022,35 @@ bool CvPlayer::isMajorCiv() const
 {
 	return GET_TEAM(getTeam()).isMajorCiv();
 }
+
+BuildingTypes CvPlayer::GetCivBuilding(BuildingClassTypes eBuildingClass) const
+{
+	if (eBuildingClass == NO_BUILDINGCLASS || eBuildingClass >= GC.getNumBuildingClassInfos())
+		return NO_BUILDING;
+
+	if (!isMajorCiv())
+	{
+		return (BuildingTypes)GC.getBuildingClassInfo(eBuildingClass)->getDefaultBuildingIndex();
+	}
+
+	CvCivilizationInfo& playerCivilizationInfo = getCivilizationInfo();
+	return (BuildingTypes)playerCivilizationInfo.getCivilizationBuildings(eBuildingClass);
+}
+
+UnitTypes CvPlayer::GetCivUnit(UnitClassTypes eUnitClass) const
+{
+	if (eUnitClass == NO_UNITCLASS || eUnitClass >= GC.getNumUnitClassInfos())
+		return NO_UNIT;
+
+	if (!isMajorCiv())
+	{
+		return (UnitTypes)GC.getUnitClassInfo(eUnitClass)->getDefaultUnitIndex();
+	}
+
+	CvCivilizationInfo& playerCivilizationInfo = getCivilizationInfo();
+	return (UnitTypes)playerCivilizationInfo.getCivilizationUnits(eUnitClass);
+}
+
 #endif
 
 
