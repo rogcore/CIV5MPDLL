@@ -14785,7 +14785,7 @@ void CvPlayer::DoUnitKilledCombat(PlayerTypes eKilledPlayer, UnitTypes eUnitType
 		int iDelta = GC.getWAR_CASUALTIES_DELTA_BASE();
 		iDelta = (100 + pKilledUnit->GetWarCasualtiesModifier()) * iDelta / 100;
 		iDelta = iDelta < 0 ? 0 : iDelta;
-		iDelta = (100 + this->GetWarCasualtiesModifier()) * iDelta / 100;
+		iDelta = (100 + pKilledPlayer.GetWarCasualtiesModifier()) * iDelta / 100;
 		pKilledPlayer.ChangeWarCasualtiesCounter(iDelta < 0 ? 0 : iDelta);
 		pKilledPlayer.CheckAndUpdateWarCasualtiesCounter();
 	}
