@@ -337,6 +337,7 @@ public:
 	int GetSplashDamageFixed() const;
 	int GetSplashDamagePlotUnitLimit() const;
 	bool GetSplashDamageImmune() const;
+	int GetSplashXP() const;
 #endif
 
 protected:
@@ -451,6 +452,7 @@ protected:
 	int m_iSplashDamageFixed = 0;
 	int m_iSplashDamagePlotUnitLimit = 0;
 	bool m_iSplashDamageImmune = 0;
+	int m_iSplashXP = 0;
 #endif
 
 #if defined(MOD_ROG_CORE)

@@ -1037,11 +1037,7 @@
     <Row Class="6" Name="GLOBAL_WAR_CASUALTIES" Value="0"/>
     <Row Class="6" Name="GLOBAL_UNIT_EXTRA_ATTACK_DEFENSE_EXPERENCE" Value="1"/>
 
-    <!-- ALTER TABLE UnitPromotions ADD COLUMN SplashDamageRadius integer not null default 0; -->
-    <!-- ALTER TABLE UnitPromotions ADD COLUMN SplashDamagePercent integer not null default 0; -->
-    <!-- ALTER TABLE UnitPromotions ADD COLUMN SplashDamageFixed integer not null default 0; -->
-    <!-- ALTER TABLE UnitPromotions ADD COLUMN SplashDamagePlotUnitLimit integer not null default 0; -->
-    <!-- ALTER TABLE UnitPromotions ADD COLUMN SplashDamageImmune boolean not null default 0; -->
+    <!-- table change: NewBattleEffects.sql -->
     <Row Class="6" Name="PROMOTION_SPLASH_DAMAGE" Value="0"/>
   </CustomModOptions>
 

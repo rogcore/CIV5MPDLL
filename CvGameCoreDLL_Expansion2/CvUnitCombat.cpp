@@ -4471,6 +4471,11 @@ void CvUnitCombat::DoSplashDamage(const CvCombatInfo& kCombatInfo)
 		pAOEUnit->changeDamage(iAOEDamage, kAttackPlayer.GetID(), pAttackerUnit->GetID());
 		pAOEUnit->ShowDamageDeltaText(iAOEDamage, pAOEUnit->plot());
 
+		if (pAttackerUnit->GetSplashXP() != 0)
+		{
+			pAttackerUnit->changeExperienceTimes100(pAttackerUnit->GetSplashXP() * 100);
+		}
+
 		if (kAttackPlayer.isHuman())
 		{
 			if (bAOEKill)

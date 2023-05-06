@@ -23231,6 +23231,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		}
 		
 		ChangeSplashImmuneRC(thisPromotion.GetSplashDamageImmune() ? iChange : 0);
+		ChangeSplashXP(thisPromotion.GetSplashXP() * iChange);
 #endif
 
 #if !defined(NO_ACHIEVEMENTS)
@@ -23613,6 +23614,7 @@ void CvUnit::read(FDataStream& kStream)
 	}
 
 	kStream >> m_iSplashImmuneRC;
+	kStream >> m_iSplashXP;
 #endif
 
 	//  Read mission queue
@@ -23772,6 +23774,7 @@ void CvUnit::write(FDataStream& kStream) const
 	}
 
 	kStream << m_iSplashImmuneRC;
+	kStream << m_iSplashXP;
 #endif
 
 	//  Write mission list
@@ -27961,6 +27964,16 @@ void CvUnit::ChangeSplashImmuneRC(int iChange) {
 }
 void CvUnit::SetSplashImmuneRC(int iValue) {
 	this->m_iSplashImmuneRC = iValue;
+}
+
+int CvUnit::GetSplashXP() const {
+	return this->m_iSplashXP;
+}
+void CvUnit::ChangeSplashXP(int iChange) {
+	this->m_iSplashXP += iChange;
+}
+void CvUnit::SetSplashXP(int iValue) {
+	this->m_iSplashXP = iValue;
 }
 
 #endif

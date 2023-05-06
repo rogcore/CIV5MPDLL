@@ -1698,6 +1698,10 @@ public:
 	int GetSplashImmuneRC() const;
 	void ChangeSplashImmuneRC(int iChange);
 	void SetSplashImmuneRC(int iValue);
+
+	int GetSplashXP() const;
+	void ChangeSplashXP(int iChange);
+	void SetSplashXP(int iValue);
 #endif
 
 protected:
@@ -2048,6 +2052,7 @@ protected:
 	std::vector<SplashInfo> m_asSplashInfoVec = {};
 
 	int m_iSplashImmuneRC = 0;
+	int m_iSplashXP = 0;
 #endif
 
 	int m_iEmbarkExtraVisibility;

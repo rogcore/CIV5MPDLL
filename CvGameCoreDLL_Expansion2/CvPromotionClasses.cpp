@@ -582,6 +582,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iSplashDamageFixed = kResults.GetInt("SplashDamageFixed");
 	m_iSplashDamagePlotUnitLimit = kResults.GetInt("SplashDamagePlotUnitLimit");
 	m_iSplashDamageImmune = kResults.GetBool("SplashDamageImmune");
+	m_iSplashXP = kResults.GetInt("SplashXP");
 #endif
 
 	//References
@@ -2621,6 +2622,10 @@ int CvPromotionEntry::GetSplashDamagePlotUnitLimit() const
 bool CvPromotionEntry::GetSplashDamageImmune() const
 {
 	return m_iSplashDamageImmune;
+}
+int CvPromotionEntry::GetSplashXP() const
+{
+	return m_iSplashXP;
 }
 #endif
 
