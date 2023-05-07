@@ -4427,7 +4427,6 @@ void CvUnitCombat::DoSplashDamage(const CvCombatInfo& kCombatInfo)
 		return;
 	}
 
-	bool bRangedAttack = kCombatInfo.getAttackIsRanged();
 	CvUnit* pAttackerUnit = kCombatInfo.getUnit(BATTLE_UNIT_ATTACKER);
 	CvCity* pAttackerCity = kCombatInfo.getCity(BATTLE_UNIT_ATTACKER);
 	CvUnit* pDefenderUnit = kCombatInfo.getUnit(BATTLE_UNIT_DEFENDER);
@@ -4443,6 +4442,7 @@ void CvUnitCombat::DoSplashDamage(const CvCombatInfo& kCombatInfo)
 	CvPlayerAI& kDefensePlayer = getDefenderPlayer(kCombatInfo);
 	CvPlot* pFromPlot = pAttackerUnit ? pAttackerUnit->plot() : pAttackerCity->plot();
 	CvPlot* pTargetPlot = kCombatInfo.getPlot();
+	bool bRangedAttack = kCombatInfo.getAttackIsRanged() || kCombatInfo.getAttackIsBombingMission();
 
 	int iX = pTargetPlot->getX();
 	int iY = pTargetPlot->getY();
@@ -4543,7 +4543,6 @@ void CvUnitCombat::DoCollateralDamage(const CvCombatInfo& kCombatInfo)
 {
 	if (!MOD_PROMOTION_COLLATERAL_DAMAGE) return;
 
-	bool bRangedAttack = kCombatInfo.getAttackIsRanged();
 	CvUnit* pAttackerUnit = kCombatInfo.getUnit(BATTLE_UNIT_ATTACKER);
 	CvCity* pAttackerCity = kCombatInfo.getCity(BATTLE_UNIT_ATTACKER);
 	CvUnit* pDefenderUnit = kCombatInfo.getUnit(BATTLE_UNIT_DEFENDER);
@@ -4558,6 +4557,8 @@ void CvUnitCombat::DoCollateralDamage(const CvCombatInfo& kCombatInfo)
 	CvPlot* pFromPlot = pAttackerUnit ? pAttackerUnit->plot() : pAttackerCity->plot();
 	CvPlot* pTargetPlot = kCombatInfo.getPlot();
 	if (pTargetPlot == nullptr) return;
+
+	bool bRangedAttack = kCombatInfo.getAttackIsRanged() || kCombatInfo.getAttackIsBombingMission();
 
 	std::tr1::unordered_map<CvUnit*, int> mUnitDamageSumMap;
 	std::tr1::unordered_map<CvUnit*, int> mUnitDamageBaseMap;
