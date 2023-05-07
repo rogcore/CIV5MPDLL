@@ -151,9 +151,15 @@ public:
 	UnitClassTypes GetCombatBonusFromNearbyUnitClass() const;
 	int GetNearbyUnitClassBonusRange() const;
 	int GetNearbyUnitClassBonus() const;
+
+	int GetBarbarianCombatBonus() const;
+	int GetAOEDamageOnKill() const;
+	int GetDamageAoEFortified() const;
+	int GetWorkRateMod() const;
 #endif
 
-
+	bool CannotBeCaptured() const;
+	int GetCaptureDefeatedEnemyChance() const;
 
 	int GetDomainAttackPercent(int i) const;
 	int GetDomainDefensePercent(int i) const;
@@ -456,8 +462,16 @@ protected:
 	int m_iNearbyUnitClassBonus;
 	int m_iNearbyUnitClassBonusRange;
 	UnitClassTypes m_iCombatBonusFromNearbyUnitClass;
+
+	int m_iAOEDamageOnKill;
+	int m_iDamageAoEFortified;
+	int m_iWorkRateMod;
+	int m_iBarbarianCombatBonus;
+
 #endif
 
+	int m_iCaptureDefeatedEnemyChance;
+	bool m_bCannotBeCaptured;
 
 #if defined(MOD_ROG_CORE)	
 	int m_iAoEDamageOnMove;

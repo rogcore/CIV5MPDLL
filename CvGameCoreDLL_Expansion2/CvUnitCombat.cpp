@@ -646,6 +646,30 @@ void CvUnitCombat::ResolveMeleeCombat(const CvCombatInfo& kCombatInfo, uint uiPa
 						pkAttacker->UnitMove(pkTargetPlot, true, pkAttacker);
 
 					pkAttacker->PublishQueuedVisualizationMoves();
+
+#if defined(MOD_ROG_CORE)
+					if (bDefenderDead)
+
+					// If a Unit is adjacent to KILL
+					for (int iI = 0; iI < NUM_DIRECTION_TYPES; iI++)
+					{
+						CvPlot* pAdjacentPlot = plotDirection(pkTargetPlot->getX(), pkTargetPlot->getY(), ((DirectionTypes)iI));
+
+						if (pAdjacentPlot != NULL)
+						{
+							for (int iJ = 0; iJ < pAdjacentPlot->getNumUnits(); iJ++)
+							{
+								CvUnit* pEnemyUnit = pAdjacentPlot->getUnitByIndex(iJ);
+								//logically we should damage non-enemy units as well? but that is too complex to consider ... 
+								if (pEnemyUnit != NULL && pEnemyUnit->isEnemy(pkDefender->getTeam()))
+								{
+									pEnemyUnit->changeDamage(pkDefender->getAOEDamageOnKill(), pkDefender->getOwner(), 0.0);
+								}
+							}
+						}
+					}
+#endif
+
 				}
 				else
 				{
@@ -1044,6 +1068,31 @@ void CvUnitCombat::ResolveRangedUnitVsCombat(const CvCombatInfo& kCombatInfo, ui
 						}
 
 						bTargetDied = true;
+
+
+#if defined(MOD_ROG_CORE)
+						if (bTargetDied)
+						{
+							// If a Unit is adjacent to KILL
+							for (int iI = 0; iI < NUM_DIRECTION_TYPES; iI++)
+							{
+								CvPlot* pAdjacentPlot = plotDirection(pkTargetPlot->getX(), pkTargetPlot->getY(), ((DirectionTypes)iI));
+
+								if (pAdjacentPlot != NULL)
+								{
+									for (int iJ = 0; iJ < pAdjacentPlot->getNumUnits(); iJ++)
+									{
+										CvUnit* pEnemyUnit = pAdjacentPlot->getUnitByIndex(iJ);
+										//logically we should damage non-enemy units as well? but that is too complex to consider ... 
+										if (pEnemyUnit != NULL && pEnemyUnit->isEnemy(pkDefender->getTeam()))
+										{
+											pEnemyUnit->changeDamage(pkDefender->getAOEDamageOnKill(), pkDefender->getOwner(), 0.0);
+										}
+									}
+								}
+							}
+						}
+#endif
 
 #if !defined(NO_ACHIEVEMENTS)
 						CvPlayerAI& kAttackerOwner = GET_PLAYER(pkAttacker->getOwner());
@@ -1899,6 +1948,29 @@ void CvUnitCombat::ResolveAirUnitVsCombat(const CvCombatInfo& kCombatInfo, uint 
 							Localization::String strSummary = Localization::Lookup("TXT_KEY_UNIT_LOST");
 							pNotifications->Add(NOTIFICATION_UNIT_DIED, strBuffer, strSummary.toUTF8(), pkDefender->getX(), pkDefender->getY(), (int) pkDefender->getUnitType(), pkDefender->getOwner());
 						}
+
+
+#if defined(MOD_ROG_CORE)
+
+							// If a Unit is adjacent to KILL
+							for (int iI = 0; iI < NUM_DIRECTION_TYPES; iI++)
+							{
+								CvPlot* pAdjacentPlot = plotDirection(pkTargetPlot->getX(), pkTargetPlot->getY(), ((DirectionTypes)iI));
+
+								if (pAdjacentPlot != NULL)
+								{
+									for (int iJ = 0; iJ < pAdjacentPlot->getNumUnits(); iJ++)
+									{
+										CvUnit* pEnemyUnit = pAdjacentPlot->getUnitByIndex(iJ);
+										//logically we should damage non-enemy units as well? but that is too complex to consider ... 
+										if (pEnemyUnit != NULL && pEnemyUnit->isEnemy(pkDefender->getTeam()))
+										{
+											pEnemyUnit->changeDamage(pkDefender->getAOEDamageOnKill(), pkDefender->getOwner(), 0.0);
+										}
+									}
+								}
+							}
+#endif
 
 						bTargetDied = true;
 

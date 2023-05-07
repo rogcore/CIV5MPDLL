@@ -1573,9 +1573,25 @@ public:
 
 	void ChangeRangedSupportFireMod(int iValue);
 	int GetRangedSupportFireMod() const;
+
+
+	int GetDamageAoEFortified() const;
+	void ChangeDamageAoEFortified(int iChange);
+
+	int GetWorkRateMod() const;
+	void ChangeWorkRateMod(int iChange);
+
+	int getAOEDamageOnKill() const;
+	void changeAOEDamageOnKill(int iChange);
+
+	int GetBarbarianCombatBonus() const;
+	void ChangeBarbarianCombatBonus(int iValue);
 #endif
 
-
+	int GetCaptureDefeatedEnemyChance() const;
+	void ChangeCaptureDefeatedEnemyChance(int iValue);
+	void ChangeCannotBeCapturedCount(int iChange);
+	bool GetCannotBeCaptured();
 
 #if defined(MOD_ROG_CORE)
 	void ChangeNumSpyAttackMod(int iValue);
@@ -2024,9 +2040,16 @@ protected:
 	int m_iMoveUsedAttackMod;
 	int m_iGoldenAgeMod;
 	int m_iRangedSupportFireMod;
+
+	int m_iBarbCombatBonus;
+	int m_iDamageAoEFortified;
+	int m_iWorkRateMod;
+	int m_iAOEDamageOnKill;
+
 #endif
 
-
+	int m_iCannotBeCapturedCount;
+	int m_iCaptureDefeatedEnemyChance;
 
 
 	int m_iEmbarkExtraVisibility;
