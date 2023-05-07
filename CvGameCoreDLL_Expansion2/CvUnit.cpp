@@ -2302,24 +2302,6 @@ void CvUnit::doTurn()
 		{
 			DoAdjacentPlotDamage(plot(), GetDamageAoEFortified());
 		}
-			// If a Unit is adjacent to KILL
-			//for (int iI = 0; iI < NUM_DIRECTION_TYPES; iI++)
-			//{
-				//CvPlot* pAdjacentPlot = plotDirection(plot()->getX(), plot()->getY(), ((DirectionTypes)iI));
-
-				//if (pAdjacentPlot != NULL)
-				//{
-					//for (int iJ = 0; iJ < pAdjacentPlot->getNumUnits(); iJ++)
-					//{
-						//CvUnit* pEnemyUnit = pAdjacentPlot->getUnitByIndex(iJ);
-						//logically we should damage non-enemy units as well? but that is too complex to consider ... 
-						//if (pEnemyUnit != NULL && pEnemyUnit->isEnemy(getTeam()))
-						//{
-							//pEnemyUnit->changeDamage(GetDamageAoEFortified(), getOwner(), 0.0);
-						//}
-					///}
-				//}
-			//}
 #endif
 
 #if defined(MOD_API_PLOT_BASED_DAMAGE)

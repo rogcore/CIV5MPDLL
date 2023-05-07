@@ -622,10 +622,7 @@ void CvUnitCombat::ResolveMeleeCombat(const CvCombatInfo& kCombatInfo, uint uiPa
 		{
 
 #if defined(MOD_ROG_CORE)
-			//if (bDefenderDead)
-			//{
-				pkDefender->DoAdjacentPlotDamage(pkTargetPlot, pkDefender->getAOEDamageOnKill());
-			//}
+			pkDefender->DoAdjacentPlotDamage(pkTargetPlot, pkDefender->getAOEDamageOnKill());
 #endif
 			if(pkDefender->isBarbarian())
 				pkDefender->DoTestBarbarianThreatToMinorsWithThisUnitsDeath(pkAttacker->getOwner());
@@ -1991,7 +1988,7 @@ void CvUnitCombat::ResolveAirUnitVsCombat(const CvCombatInfo& kCombatInfo, uint 
 						}
 
 #if defined(MOD_ROG_CORE)
-							// If a Unit is adjacent to KILL
+						// If a Unit is adjacent to KILL
 						pkDefender->DoAdjacentPlotDamage(pkTargetPlot, pkDefender->getAOEDamageOnKill());
 #endif
 
