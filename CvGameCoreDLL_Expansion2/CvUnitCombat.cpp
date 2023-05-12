@@ -4704,7 +4704,7 @@ static void DoAddEnermyPromotionsInner(CvUnit* thisUnit, CvUnit* thatUnit, Battl
 			bool triggerFlag = false;
 			if (triggerInfo.m_bLuaCheck)
 			{
-				triggerFlag = GAMEEVENTINVOKE_TESTALL(GAMEEVENT_CanAddEnermyPromotion, promotionIter->m_ePromotionType, collectionType, 
+				triggerFlag = GAMEEVENTINVOKE_TESTANY(GAMEEVENT_CanAddEnermyPromotion, promotionIter->m_ePromotionType, collectionType, 
 					thisBattleType, thisUnit->getOwner(), thisUnit->GetID(), thatUnit->getOwner(), thatUnit->GetID()) == GAMEEVENTRETURN_TRUE;
 			}
 			if (!triggerFlag)
