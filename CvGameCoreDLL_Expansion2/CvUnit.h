@@ -1729,6 +1729,11 @@ public:
 	void ChangeAddEnermyPromotionImmuneRC(int iChange);
 #endif
 
+#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
+	void ClearSamePlotPromotions();
+	std::tr1::unordered_set<PromotionTypes>& GetPromotionsThatCanBeActionCleared();
+#endif
+
 #ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
 	std::vector<CollateralInfo>& GetCollateralInfoVec();
 
@@ -2115,6 +2120,11 @@ protected:
  #ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
 	int m_iAddEnermyPromotionImmuneRC = 0;
  #endif
+
+#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
+	std::tr1::unordered_map<PromotionTypes, AutoRemoveInfo> m_mapAutoRemovePromotions;
+	std::tr1::unordered_set<PromotionTypes> m_sPromotionsThatCanBeActionCleared;
+#endif
 
 	int m_iEmbarkExtraVisibility;
 	int m_iEmbarkDefensiveModifier;
