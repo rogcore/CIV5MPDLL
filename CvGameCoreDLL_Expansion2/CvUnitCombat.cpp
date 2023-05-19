@@ -4426,7 +4426,7 @@ void CvUnitCombat::DoNewBattleEffects(const CvCombatInfo& kCombatInfo)
 		return;
 	DoSplashDamage(kCombatInfo);
 	DoCollateralDamage(kCombatInfo);
-	DoAddEnermyPromotions(kCombatInfo);
+	DoAddEnemyPromotions(kCombatInfo);
 	DoDestroyBuildings(kCombatInfo);
 	DoKillCitizens(kCombatInfo);
 }
@@ -4668,11 +4668,11 @@ void CvUnitCombat::DoCollateralDamage(const CvCombatInfo& kCombatInfo)
 }
 #endif
 
-#ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
-static void DoAddEnermyPromotionsInner(CvUnit* thisUnit, CvUnit* thatUnit, BattleUnitTypes thisBattleType, const CvCombatInfo& kCombatInfo)
+#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
+static void DoAddEnemyPromotionsInner(CvUnit* thisUnit, CvUnit* thatUnit, BattleUnitTypes thisBattleType, const CvCombatInfo& kCombatInfo)
 {
 	if (thisUnit == nullptr || thisUnit->GetPromotionCollections().empty()) return;
-	if (thatUnit == nullptr || thatUnit->isDelayedDeath() || thatUnit->IsDead() || thatUnit->GetAddEnermyPromotionImmuneRC() > 0) return;
+	if (thatUnit == nullptr || thatUnit->isDelayedDeath() || thatUnit->IsDead() || thatUnit->GetAddEnemyPromotionImmuneRC() > 0) return;
 
 	bool ranged = kCombatInfo.getAttackIsRanged() || kCombatInfo.getAttackIsBombingMission();
 	bool melee = !ranged;
@@ -4690,7 +4690,7 @@ static void DoAddEnermyPromotionsInner(CvUnit* thisUnit, CvUnit* thatUnit, Battl
 
 		auto collectionType = collectionIter->first;
 		auto* collection = GC.GetPromotionCollection(collectionType);
-		if (!collection->CanAddEnermyPromotions()) continue;
+		if (!collection->CanAddEnemyPromotions()) continue;
 
 		bool breakPromotionLoop = false;
 		for (auto promotionIter = collection->GetPromotions().rbegin(); !breakPromotionLoop && promotionIter != collection->GetPromotions().rend(); promotionIter++)
@@ -4708,7 +4708,7 @@ static void DoAddEnermyPromotionsInner(CvUnit* thisUnit, CvUnit* thatUnit, Battl
 			bool isTrigger = false;
 			if (triggerInfo.m_bLuaCheck)
 			{
-				isTrigger = GAMEEVENTINVOKE_TESTANY(GAMEEVENT_CanAddEnermyPromotion, promotionIter->m_ePromotionType, collectionType, 
+				isTrigger = GAMEEVENTINVOKE_TESTANY(GAMEEVENT_CanAddEnemyPromotion, promotionIter->m_ePromotionType, collectionType, 
 					thisBattleType, thisUnit->getOwner(), thisUnit->GetID(), thatUnit->getOwner(), thatUnit->GetID()) == GAMEEVENTRETURN_TRUE;
 			}
 			if (!isTrigger)
@@ -4721,7 +4721,7 @@ static void DoAddEnermyPromotionsInner(CvUnit* thisUnit, CvUnit* thatUnit, Battl
 			}
 			if (!isTrigger) continue;
 
-			for (auto collectionToAdd : collection->GetAddEnermyPromotionPools())
+			for (auto collectionToAdd : collection->GetAddEnemyPromotionPools())
 			{
 				auto* pCollectionToAdd = GC.GetPromotionCollection(collectionToAdd);
 				PromotionTypes thatPromotion = NO_PROMOTION;
@@ -4735,7 +4735,7 @@ static void DoAddEnermyPromotionsInner(CvUnit* thisUnit, CvUnit* thatUnit, Battl
 				}
 				if (triggerInfo.m_bLuaHook)
 				{
-					GAMEEVENTINVOKE_HOOK(GAMEEVENT_OnTriggerAddEnermyPromotion, promotionIter->m_ePromotionType, collectionType, thisBattleType, thisUnit->getOwner(), thisUnit->GetID(),
+					GAMEEVENTINVOKE_HOOK(GAMEEVENT_OnTriggerAddEnemyPromotion, promotionIter->m_ePromotionType, collectionType, thisBattleType, thisUnit->getOwner(), thisUnit->GetID(),
 					thisUnit->getUnitInfo().GetID(), thatPromotion, pCollectionToAdd->GetID(), thatUnit->getOwner(), thatUnit->GetID(), thatUnit->getUnitInfo().GetID());
 				}
 			}
@@ -4743,9 +4743,9 @@ static void DoAddEnermyPromotionsInner(CvUnit* thisUnit, CvUnit* thatUnit, Battl
 	}
 }
 
-void CvUnitCombat::DoAddEnermyPromotions(const CvCombatInfo& kCombatInfo)
+void CvUnitCombat::DoAddEnemyPromotions(const CvCombatInfo& kCombatInfo)
 {
-	if (!MOD_PROMOTION_ADD_ENERMY_PROMOTIONS) {
+	if (!MOD_PROMOTION_ADD_ENEMY_PROMOTIONS) {
 		return;
 	}
 
@@ -4757,8 +4757,8 @@ void CvUnitCombat::DoAddEnermyPromotions(const CvCombatInfo& kCombatInfo)
 	if (pAttackerCity || pDefenderCity) return; // no city combat
 	if (kCombatInfo.getAttackIsNuclear() || kCombatInfo.getAttackIsAirSweep()) return;
 
-	DoAddEnermyPromotionsInner(pAttackerUnit, pDefenderUnit, BATTLE_UNIT_ATTACKER, kCombatInfo);
-	DoAddEnermyPromotionsInner(pDefenderUnit, pAttackerUnit, BATTLE_UNIT_DEFENDER, kCombatInfo);
+	DoAddEnemyPromotionsInner(pAttackerUnit, pDefenderUnit, BATTLE_UNIT_ATTACKER, kCombatInfo);
+	DoAddEnemyPromotionsInner(pDefenderUnit, pAttackerUnit, BATTLE_UNIT_DEFENDER, kCombatInfo);
 }
 #endif
 

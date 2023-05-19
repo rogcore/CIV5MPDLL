@@ -1736,10 +1736,10 @@ public:
 	std::tr1::unordered_map<PromotionCollectionsTypes, int>& GetPromotionCollections();
 #endif
 
-#ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
-	int GetAddEnermyPromotionImmuneRC() const;
+#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
+	int GetAddEnemyPromotionImmuneRC() const;
 	bool IsImmuneNegtivePromotions() const;
-	void ChangeAddEnermyPromotionImmuneRC(int iChange);
+	void ChangeAddEnemyPromotionImmuneRC(int iChange);
 #endif
 
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
@@ -2148,8 +2148,8 @@ protected:
 	std::tr1::unordered_map<PromotionCollectionsTypes, int> m_sPromotionCollections;
 #endif
 
- #ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
-	int m_iAddEnermyPromotionImmuneRC = 0;
+ #ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
+	int m_iAddEnemyPromotionImmuneRC = 0;
  #endif
 
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL

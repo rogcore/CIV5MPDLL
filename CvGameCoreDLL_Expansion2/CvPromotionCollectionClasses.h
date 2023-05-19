@@ -28,7 +28,7 @@ private:
     };
 
     std::vector<PromotionEntry> m_vPromotions;
-    std::vector<PromotionCollectionsTypes> m_vAddEnermyPromotionPools;
+    std::vector<PromotionCollectionsTypes> m_vAddEnemyPromotionPools;
 
 public:
     CvPromotionCollectionEntry() = default;
@@ -36,10 +36,10 @@ public:
 
     bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility) override;
 
-    bool CanAddEnermyPromotions() const { return !m_vAddEnermyPromotionPools.empty();}
+    bool CanAddEnemyPromotions() const { return !m_vAddEnemyPromotionPools.empty();}
 
     auto GetPromotions() -> decltype(m_vPromotions)& { return m_vPromotions; }
-    auto GetAddEnermyPromotionPools() -> decltype(m_vAddEnermyPromotionPools)& { return m_vAddEnermyPromotionPools; }
+    auto GetAddEnemyPromotionPools() -> decltype(m_vAddEnemyPromotionPools)& { return m_vAddEnemyPromotionPools; }
 };
 
 class CvPromotionCollectionEntries

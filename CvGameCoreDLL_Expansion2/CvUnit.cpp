@@ -23685,8 +23685,8 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		}
 #endif
 
-#ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
-		ChangeAddEnermyPromotionImmuneRC(thisPromotion.GetAddEnermyPromotionImmune() ? iChange : 0);
+#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
+		ChangeAddEnemyPromotionImmuneRC(thisPromotion.GetAddEnemyPromotionImmune() ? iChange : 0);
 #endif
 
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
@@ -24169,8 +24169,8 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iSiegeKillCitizensFixed;
 #endif
 
-#ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
-	kStream >> m_iAddEnermyPromotionImmuneRC;
+#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
+	kStream >> m_iAddEnemyPromotionImmuneRC;
 #endif
 
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
@@ -24404,8 +24404,8 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iSiegeKillCitizensFixed;
 #endif
 
-#ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
-	kStream << m_iAddEnermyPromotionImmuneRC;
+#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
+	kStream << m_iAddEnemyPromotionImmuneRC;
 #endif
 
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
@@ -28658,18 +28658,18 @@ std::tr1::unordered_map<PromotionCollectionsTypes, int>& CvUnit::GetPromotionCol
 }
 #endif
 
-#ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
-int CvUnit::GetAddEnermyPromotionImmuneRC() const
+#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
+int CvUnit::GetAddEnemyPromotionImmuneRC() const
 {
-	return m_iAddEnermyPromotionImmuneRC;
+	return m_iAddEnemyPromotionImmuneRC;
 }
 bool CvUnit::IsImmuneNegtivePromotions() const
 {
-	return GetAddEnermyPromotionImmuneRC() > 0;
+	return GetAddEnemyPromotionImmuneRC() > 0;
 }
-void CvUnit::ChangeAddEnermyPromotionImmuneRC(int iChange)
+void CvUnit::ChangeAddEnemyPromotionImmuneRC(int iChange)
 {
-	m_iAddEnermyPromotionImmuneRC += iChange;
+	m_iAddEnemyPromotionImmuneRC += iChange;
 }
 #endif
 

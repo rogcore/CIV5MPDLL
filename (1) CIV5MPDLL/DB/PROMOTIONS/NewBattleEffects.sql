@@ -11,12 +11,12 @@ ALTER TABLE UnitPromotions ADD COLUMN CollateralDamagePlotUnitLimit integer not 
 ALTER TABLE UnitPromotions ADD COLUMN CollateralDamageImmune boolean not null default 0;
 ALTER TABLE UnitPromotions ADD COLUMN CollateralXP int not null default 0;
 
-create table PromotionCollections_AddEnermyPromotions (
+create table PromotionCollections_AddEnemyPromotions (
     CollectionType text not null references PromotionCollections(Type),
     OtherCollectionType text not null references PromotionCollections(Type)
 );
 
-alter table UnitPromotions add column AddEnermyPromotionImmune boolean not null default 0;
+alter table UnitPromotions add column AddEnemyPromotionImmune boolean not null default 0;
 
 alter table UnitPromotions add column 'DestroyBuildingCollection' text default '' not null;
 alter table UnitPromotions add column 'DestroyBuildingProbability' int default 0 not null;

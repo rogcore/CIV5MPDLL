@@ -785,7 +785,7 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
 	Method(ClearSamePlotPromotions);
 #endif
-#ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
+#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
 	Method(IsImmuneNegtivePromotions);
 #endif
 }
@@ -6035,6 +6035,6 @@ LUAAPIIMPL(Unit, IsWithinDistanceOfTerrain)
 LUAAPIIMPL(Unit, ClearSamePlotPromotions)
 #endif
 
-#ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
+#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
 LUAAPIIMPL(Unit, IsImmuneNegtivePromotions)
 #endif

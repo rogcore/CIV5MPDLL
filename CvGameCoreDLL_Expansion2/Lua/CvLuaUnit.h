@@ -710,7 +710,7 @@ protected:
 	LUAAPIEXTN(ClearSamePlotPromotions, void);
 #endif
 
-#ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
+#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
 	LUAAPIEXTN(IsImmuneNegtivePromotions, bool);
 #endif
 };
