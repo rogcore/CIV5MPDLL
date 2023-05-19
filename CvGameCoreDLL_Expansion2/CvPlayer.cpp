@@ -25781,7 +25781,6 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_aiYieldRateModifier;
 	kStream >> m_aiCapitalYieldRateModifier;
 
-	kStream >> m_aiYieldFromProcessModifierGlobal;
 
 	if (uiVersion >= 4)
 	{
@@ -25814,6 +25813,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	}
 	
 	kStream >> m_aiMinorFriendshipAnchors;
+	kStream >> m_aiYieldFromProcessModifierGlobal;
 	if (uiVersion >= 7)
 	{
 		kStream >> m_aiSiphonLuxuryCount;
@@ -26364,8 +26364,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_aiMinorFriendshipAnchors; // Version 38
 	kStream << m_aiYieldFromProcessModifierGlobal;
 
-	kStream << m_aiSeaPlotYield;
-	//kStream << m_abOptions;
+	kStream << m_aiSiphonLuxuryCount;
 
 	kStream << m_strReligionKey;
 	kStream << m_strScriptData;
