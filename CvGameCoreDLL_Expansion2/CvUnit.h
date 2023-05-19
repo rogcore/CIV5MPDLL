@@ -1738,6 +1738,7 @@ public:
 
 #ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
 	int GetAddEnermyPromotionImmuneRC() const;
+	bool IsImmuneNegtivePromotions() const;
 	void ChangeAddEnermyPromotionImmuneRC(int iChange);
 #endif
 

@@ -28663,6 +28663,10 @@ int CvUnit::GetAddEnermyPromotionImmuneRC() const
 {
 	return m_iAddEnermyPromotionImmuneRC;
 }
+bool CvUnit::IsImmuneNegtivePromotions() const
+{
+	return GetAddEnermyPromotionImmuneRC() > 0;
+}
 void CvUnit::ChangeAddEnermyPromotionImmuneRC(int iChange)
 {
 	m_iAddEnermyPromotionImmuneRC += iChange;
