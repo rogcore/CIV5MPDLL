@@ -438,7 +438,9 @@ void CvUnitCombat::ResolveMeleeCombat(const CvCombatInfo& kCombatInfo, uint uiPa
 			gDLL->UnlockAchievement(ACHIEVEMENT_ONEHITKILL);
 		}
 #endif
-
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+		DoInstantYieldFromCombat(kCombatInfo);
+#endif		
 #if defined(MOD_API_UNIT_STATS)
 		pkDefender->changeDamage(iAttackerDamageInflicted, pkAttacker->getOwner(), pkAttacker->GetID());
 		iAttackerDamageDelta = pkAttacker->changeDamage(iDefenderDamageInflicted, pkDefender->getOwner(), pkDefender->GetID(), -1.f);		// Signal that we don't want the popup text.  It will be added later when the unit is at its final location
@@ -1104,6 +1106,9 @@ void CvUnitCombat::ResolveRangedUnitVsCombat(const CvCombatInfo& kCombatInfo, ui
 					//white icon over defending unit
 					//pkDLLInterface->AddMessage(uiParentEventID, pkDefender->getOwner(), false, 0, ""/*, "AS2D_COMBAT", MESSAGE_TYPE_DISPLAY_ONLY, pkDefender->getUnitInfo().GetButton(), (ColorTypes)GC.getInfoTypeForString("COLOR_WHITE"), pkDefender->getX(), pkDefender->getY(), true, true*/);
 
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+					DoInstantYieldFromCombat(kCombatInfo);
+#endif	
 					//set damage but don't update entity damage visibility
 #if defined(MOD_API_UNIT_STATS)
 					pkDefender->changeDamage(iDamage, pkAttacker->getOwner(), pkAttacker->GetID());
@@ -1268,6 +1273,9 @@ void CvUnitCombat::ResolveRangedCityVsUnitCombat(const CvCombatInfo& kCombatInfo
 #endif
 					}
 
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+					DoInstantYieldFromCombat(kCombatInfo);
+#endif	
 					//set damage but don't update entity damage visibility
 #if defined(MOD_API_UNIT_STATS)
 					pkDefender->changeDamage(iDamage, pkAttacker->getOwner(), pkAttacker->GetID());
@@ -1336,6 +1344,9 @@ void CvUnitCombat::ResolveCityMeleeCombat(const CvCombatInfo& kCombatInfo, uint 
 
 	if(pkAttacker && pkDefender)
 	{
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+		DoInstantYieldFromCombat(kCombatInfo);
+#endif	
 #if defined(MOD_API_UNIT_STATS)
 		pkAttacker->changeDamage(iDefenderDamageInflicted, pkDefender->getOwner(), pkDefender->GetID());
 #else
@@ -1838,6 +1849,9 @@ void CvUnitCombat::ResolveAirUnitVsCombat(const CvCombatInfo& kCombatInfo, uint 
 					}
 #endif
 
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+					DoInstantYieldFromCombat(kCombatInfo);
+#endif	
 #if defined(MOD_API_UNIT_STATS)
 					pkAttacker->changeDamage(iDefenderDamageInflicted, pkDefender->getOwner(), pkDefender->GetID());
 					pkDefender->changeDamage(iAttackerDamageInflicted, pkAttacker->getOwner(), pkAttacker->GetID());
@@ -2267,6 +2281,9 @@ void CvUnitCombat::ResolveAirSweep(const CvCombatInfo& kCombatInfo, uint uiParen
 				gDLL->UnlockAchievement(ACHIEVEMENT_ONEHITKILL);
 			}
 #endif
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+			DoInstantYieldFromCombat(kCombatInfo);
+#endif	
 
 #if defined(MOD_API_UNIT_STATS)
 			pkDefender->changeDamage(iAttackerDamageInflicted, pkAttacker->getOwner(), pkAttacker->GetID());
@@ -4314,6 +4331,38 @@ void CvUnitCombat::ApplyPostCityCombatEffects(CvUnit* pkAttacker, CvCity* pkDefe
 			}
 		}
 	}
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+	int iCityAttackFaithBonus;
+#if !defined(SHOW_PLOT_POPUP)
+	float fDelay = GC.getPOST_COMBAT_TEXT_DELAY() * 3;
+#endif
+	iCityAttackFaithBonus = pkAttacker->GetCityAttackFaithBonus();
+	if(iCityAttackFaithBonus > 0 && MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+	{
+		int iFaithBonus = iAttackerDamageInflicted * iCityAttackFaithBonus;
+		iFaithBonus /= 100;
+
+		if(iFaithBonus > 0)
+		{
+			GET_PLAYER(pkAttacker->getOwner()).ChangeFaith(iFaithBonus);
+			CvPlayer& kCityPlayer = GET_PLAYER(pkDefender->getOwner());
+			int iDeduction = min(iFaithBonus, kCityPlayer.GetFaith());
+			kCityPlayer.ChangeFaith(-iDeduction);
+
+			if(pkAttacker->getOwner() == GC.getGame().getActivePlayer())
+			{
+				char text[256] = {0};
+				colorString = "[COLOR_YELLOW]+%d[ENDCOLOR][ICON_PEACE]";
+				sprintf_s(text, colorString, iFaithBonus);
+#if defined(SHOW_PLOT_POPUP)
+				SHOW_PLOT_POPUP(pkAttacker->plot(), pkAttacker->getOwner(), text, 0.0);
+#else
+				GC.GetEngineUserInterface()->AddPopupText(pkAttacker->getX(), pkAttacker->getY(), text, fDelay);
+#endif
+			}
+		}
+	}	
+#endif
 }
 
 #ifdef MOD_NEW_BATTLE_EFFECTS
@@ -4948,4 +4997,39 @@ void CvUnitCombat::DoStackingFightBack(const CvCombatInfo & kCombatInfo)
 	}
 }
 
+#endif
+
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+void CvUnitCombat::DoInstantYieldFromCombat(const CvCombatInfo & kCombatInfo)
+{
+	if (!MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK) return;
+#if !defined(SHOW_PLOT_POPUP)
+	float fDelay = GC.getPOST_COMBAT_TEXT_DELAY() * 3;
+#endif
+	CvUnit* pAttackerUnit = kCombatInfo.getUnit(BATTLE_UNIT_ATTACKER);
+	CvUnit* pDefenderUnit = kCombatInfo.getUnit(BATTLE_UNIT_DEFENDER);
+	// Only work when unit vs unit
+	if (pAttackerUnit == nullptr || pDefenderUnit == nullptr) return;
+	int iUnitAttackFaithBonus = pAttackerUnit->GetUnitAttackFaithBonus();
+	if(iUnitAttackFaithBonus <= 0) return;
+
+	CvString colorString;
+	CvPlayerAI& kAttackPlayer = getAttackerPlayer(kCombatInfo);
+	int iAttackDamage = kCombatInfo.getDamageInflicted(BATTLE_UNIT_ATTACKER);
+	iAttackDamage = iAttackDamage < pDefenderUnit->GetCurrHitPoints() ? iAttackDamage : pDefenderUnit->GetCurrHitPoints();
+	int iFaithBonus = iAttackDamage * iUnitAttackFaithBonus /100;
+	
+	kAttackPlayer.ChangeFaith(iFaithBonus);
+	if (kAttackPlayer.isHuman())
+	{
+		char text[256] = {0};
+		colorString = "[COLOR_YELLOW]+%d[ENDCOLOR][ICON_PEACE]";
+		sprintf_s(text, colorString, iFaithBonus);
+#if defined(SHOW_PLOT_POPUP)
+		SHOW_PLOT_POPUP(pAttackerUnit->plot(), pAttackerUnit->getOwner(), text, 0.0);
+#else
+		GC.GetEngineUserInterface()->AddPopupText(pAttackerUnit->getX(), pAttackerUnit->getY(), text, fDelay);
+#endif
+	}
+}
 #endif

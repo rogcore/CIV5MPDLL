@@ -1676,6 +1676,17 @@ public:
 	void ChangeCityAttackPlunderModifier(int iValue);
 	int GetCityAttackPlunderModifier() const;
 
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+	void ChangeUnitAttackFaithBonus(int iValue);
+	void ChangeCityAttackFaithBonus(int iValue);
+	int GetUnitAttackFaithBonus() const;
+	int GetCityAttackFaithBonus() const;
+#endif
+#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+	void setRemovePromotionUpgrade(int iValue);
+	int GetRemovePromotionUpgrade() const;
+#endif
+
 	void ChangeReligiousStrengthLossRivalTerritory(int iValue);
 	int GetReligiousStrengthLossRivalTerritory() const;
 
@@ -2194,6 +2205,13 @@ protected:
 	int m_iCapitalDefenseModifier;
 	int m_iCapitalDefenseFalloff;
 	int m_iCityAttackPlunderModifier;
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+	int m_iUnitAttackFaithBonus;
+	int m_iCityAttackFaithBonus;
+#endif	
+#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+	int m_iRemovePromotionUpgrade;
+#endif
 	int m_iReligiousStrengthLossRivalTerritory;
 	int m_iTradeMissionInfluenceModifier;
 	int m_iTradeMissionGoldModifier;

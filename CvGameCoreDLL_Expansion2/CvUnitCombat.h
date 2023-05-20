@@ -85,6 +85,9 @@ public:
 	static void DoStackingFightBack(const CvCombatInfo& kInfo);
 #endif
 #endif
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+	static void DoInstantYieldFromCombat(const CvCombatInfo& kInfo);
+#endif
 
 #ifdef MOD_ROG_CORE
 	static void InterveneInflictDamage(InflictDamageContext* ctx);

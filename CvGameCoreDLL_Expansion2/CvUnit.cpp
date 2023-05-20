@@ -427,6 +427,13 @@ CvUnit::CvUnit() :
 	, m_iCapitalDefenseModifier(0)
 	, m_iCapitalDefenseFalloff(0)
 	, m_iCityAttackPlunderModifier(0)
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+	, m_iUnitAttackFaithBonus(0)
+	, m_iCityAttackFaithBonus(0)
+#endif
+#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+	, m_iRemovePromotionUpgrade(NO_PROMOTION)
+#endif
 	, m_iReligiousStrengthLossRivalTerritory(0)
 	, m_iTradeMissionInfluenceModifier(0)
 	, m_iTradeMissionGoldModifier(0)
@@ -1254,6 +1261,13 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iCapitalDefenseModifier = 0;
 	m_iCapitalDefenseFalloff = 0;
 	m_iCityAttackPlunderModifier = 0;
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+	m_iUnitAttackFaithBonus = 0;
+	m_iCityAttackFaithBonus = 0;
+#endif
+#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+	m_iRemovePromotionUpgrade = NO_PROMOTION;
+#endif
 	m_iReligiousStrengthLossRivalTerritory = 0;
 	m_iTradeMissionInfluenceModifier = 0;
 	m_iTradeMissionGoldModifier = 0;
@@ -5943,6 +5957,47 @@ int CvUnit::GetCityAttackPlunderModifier() const
 	return m_iCityAttackPlunderModifier;
 }
 
+//	--------------------------------------------------------------------------------
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+void CvUnit::ChangeUnitAttackFaithBonus(int iValue)
+{
+	m_iUnitAttackFaithBonus += iValue;
+}
+
+//	--------------------------------------------------------------------------------
+int CvUnit::GetUnitAttackFaithBonus() const
+{
+	return m_iUnitAttackFaithBonus;
+}
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeCityAttackFaithBonus(int iValue)
+{
+	m_iCityAttackFaithBonus += iValue;
+}
+
+//	--------------------------------------------------------------------------------
+int CvUnit::GetCityAttackFaithBonus() const
+{
+	return m_iCityAttackFaithBonus;
+}
+#endif
+//	--------------------------------------------------------------------------------
+#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+void CvUnit::setRemovePromotionUpgrade(int iValue)
+{
+	if(m_iRemovePromotionUpgrade < 0 && iValue >= 0)
+	{
+		m_iRemovePromotionUpgrade = iValue;
+	}
+}
+
+//	--------------------------------------------------------------------------------
+int CvUnit::GetRemovePromotionUpgrade() const
+{
+	return m_iRemovePromotionUpgrade;
+}
+//	
+#endif
 //	--------------------------------------------------------------------------------
 void CvUnit::ChangeReligiousStrengthLossRivalTerritory(int iValue)
 {
@@ -12095,6 +12150,16 @@ CvUnit* CvUnit::DoUpgradeTo(UnitTypes eUnitType, bool bFree)
 #endif
 		pNewUnit->convert(this, true);
 		pNewUnit->setupGraphical();
+	
+#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+		if(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE && pNewUnit->GetRemovePromotionUpgrade() > NO_PROMOTION)
+		{
+			if(pNewUnit->HasPromotion((PromotionTypes)pNewUnit->GetRemovePromotionUpgrade()))
+			{
+				pNewUnit->setHasPromotion((PromotionTypes)pNewUnit->GetRemovePromotionUpgrade(),false);
+			}
+		}
+#endif
 		
 		// Can't move after upgrading
 #if defined(MOD_GLOBAL_MOVE_AFTER_UPGRADE)
@@ -23533,6 +23598,13 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeCapitalDefenseModifier((thisPromotion.GetCapitalDefenseModifier()) * iChange);
 		ChangeCapitalDefenseFalloff((thisPromotion.GetCapitalDefenseFalloff()) * iChange);
 		ChangeCityAttackPlunderModifier((thisPromotion.GetCityAttackPlunderModifier()) *  iChange);
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+		ChangeUnitAttackFaithBonus((thisPromotion.GetUnitAttackFaithBonus()) *  iChange);
+		ChangeCityAttackFaithBonus((thisPromotion.GetCityAttackFaithBonus()) *  iChange);
+#endif
+#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+		setRemovePromotionUpgrade(thisPromotion.GetRemovePromotionUpgrade() ? thisPromotion.GetRemovePromotionUpgrade() : -1);
+#endif
 		ChangeReligiousStrengthLossRivalTerritory((thisPromotion.GetReligiousStrengthLossRivalTerritory()) *  iChange);
 		ChangeTradeMissionInfluenceModifier((thisPromotion.GetTradeMissionInfluenceModifier()) * iChange);
 		ChangeTradeMissionGoldModifier((thisPromotion.GetTradeMissionGoldModifier()) * iChange);
@@ -24042,6 +24114,13 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iCapitalDefenseModifier;
 	kStream >> m_iCapitalDefenseFalloff;
 	kStream >> m_iCityAttackPlunderModifier;
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+	kStream >> m_iUnitAttackFaithBonus;
+	kStream >> m_iCityAttackFaithBonus;
+#endif
+#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+	kStream >> m_iRemovePromotionUpgrade;
+#endif
 	kStream >> m_iReligiousStrengthLossRivalTerritory;
 	kStream >> m_iTradeMissionInfluenceModifier;
 	kStream >> m_iTradeMissionGoldModifier;
@@ -24358,6 +24437,13 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iCapitalDefenseModifier;
 	kStream << m_iCapitalDefenseFalloff;
 	kStream << m_iCityAttackPlunderModifier;
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+	kStream << m_iUnitAttackFaithBonus;
+	kStream << m_iCityAttackFaithBonus;
+#endif
+#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+	kStream << m_iRemovePromotionUpgrade;
+#endif
 	kStream << m_iReligiousStrengthLossRivalTerritory;
 	kStream << m_iTradeMissionInfluenceModifier;
 	kStream << m_iTradeMissionGoldModifier;

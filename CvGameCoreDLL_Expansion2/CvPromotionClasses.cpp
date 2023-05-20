@@ -179,6 +179,10 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iCapitalDefenseModifier(0),
 	m_iCapitalDefenseFalloff(0),
 	m_iCityAttackPlunderModifier(0),
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+	m_iUnitAttackFaithBonus(0),
+	m_iCityAttackFaithBonus(0),
+#endif
 	m_iReligiousStrengthLossRivalTerritory(0),
 	m_iTradeMissionInfluenceModifier(0),
 	m_iTradeMissionGoldModifier(0),
@@ -611,6 +615,14 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iCapitalDefenseModifier = kResults.GetInt("CapitalDefenseModifier");
 	m_iCapitalDefenseFalloff = kResults.GetInt("CapitalDefenseFalloff");
 	m_iCityAttackPlunderModifier = kResults.GetInt("CityAttackPlunderModifier");
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+	m_iUnitAttackFaithBonus = kResults.GetInt("UnitAttackFaithBonus");
+	m_iCityAttackFaithBonus = kResults.GetInt("CityAttackFaithBonus");
+#endif
+#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+	const char* szRemovePromotionUpgrade = kResults.GetText("RemovePromotionUpgrade");
+	m_iRemovePromotionUpgrade = GC.getInfoTypeForString(szRemovePromotionUpgrade, true);
+#endif
 	m_iReligiousStrengthLossRivalTerritory = kResults.GetInt("ReligiousStrengthLossRivalTerritory");
 	m_iTradeMissionInfluenceModifier = kResults.GetInt("TradeMissionInfluenceModifier");
 	m_iTradeMissionGoldModifier = kResults.GetInt("TradeMissionGoldModifier");
@@ -2047,6 +2059,26 @@ int CvPromotionEntry::GetCityAttackPlunderModifier() const
 {
 	return m_iCityAttackPlunderModifier;
 }
+
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+/// Accessor: faith earned from damage on an attacked unit
+int CvPromotionEntry::GetUnitAttackFaithBonus() const
+{
+	return m_iUnitAttackFaithBonus;
+}
+/// Accessor: faith earned from damage on an attacked city
+int CvPromotionEntry::GetCityAttackFaithBonus() const
+{
+	return m_iCityAttackFaithBonus;
+}
+#endif
+
+#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+int CvPromotionEntry::GetRemovePromotionUpgrade() const
+{
+	return m_iRemovePromotionUpgrade;
+}
+#endif
 
 /// Accessor: loss of strength at end of each turn in rival territory without open borders
 int CvPromotionEntry::GetReligiousStrengthLossRivalTerritory() const
