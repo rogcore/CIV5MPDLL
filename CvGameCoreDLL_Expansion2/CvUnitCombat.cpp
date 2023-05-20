@@ -4371,7 +4371,8 @@ void CityDamageChangeIntervene(InflictDamageContext* ctx)
 
 void UnitAttackInflictDamageIntervene(InflictDamageContext* ctx)
 {
-	if (ctx->pAttackerUnit != nullptr && ctx->piAttackInflictDamage != nullptr)
+	// Unit VS Unit
+	if (ctx->pAttackerUnit != nullptr && ctx->piAttackInflictDamage != nullptr && ctx->pDefenderCity == nullptr)
 	{
 		*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetAttackInflictDamageChange();
 		if (ctx->pDefenderUnit != nullptr)
@@ -4383,13 +4384,24 @@ void UnitAttackInflictDamageIntervene(InflictDamageContext* ctx)
 
 void UnitDefenseInflictDamageIntervene(InflictDamageContext* ctx)
 {
-	if (ctx->pDefenderUnit != nullptr && ctx->piDefenseInflictDamage != nullptr)
+	// Unit VS Unit
+	if (ctx->pDefenderUnit != nullptr && ctx->piDefenseInflictDamage != nullptr && ctx->pAttackerCity == nullptr)
 	{
 		*ctx->piDefenseInflictDamage += ctx->pDefenderUnit->GetDefenseInflictDamageChange();
 		if (ctx->pAttackerUnit != nullptr)
 		{
 			*ctx->piDefenseInflictDamage += ctx->pDefenderUnit->GetDefenseInflictDamageChangeMaxHPPercent() * ctx->pAttackerUnit->GetMaxHitPoints() / 100;
 		}
+	}
+}
+
+void SiegeInflictDamageIntervene(InflictDamageContext* ctx)
+{
+	// Unit VS City
+	if (ctx->pAttackerUnit != nullptr && ctx->piAttackInflictDamage != nullptr && ctx->pDefenderCity != nullptr)
+	{
+		*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetSiegeInflictDamageChange();
+		*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetSiegeInflictDamageChangeMaxHPPercent() * ctx->pDefenderCity->GetMaxHitPoints() / 100;
 	}
 }
 
@@ -4400,12 +4412,12 @@ void CvUnitCombat::InterveneInflictDamage(InflictDamageContext* ctx)
 	CityDamageChangeIntervene(ctx);
 	UnitAttackInflictDamageIntervene(ctx);
 	UnitDefenseInflictDamageIntervene(ctx);
+	SiegeInflictDamageIntervene(ctx);
 
 	if (ctx->piAttackInflictDamage && *ctx->piAttackInflictDamage <= 0)
 	{
 		*ctx->piAttackInflictDamage = 0;
 	}
-
 	if (ctx->piDefenseInflictDamage && *ctx->piDefenseInflictDamage <= 0)
 	{
 		*ctx->piDefenseInflictDamage = 0;

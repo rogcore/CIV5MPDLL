@@ -23816,6 +23816,8 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeAttackInflictDamageChangeMaxHPPercent(iChange * thisPromotion.GetAttackInflictDamageChangeMaxHPPercent());
 		ChangeDefenseInflictDamageChange(iChange * thisPromotion.GetDefenseInflictDamageChange());
 		ChangeDefenseInflictDamageChangeMaxHPPercent(iChange * thisPromotion.GetDefenseInflictDamageChangeMaxHPPercent());
+		ChangeSiegeInflictDamageChange(iChange * thisPromotion.GetSiegeInflictDamageChange());
+		ChangeSiegeInflictDamageChangeMaxHPPercent(iChange * thisPromotion.GetSiegeInflictDamageChangeMaxHPPercent());
 
 #if defined(MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 		if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
@@ -24280,6 +24282,9 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iDefenseInflictDamageChange;
 	kStream >> m_iDefenseInflictDamageChangeMaxHPPercent;
 
+	kStream >> m_iSiegeInflictDamageChange;
+	kStream >> m_iSiegeInflictDamageChangeMaxHPPercent;
+
 	//  Read mission queue
 	UINT uSize;
 	kStream >> uSize;
@@ -24516,6 +24521,9 @@ void CvUnit::write(FDataStream& kStream) const
 
 	kStream << m_iDefenseInflictDamageChange;
 	kStream << m_iDefenseInflictDamageChangeMaxHPPercent;
+
+	kStream << m_iSiegeInflictDamageChange;
+	kStream << m_iSiegeInflictDamageChangeMaxHPPercent;
 
 	//  Write mission list
 	kStream << m_missionQueue.getLength();
@@ -28844,4 +28852,21 @@ void CvUnit::ChangeDefenseInflictDamageChange(int iChange)
 void CvUnit::ChangeDefenseInflictDamageChangeMaxHPPercent(int iChange)
 {
 	m_iDefenseInflictDamageChangeMaxHPPercent += iChange;
+}
+
+int CvUnit::GetSiegeInflictDamageChange() const
+{
+	return m_iSiegeInflictDamageChange;
+}
+int CvUnit::GetSiegeInflictDamageChangeMaxHPPercent() const
+{
+	return m_iSiegeInflictDamageChangeMaxHPPercent;
+}
+void CvUnit::ChangeSiegeInflictDamageChange(int iChange)
+{
+	m_iSiegeInflictDamageChange += iChange;
+}
+void CvUnit::ChangeSiegeInflictDamageChangeMaxHPPercent(int iChange)
+{
+	m_iSiegeInflictDamageChangeMaxHPPercent += iChange;
 }

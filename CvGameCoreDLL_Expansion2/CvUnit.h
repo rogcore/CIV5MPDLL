@@ -974,15 +974,18 @@ public:
 
 	int GetAttackInflictDamageChange() const;
 	int GetAttackInflictDamageChangeMaxHPPercent() const;
-
-	int GetDefenseInflictDamageChange() const;
-	int GetDefenseInflictDamageChangeMaxHPPercent() const;
-
 	void ChangeAttackInflictDamageChange(int iChange);
 	void ChangeAttackInflictDamageChangeMaxHPPercent(int iChange);
 
+	int GetDefenseInflictDamageChange() const;
+	int GetDefenseInflictDamageChangeMaxHPPercent() const;
 	void ChangeDefenseInflictDamageChange(int iChange);
 	void ChangeDefenseInflictDamageChangeMaxHPPercent(int iChange);
+
+	int GetSiegeInflictDamageChange() const;
+	int GetSiegeInflictDamageChangeMaxHPPercent() const;
+	void ChangeSiegeInflictDamageChange(int iChange);
+	void ChangeSiegeInflictDamageChangeMaxHPPercent(int iChange);
 
 	int getAmphibCount() const;
 	bool isAmphib() const;
@@ -2203,6 +2206,9 @@ protected:
 
 	int m_iDefenseInflictDamageChange = 0;
 	int m_iDefenseInflictDamageChangeMaxHPPercent = 0;
+
+	int m_iSiegeInflictDamageChange = 0;
+	int m_iSiegeInflictDamageChangeMaxHPPercent = 0;
 	
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 	CvString m_strUnitName;

@@ -415,6 +415,9 @@ public:
 	int GetDefenseInflictDamageChange() const;
 	int GetDefenseInflictDamageChangeMaxHPPercent() const;
 
+	int GetSiegeInflictDamageChange() const;
+	int GetSiegeInflictDamageChangeMaxHPPercent() const;
+
 protected:
 	int m_iLayerAnimationPath;
 	int m_iPrereqPromotion;
@@ -771,6 +774,9 @@ protected:
 
 	int m_iDefenseInflictDamageChange = 0;
 	int m_iDefenseInflictDamageChangeMaxHPPercent = 0;
+
+	int m_iSiegeInflictDamageChange = 0;
+	int m_iSiegeInflictDamageChangeMaxHPPercent = 0;
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

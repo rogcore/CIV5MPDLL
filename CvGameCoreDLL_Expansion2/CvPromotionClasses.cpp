@@ -706,6 +706,9 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iDefenseInflictDamageChange = kResults.GetInt("DefenseInflictDamageChange");
 	m_iDefenseInflictDamageChangeMaxHPPercent = kResults.GetInt("DefenseInflictDamageChangeMaxHPPercent");
 
+	m_iSiegeInflictDamageChange = kResults.GetInt("SiegeInflictDamageChange");
+	m_iSiegeInflictDamageChangeMaxHPPercent = kResults.GetInt("SiegeInflictDamageChangeMaxHPPercent");
+
 	const char* szPromotionPrereq = kResults.GetText("PromotionPrereq");
 	m_iPrereqPromotion = GC.getInfoTypeForString(szPromotionPrereq, true);
 
@@ -2973,6 +2976,15 @@ int CvPromotionEntry::GetDefenseInflictDamageChange() const
 int CvPromotionEntry::GetDefenseInflictDamageChangeMaxHPPercent() const
 {
 	return m_iDefenseInflictDamageChangeMaxHPPercent;
+}
+
+int CvPromotionEntry::GetSiegeInflictDamageChange() const
+{
+	return m_iSiegeInflictDamageChange;
+}
+int CvPromotionEntry::GetSiegeInflictDamageChangeMaxHPPercent() const
+{
+	return m_iSiegeInflictDamageChangeMaxHPPercent;
 }
 
 #ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
