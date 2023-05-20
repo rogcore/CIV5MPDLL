@@ -6,7 +6,7 @@
 
 class CvPromotionCollectionEntry : public CvBaseInfo
 {
-private:
+public:
     struct TriggerAddPromotionInfo {
         bool m_bMeleeAttack = false;
         bool m_bRangedAttack = false;
@@ -20,15 +20,22 @@ private:
         bool m_bLuaHook = false;
     };
 
+    struct StackingFightBackInfo {
+        bool m_bOnlyMelee = false;
+    };
+
     struct PromotionEntry {
         PromotionTypes m_ePromotionType;
 
         int m_iIndex = 0;
         TriggerAddPromotionInfo m_kTriggerAddPromotionInfo;
+        StackingFightBackInfo m_kStackingFightBackInfo;
     };
 
+private:
     std::vector<PromotionEntry> m_vPromotions;
     std::vector<PromotionCollectionsTypes> m_vAddEnemyPromotionPools;
+    bool m_bStackingFightBack = false;
 
 public:
     CvPromotionCollectionEntry() = default;
@@ -40,6 +47,8 @@ public:
 
     auto GetPromotions() -> decltype(m_vPromotions)& { return m_vPromotions; }
     auto GetAddEnemyPromotionPools() -> decltype(m_vAddEnemyPromotionPools)& { return m_vAddEnemyPromotionPools; }
+
+    auto GetStackingFightBack() -> decltype(m_bStackingFightBack) { return m_bStackingFightBack; }
 };
 
 class CvPromotionCollectionEntries

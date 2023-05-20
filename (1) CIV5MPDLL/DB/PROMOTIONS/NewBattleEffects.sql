@@ -25,3 +25,6 @@ alter table UnitPromotions add column 'DestroyBuildingNumLimit' int default 0 no
 alter table UnitPromotions add column 'SiegeKillCitizensPercent' integer default 0 not null;
 alter table UnitPromotions add column 'SiegeKillCitizensFixed' integer default 0 not null;
 alter table Buildings add column 'SiegeKillCitizensModifier' integer default 0 not null;
+
+alter table PromotionCollections add column 'StackingFightBack' boolean not null default 0;
+alter table PromotionCollections_Entries add column 'StackingFightBackOnlyMelee' boolean not null default 0;

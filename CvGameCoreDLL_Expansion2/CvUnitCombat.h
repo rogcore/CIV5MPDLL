@@ -65,6 +65,7 @@ public:
 	static void DoAddEnemyPromotions(const CvCombatInfo& kInfo);
 	static void DoDestroyBuildings(const CvCombatInfo& kInfo);
 	static void DoKillCitizens(const CvCombatInfo& kInfo);
+	static void DoStackingFightBack(const CvCombatInfo& kInfo);
 #endif
 #endif
 

@@ -42,6 +42,8 @@ bool CvPromotionCollectionEntry::CacheResults(Database::Results& kResults, CvDat
             entry.m_kTriggerAddPromotionInfo.m_bLuaCheck = pResults->GetBool("TriggerLuaCheck");
             entry.m_kTriggerAddPromotionInfo.m_bLuaHook = pResults->GetBool("TriggerLuaHook");
 
+			entry.m_kStackingFightBackInfo.m_bOnlyMelee = pResults->GetBool("StackingFightBackOnlyMelee");
+
             m_vPromotions.push_back(entry);
 		}
 		pResults->Reset();
@@ -65,6 +67,7 @@ bool CvPromotionCollectionEntry::CacheResults(Database::Results& kResults, CvDat
 		pResults->Reset();
 	}
 
+	m_bStackingFightBack = kResults.GetBool("StackingFightBack");
 // ------------------------------------------------------------------------
 
 #ifdef DEBUG_CvPromotionCollectionEntry
