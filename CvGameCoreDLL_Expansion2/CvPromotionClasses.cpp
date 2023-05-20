@@ -700,6 +700,12 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iMultipleInitExperence = kResults.GetInt("MultipleInitExperence");
 #endif
 
+	m_iAttackInflictDamageChange = kResults.GetInt("AttackInflictDamageChange");
+	m_iAttackInflictDamageChangeMaxHPPercent = kResults.GetInt("AttackInflictDamageChangeMaxHPPercent");
+
+	m_iDefenseInflictDamageChange = kResults.GetInt("DefenseInflictDamageChange");
+	m_iDefenseInflictDamageChangeMaxHPPercent = kResults.GetInt("DefenseInflictDamageChangeMaxHPPercent");
+
 	const char* szPromotionPrereq = kResults.GetText("PromotionPrereq");
 	m_iPrereqPromotion = GC.getInfoTypeForString(szPromotionPrereq, true);
 
@@ -2950,6 +2956,24 @@ int CvPromotionEntry::GetCollateralXP() const
 	return m_iCollateralXP;
 }
 #endif
+
+int CvPromotionEntry::GetAttackInflictDamageChange() const
+{
+	return m_iAttackInflictDamageChange;
+}
+int CvPromotionEntry::GetAttackInflictDamageChangeMaxHPPercent() const
+{
+	return m_iAttackInflictDamageChangeMaxHPPercent;
+}
+
+int CvPromotionEntry::GetDefenseInflictDamageChange() const
+{
+	return m_iDefenseInflictDamageChange;
+}
+int CvPromotionEntry::GetDefenseInflictDamageChangeMaxHPPercent() const
+{
+	return m_iDefenseInflictDamageChangeMaxHPPercent;
+}
 
 #ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
 bool CvPromotionEntry::GetAddEnemyPromotionImmune() const

@@ -972,7 +972,17 @@ public:
 	void changeOutsideCapitalLandDefenseMod(int iValue);
 #endif
 
+	int GetAttackInflictDamageChange() const;
+	int GetAttackInflictDamageChangeMaxHPPercent() const;
 
+	int GetDefenseInflictDamageChange() const;
+	int GetDefenseInflictDamageChangeMaxHPPercent() const;
+
+	void ChangeAttackInflictDamageChange(int iChange);
+	void ChangeAttackInflictDamageChangeMaxHPPercent(int iChange);
+
+	void ChangeDefenseInflictDamageChange(int iChange);
+	void ChangeDefenseInflictDamageChangeMaxHPPercent(int iChange);
 
 	int getAmphibCount() const;
 	bool isAmphib() const;
@@ -2187,6 +2197,12 @@ protected:
 	int m_iMapLayer;		// Which layer does the unit reside on for pathing/stacking/etc.
 	int m_iNumGoodyHutsPopped;
 	int m_iLastGameTurnAtFullHealth;
+
+	int m_iAttackInflictDamageChange = 0;
+	int m_iAttackInflictDamageChangeMaxHPPercent = 0;
+
+	int m_iDefenseInflictDamageChange = 0;
+	int m_iDefenseInflictDamageChangeMaxHPPercent = 0;
 	
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 	CvString m_strUnitName;

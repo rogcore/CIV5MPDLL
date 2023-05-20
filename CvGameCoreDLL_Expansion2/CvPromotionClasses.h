@@ -409,6 +409,12 @@ public:
 	int GetCollateralXP() const;
 #endif
 
+	int GetAttackInflictDamageChange() const;
+	int GetAttackInflictDamageChangeMaxHPPercent() const;
+
+	int GetDefenseInflictDamageChange() const;
+	int GetDefenseInflictDamageChangeMaxHPPercent() const;
+
 protected:
 	int m_iLayerAnimationPath;
 	int m_iPrereqPromotion;
@@ -759,6 +765,12 @@ protected:
 	int m_iSiegeKillCitizensPercent = 0;
 	int m_iSiegeKillCitizensFixed = 0;
 #endif
+
+	int m_iAttackInflictDamageChange = 0;
+	int m_iAttackInflictDamageChangeMaxHPPercent = 0;
+
+	int m_iDefenseInflictDamageChange = 0;
+	int m_iDefenseInflictDamageChangeMaxHPPercent = 0;
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

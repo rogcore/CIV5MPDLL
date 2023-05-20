@@ -23803,20 +23803,25 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 
 #if !defined(NO_ACHIEVEMENTS)
 		PromotionTypes eBuffaloChest =(PromotionTypes) GC.getInfoTypeForString("PROMOTION_BUFFALO_CHEST", true /*bHideAssert*/);
-		PromotionTypes eBuffaloLoins =(PromotionTypes) GC.getInfoTypeForString("PROMOTION_BUFFALO_LOINS", true /*bHideAssert*/);
+		PromotionTypes eBuffaloLoins = (PromotionTypes)GC.getInfoTypeForString("PROMOTION_BUFFALO_LOINS", true /*bHideAssert*/);
 
 		const PlayerTypes eActivePlayer = GC.getGame().getActivePlayer();
-		if(getOwner() == eActivePlayer && ((eIndex == eBuffaloChest && isHasPromotion(eBuffaloLoins)) || (eIndex == eBuffaloLoins && isHasPromotion(eBuffaloChest))))
+		if (getOwner() == eActivePlayer && ((eIndex == eBuffaloChest && isHasPromotion(eBuffaloLoins)) || (eIndex == eBuffaloLoins && isHasPromotion(eBuffaloChest))))
 		{
 			gDLL->UnlockAchievement(ACHIEVEMENT_XP2_27);
 		}
 #endif
 
+		ChangeAttackInflictDamageChange(iChange * thisPromotion.GetAttackInflictDamageChange());
+		ChangeAttackInflictDamageChangeMaxHPPercent(iChange * thisPromotion.GetAttackInflictDamageChangeMaxHPPercent());
+		ChangeDefenseInflictDamageChange(iChange * thisPromotion.GetDefenseInflictDamageChange());
+		ChangeDefenseInflictDamageChangeMaxHPPercent(iChange * thisPromotion.GetDefenseInflictDamageChangeMaxHPPercent());
+
 #if defined(MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
-	if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
-	{
-		SetCannotBeRangedAttacked(m_Promotions.IsCannotBeRangedAttacked());
-	}
+		if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
+		{
+			SetCannotBeRangedAttacked(m_Promotions.IsCannotBeRangedAttacked());
+		}
 #endif
 	}
 }
@@ -24269,6 +24274,12 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iAllyCityStateCombatModifierMax;
 #endif
 
+	kStream >> m_iAttackInflictDamageChange;
+	kStream >> m_iAttackInflictDamageChangeMaxHPPercent;
+
+	kStream >> m_iDefenseInflictDamageChange;
+	kStream >> m_iDefenseInflictDamageChangeMaxHPPercent;
+
 	//  Read mission queue
 	UINT uSize;
 	kStream >> uSize;
@@ -24499,6 +24510,12 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iAllyCityStateCombatModifier;
 	kStream << m_iAllyCityStateCombatModifierMax;
 #endif
+
+	kStream << m_iAttackInflictDamageChange;
+	kStream << m_iAttackInflictDamageChangeMaxHPPercent;
+
+	kStream << m_iDefenseInflictDamageChange;
+	kStream << m_iDefenseInflictDamageChangeMaxHPPercent;
 
 	//  Write mission list
 	kStream << m_missionQueue.getLength();
@@ -28792,3 +28809,39 @@ bool CvUnit::CanSiegeKillCitizens() const
 }
 
 #endif
+
+int CvUnit::GetAttackInflictDamageChange() const
+{
+	return m_iAttackInflictDamageChange;
+}
+int CvUnit::GetAttackInflictDamageChangeMaxHPPercent() const
+{
+	return m_iAttackInflictDamageChangeMaxHPPercent;
+}
+
+int CvUnit::GetDefenseInflictDamageChange() const
+{
+	return m_iDefenseInflictDamageChange;
+}
+int CvUnit::GetDefenseInflictDamageChangeMaxHPPercent() const
+{
+	return m_iDefenseInflictDamageChangeMaxHPPercent;
+}
+
+void CvUnit::ChangeAttackInflictDamageChange(int iChange)
+{
+	m_iAttackInflictDamageChange += iChange;
+}
+void CvUnit::ChangeAttackInflictDamageChangeMaxHPPercent(int iChange)
+{
+	m_iAttackInflictDamageChangeMaxHPPercent += iChange;
+}
+
+void CvUnit::ChangeDefenseInflictDamageChange(int iChange)
+{
+	m_iDefenseInflictDamageChange += iChange;
+}
+void CvUnit::ChangeDefenseInflictDamageChangeMaxHPPercent(int iChange)
+{
+	m_iDefenseInflictDamageChangeMaxHPPercent += iChange;
+}

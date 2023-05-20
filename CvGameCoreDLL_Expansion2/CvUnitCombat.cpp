@@ -4369,11 +4369,37 @@ void CityDamageChangeIntervene(InflictDamageContext* ctx)
 	CityDamageChangeInterveneNoCondition(ctx->pDefenderCity, ctx->piAttackInflictDamage);
 }
 
+void UnitAttackInflictDamageIntervene(InflictDamageContext* ctx)
+{
+	if (ctx->pAttackerUnit != nullptr && ctx->piAttackInflictDamage != nullptr)
+	{
+		*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetAttackInflictDamageChange();
+		if (ctx->pDefenderUnit != nullptr)
+		{
+			*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetAttackInflictDamageChangeMaxHPPercent() * ctx->pDefenderUnit->GetMaxHitPoints() / 100;
+		}
+	}
+}
+
+void UnitDefenseInflictDamageIntervene(InflictDamageContext* ctx)
+{
+	if (ctx->pDefenderUnit != nullptr && ctx->piDefenseInflictDamage != nullptr)
+	{
+		*ctx->piDefenseInflictDamage += ctx->pDefenderUnit->GetDefenseInflictDamageChange();
+		if (ctx->pAttackerUnit != nullptr)
+		{
+			*ctx->piDefenseInflictDamage += ctx->pDefenderUnit->GetDefenseInflictDamageChangeMaxHPPercent() * ctx->pAttackerUnit->GetMaxHitPoints() / 100;
+		}
+	}
+}
+
 void CvUnitCombat::InterveneInflictDamage(InflictDamageContext* ctx)
 {
 	if (ctx == nullptr) return;
 	UnitDamageChangeIntervene(ctx);
 	CityDamageChangeIntervene(ctx);
+	UnitAttackInflictDamageIntervene(ctx);
+	UnitDefenseInflictDamageIntervene(ctx);
 
 	if (ctx->piAttackInflictDamage && *ctx->piAttackInflictDamage <= 0)
 	{
