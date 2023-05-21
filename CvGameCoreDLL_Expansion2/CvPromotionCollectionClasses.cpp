@@ -33,16 +33,14 @@ bool CvPromotionCollectionEntry::CacheResults(Database::Results& kResults, CvDat
             PromotionEntry entry;
             entry.m_ePromotionType = (PromotionTypes) pResults->GetInt("PromotionID");
             entry.m_iIndex = pResults->GetInt("PromotionIndex");
-            entry.m_kTriggerAddPromotionInfo.m_bMeleeAttack = pResults->GetBool("TriggerMeleeAttack");
-            entry.m_kTriggerAddPromotionInfo.m_bRangedAttack = pResults->GetBool("TriggerRangedAttack");
-            entry.m_kTriggerAddPromotionInfo.m_bMeleeDefense = pResults->GetBool("TriggerMeleeDefense");
-            entry.m_kTriggerAddPromotionInfo.m_bRangedDefense = pResults->GetBool("TriggerRangedDefense");
-            entry.m_kTriggerAddPromotionInfo.m_iHPFixed = pResults->GetInt("TriggerHPFixed");
-            entry.m_kTriggerAddPromotionInfo.m_iHPPercent = pResults->GetInt("TriggerHPPercent");
-            entry.m_kTriggerAddPromotionInfo.m_bLuaCheck = pResults->GetBool("TriggerLuaCheck");
-            entry.m_kTriggerAddPromotionInfo.m_bLuaHook = pResults->GetBool("TriggerLuaHook");
-
-			entry.m_kStackingFightBackInfo.m_bOnlyMelee = pResults->GetBool("StackingFightBackOnlyMelee");
+            entry.m_kTriggerInfo.m_bMeleeAttack = pResults->GetBool("TriggerMeleeAttack");
+            entry.m_kTriggerInfo.m_bRangedAttack = pResults->GetBool("TriggerRangedAttack");
+            entry.m_kTriggerInfo.m_bMeleeDefense = pResults->GetBool("TriggerMeleeDefense");
+            entry.m_kTriggerInfo.m_bRangedDefense = pResults->GetBool("TriggerRangedDefense");
+            entry.m_kTriggerInfo.m_iHPFixed = pResults->GetInt("TriggerHPFixed");
+            entry.m_kTriggerInfo.m_iHPPercent = pResults->GetInt("TriggerHPPercent");
+            entry.m_kTriggerInfo.m_bLuaCheck = pResults->GetBool("TriggerLuaCheck");
+            entry.m_kTriggerInfo.m_bLuaHook = pResults->GetBool("TriggerLuaHook");
 
             m_vPromotions.push_back(entry);
 		}

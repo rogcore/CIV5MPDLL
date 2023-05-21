@@ -4794,7 +4794,7 @@ static void DoAddEnemyPromotionsInner(CvUnit* thisUnit, CvUnit* thatUnit, Battle
 			if (!thisUnit->HasPromotion(promotionIter->m_ePromotionType)) continue;
 			breakPromotionLoop = true;
 
-			auto& triggerInfo = promotionIter->m_kTriggerAddPromotionInfo;
+			auto& triggerInfo = promotionIter->m_kTriggerInfo;
 			bool combatTypeOK = ((rangedAttack && triggerInfo.m_bRangedAttack)
 				|| (rangedDefense && triggerInfo.m_bRangedDefense)
 				|| (meleeAttack && triggerInfo.m_bMeleeAttack)
@@ -4991,19 +4991,22 @@ void CvUnitCombat::DoStackingFightBack(const CvCombatInfo & kCombatInfo)
 
 			auto &promotions = collection->GetPromotions();
 			PromotionTypes activatePromotion = NO_PROMOTION;
-			CvPromotionCollectionEntry::StackingFightBackInfo info;
+			bool canMelee = false;
+			bool canRanged = false;
 			for (auto it2 = promotions.rbegin(); it2 != promotions.rend(); it2++)
 			{
 				if (pFoundUnit->HasPromotion(it2->m_ePromotionType))
 				{
-					info = it2->m_kStackingFightBackInfo;
+					canMelee = it2->m_kTriggerInfo.m_bMeleeDefense;
+					canRanged = it2->m_kTriggerInfo.m_bRangedDefense;
 					activatePromotion = it2->m_ePromotionType;
+					break;
 				}
 			}
 
 			if (activatePromotion == NO_PROMOTION)
 				continue;
-			if (info.m_bOnlyMelee && ranged)
+			if (!((melee && canMelee) || (ranged && canRanged)))
 				continue;
 
 			auto movesLeft = pFoundUnit->movesLeft();

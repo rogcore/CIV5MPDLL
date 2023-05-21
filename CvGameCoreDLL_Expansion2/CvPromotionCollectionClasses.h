@@ -7,7 +7,7 @@
 class CvPromotionCollectionEntry : public CvBaseInfo
 {
 public:
-    struct TriggerAddPromotionInfo {
+    struct TriggerInfo {
         bool m_bMeleeAttack = false;
         bool m_bRangedAttack = false;
         bool m_bMeleeDefense = false;
@@ -20,16 +20,11 @@ public:
         bool m_bLuaHook = false;
     };
 
-    struct StackingFightBackInfo {
-        bool m_bOnlyMelee = false;
-    };
-
     struct PromotionEntry {
         PromotionTypes m_ePromotionType;
 
         int m_iIndex = 0;
-        TriggerAddPromotionInfo m_kTriggerAddPromotionInfo;
-        StackingFightBackInfo m_kStackingFightBackInfo;
+        TriggerInfo m_kTriggerInfo;
     };
 
 private:
