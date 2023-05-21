@@ -66,6 +66,7 @@ bool CvPromotionCollectionEntry::CacheResults(Database::Results& kResults, CvDat
 	}
 
 	m_bStackingFightBack = kResults.GetBool("StackingFightBack");
+	m_bStopAttacker = kResults.GetBool("StopAttacker");
 // ------------------------------------------------------------------------
 
 #ifdef DEBUG_CvPromotionCollectionEntry

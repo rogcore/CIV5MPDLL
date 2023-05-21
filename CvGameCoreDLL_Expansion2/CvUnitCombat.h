@@ -76,15 +76,13 @@ public:
 	static void DoNewBattleEffects(const CvCombatInfo& kInfo);
 	static bool ShouldDoNewBattleEffects(const CvCombatInfo& kInfo);
 
-#ifdef MOD_PROMOTION_SPLASH_DAMAGE
 	static void DoSplashDamage(const CvCombatInfo& kInfo);
 	static void DoCollateralDamage(const CvCombatInfo& kInfo);
 	static void DoAddEnemyPromotions(const CvCombatInfo& kInfo);
 	static void DoDestroyBuildings(const CvCombatInfo& kInfo);
 	static void DoKillCitizens(const CvCombatInfo& kInfo);
 	static void DoStackingFightBack(const CvCombatInfo& kInfo);
-#endif
-
+	static void DoStopAttacker(const CvCombatInfo& kInfo);
 	static void DoHeavyChargeEffects(CvUnit* attacker, CvUnit* defender, CvPlot* battlePlot);
 
 #endif

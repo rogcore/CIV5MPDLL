@@ -4515,6 +4515,7 @@ void CvUnitCombat::DoNewBattleEffects(const CvCombatInfo& kCombatInfo)
 	DoDestroyBuildings(kCombatInfo);
 	DoKillCitizens(kCombatInfo);
 	DoStackingFightBack(kCombatInfo);
+	DoStopAttacker(kCombatInfo);
 }
 
 bool CvUnitCombat::ShouldDoNewBattleEffects(const CvCombatInfo& kCombatInfo)
@@ -5017,7 +5018,67 @@ void CvUnitCombat::DoStackingFightBack(const CvCombatInfo & kCombatInfo)
 	}
 }
 
-#endif
+void CvUnitCombat::DoStopAttacker(const CvCombatInfo& kCombatInfo)
+{
+	CvUnit *pAttackerUnit = kCombatInfo.getUnit(BATTLE_UNIT_ATTACKER);
+	CvUnit *pDefenderUnit = kCombatInfo.getUnit(BATTLE_UNIT_DEFENDER);
+	if (pAttackerUnit == nullptr || pDefenderUnit == nullptr)
+		return;
+	if (pAttackerUnit->IsDead() || pAttackerUnit->isDelayedDeath() || pDefenderUnit->IsDead() || pDefenderUnit->isDelayedDeath() || !pDefenderUnit->IsCombatUnit())
+		return;
+	if (pDefenderUnit->IsGarrisoned())
+		return;
+	if (pDefenderUnit->getDomainType() != pAttackerUnit->getDomainType())
+		return;
+
+	bool ranged = kCombatInfo.getAttackIsRanged();
+	bool melee = !ranged;
+
+	auto &collections = pDefenderUnit->GetPromotionCollections();
+	for (auto it = collections.begin(); it != collections.end(); it++)
+	{
+		if (it->second <= 0)
+			continue;
+
+		auto collectionType = it->first;
+		auto *collection = GC.GetPromotionCollection(collectionType);
+		if (collection == nullptr)
+			continue;
+		if (!collection->GetStopAttacker())
+			continue;
+
+		auto &promotions = collection->GetPromotions();
+		PromotionTypes activatePromotion = NO_PROMOTION;
+		bool canMelee = false;
+		bool canRanged = false;
+		int triggerHPFixed = 0;
+		int triggerHPPercent = 0;
+		for (auto it2 = promotions.rbegin(); it2 != promotions.rend(); it2++)
+		{
+			if (pDefenderUnit->HasPromotion(it2->m_ePromotionType))
+			{
+				canMelee = it2->m_kTriggerInfo.m_bMeleeDefense;
+				canRanged = it2->m_kTriggerInfo.m_bRangedDefense;
+				triggerHPFixed = it2->m_kTriggerInfo.m_iHPFixed;
+				triggerHPPercent = it2->m_kTriggerInfo.m_iHPPercent;
+				activatePromotion = it2->m_ePromotionType;
+				break;
+			}
+		}
+
+		if (activatePromotion == NO_PROMOTION)
+			continue;
+		if (!((melee && canMelee) || (ranged && canRanged)))
+			continue;
+		if (triggerHPFixed <= 0 && triggerHPPercent <= 0)
+			continue;
+		if (pAttackerUnit->GetCurrHitPoints() >= triggerHPFixed + triggerHPPercent * pAttackerUnit->GetMaxHitPoints() / 100)
+			continue;
+
+		pAttackerUnit->setMoves(0);
+		return;
+	}
+}
 
 void CvUnitCombat::DoHeavyChargeEffects(CvUnit* attacker, CvUnit* defender, CvPlot* battlePlot)
 {
@@ -5055,6 +5116,8 @@ void CvUnitCombat::DoHeavyChargeEffects(CvUnit* attacker, CvUnit* defender, CvPl
 		}
 	}
 }
+
+#endif
 
 #if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
 void CvUnitCombat::DoInstantYieldFromCombat(const CvCombatInfo & kCombatInfo)

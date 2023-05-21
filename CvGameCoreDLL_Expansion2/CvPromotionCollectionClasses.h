@@ -31,6 +31,7 @@ private:
     std::vector<PromotionEntry> m_vPromotions;
     std::vector<PromotionCollectionsTypes> m_vAddEnemyPromotionPools;
     bool m_bStackingFightBack = false;
+    bool m_bStopAttacker = false;
 
 public:
     CvPromotionCollectionEntry() = default;
@@ -44,6 +45,7 @@ public:
     auto GetAddEnemyPromotionPools() -> decltype(m_vAddEnemyPromotionPools)& { return m_vAddEnemyPromotionPools; }
 
     auto GetStackingFightBack() -> decltype(m_bStackingFightBack) { return m_bStackingFightBack; }
+    auto GetStopAttacker() -> decltype(m_bStopAttacker) { return m_bStopAttacker; }
 };
 
 class CvPromotionCollectionEntries
