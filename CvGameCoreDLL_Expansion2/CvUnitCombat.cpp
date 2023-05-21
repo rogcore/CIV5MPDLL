@@ -624,9 +624,11 @@ void CvUnitCombat::ResolveMeleeCombat(const CvCombatInfo& kCombatInfo, uint uiPa
 		{
 			if(pkTargetPlot)
 			{
-				if (pkAttacker->IsCanHeavyCharge() && !pkDefender->isDelayedDeath() && bAttackerDidMoreDamage)
+				if (pkAttacker->IsCanHeavyCharge() && bAttackerDidMoreDamage)
 				{
-					pkDefender->DoFallBackFromMelee(*pkAttacker);
+					if (!pkDefender->isDelayedDeath())
+						pkDefender->DoFallBackFromMelee(*pkAttacker);
+					DoHeavyChargeEffects(pkAttacker, pkDefender, pkTargetPlot);
 				}
 
 				bool bCanAdvance = kCombatInfo.getAttackerAdvances() && pkTargetPlot->getNumVisibleEnemyDefenders(pkAttacker) == 0;
@@ -4474,6 +4476,18 @@ void CvUnitCombat::InterveneInflictDamage(InflictDamageContext* ctx)
 }
 #endif
 
+static int calcDamage(CvUnit* pAttacker, CvPlot* pFromPlot, CvUnit* pDefender, CvPlot* pTargetPlot, bool bRangedAttack)
+{
+	if (bRangedAttack) {
+		return pAttacker->GetRangeCombatDamage(pDefender, nullptr, false); ;
+	}
+	else {
+		int iAttackStrength = pAttacker->GetMaxAttackStrength(pFromPlot, pDefender->plot(), pDefender);
+		int iDefenseStrength = pDefender->GetMaxDefenseStrength(pDefender->plot(), pAttacker, false);
+		return pAttacker->getCombatDamage(iAttackStrength, iDefenseStrength, pAttacker->getDamage(), false, false, false);
+	}
+}
+
 static int calcOrCacheDamage(CvUnit* pAttacker, CvPlot* pFromPlot, CvUnit* pDefender, CvPlot* pTargetPlot, bool bRangedAttack, std::tr1::unordered_map<CvUnit*, int>& mUnitDamageBaseMap)
 {
 	int result = 0;
@@ -4484,14 +4498,7 @@ static int calcOrCacheDamage(CvUnit* pAttacker, CvPlot* pFromPlot, CvUnit* pDefe
 	}
 	else
 	{
-		if (bRangedAttack) {
-			result = pAttacker->GetRangeCombatDamage(pDefender, nullptr, false); ;
-		}
-		else {
-			int iAttackStrength = pAttacker->GetMaxAttackStrength(pFromPlot, pDefender->plot(), pDefender);
-			int iDefenseStrength = pDefender->GetMaxDefenseStrength(pDefender->plot(), pAttacker, false);
-			result = pAttacker->getCombatDamage(iAttackStrength, iDefenseStrength, pAttacker->getDamage(), false, false, false);
-		}
+		result = calcDamage(pAttacker, pFromPlot, pDefender, pTargetPlot, bRangedAttack);
 		mUnitDamageBaseMap[pDefender] = result;
 	}
 
@@ -4998,6 +5005,43 @@ void CvUnitCombat::DoStackingFightBack(const CvCombatInfo & kCombatInfo)
 }
 
 #endif
+
+void CvUnitCombat::DoHeavyChargeEffects(CvUnit* attacker, CvUnit* defender, CvPlot* battlePlot)
+{
+	if (attacker == nullptr || attacker->IsDead() || attacker->isDelayedDeath()) return;
+
+	int addMoves = attacker->GetHeavyChargeAddMoves();
+	if (addMoves > 0)
+	{
+		attacker->changeMoves(addMoves);
+	}
+
+	auto& kAttackPlayer = GET_PLAYER(attacker->getOwner());
+	int collateralFixed = attacker->GetHeavyChargeCollateralFixed(), collateralPercent = attacker->GetHeavyChargeCollateralPercent();
+	if (collateralFixed > 0 || collateralPercent > 0)
+	{
+		for (int iUnitIndex = 0; iUnitIndex < battlePlot->getNumUnits(); iUnitIndex++)
+		{
+			CvUnit* pAffectedUnit = battlePlot->getUnitByIndex(iUnitIndex);
+			if (pAffectedUnit == defender) continue;
+			if (pAffectedUnit->getDomainType() != DOMAIN_LAND && pAffectedUnit->getDomainType() != DOMAIN_SEA) continue;
+			if (!kAttackPlayer.IsAtWarWith(pAffectedUnit->getOwner())) continue;
+
+			int iDamageBase = calcDamage(attacker, attacker->plot(), pAffectedUnit, battlePlot, false);
+			int iDamage = (int64)iDamageBase * (int64)collateralPercent / 100 + collateralFixed;
+			pAffectedUnit->changeDamage(iDamage, attacker->getOwner(), attacker->GetID());
+		}
+	}
+
+	int extraDamage = attacker->GetHeavyChargeExtraDamage();
+	if (defender && !defender->isDelayedDeath() && extraDamage > 0)
+	{
+		if (!defender->IsDead() && !defender->isDelayedDeath())
+		{
+			defender->changeDamage(extraDamage, attacker->getOwner(), attacker->GetID());
+		}
+	}
+}
 
 #if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
 void CvUnitCombat::DoInstantYieldFromCombat(const CvCombatInfo & kCombatInfo)

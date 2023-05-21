@@ -84,6 +84,9 @@ public:
 	static void DoKillCitizens(const CvCombatInfo& kInfo);
 	static void DoStackingFightBack(const CvCombatInfo& kInfo);
 #endif
+
+	static void DoHeavyChargeEffects(CvUnit* attacker, CvUnit* defender, CvPlot* battlePlot);
+
 #endif
 #if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
 	static void DoInstantYieldFromCombat(const CvCombatInfo& kInfo);

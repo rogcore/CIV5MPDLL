@@ -23890,6 +23890,10 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeDefenseInflictDamageChangeMaxHPPercent(iChange * thisPromotion.GetDefenseInflictDamageChangeMaxHPPercent());
 		ChangeSiegeInflictDamageChange(iChange * thisPromotion.GetSiegeInflictDamageChange());
 		ChangeSiegeInflictDamageChangeMaxHPPercent(iChange * thisPromotion.GetSiegeInflictDamageChangeMaxHPPercent());
+		ChangeHeavyChargeAddMoves(iChange * thisPromotion.GetHeavyChargeAddMoves());
+		ChangeHeavyChargeExtraDamage(iChange * thisPromotion.GetHeavyChargeExtraDamage());
+		ChangeHeavyChargeCollateralFixed(iChange * thisPromotion.GetHeavyChargeCollateralFixed());
+		ChangeHeavyChargeCollateralPercent(iChange * thisPromotion.GetHeavyChargeCollateralPercent());
 
 #if defined(MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 		if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
@@ -24364,6 +24368,11 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iSiegeInflictDamageChange;
 	kStream >> m_iSiegeInflictDamageChangeMaxHPPercent;
 
+	kStream >> m_iHeavyChargeAddMoves;
+	kStream >> m_iHeavyChargeExtraDamage;
+	kStream >> m_iHeavyChargeCollateralFixed;
+	kStream >> m_iHeavyChargeCollateralPercent;
+
 	//  Read mission queue
 	UINT uSize;
 	kStream >> uSize;
@@ -24610,6 +24619,11 @@ void CvUnit::write(FDataStream& kStream) const
 
 	kStream << m_iSiegeInflictDamageChange;
 	kStream << m_iSiegeInflictDamageChangeMaxHPPercent;
+
+	kStream << m_iHeavyChargeAddMoves;
+	kStream << m_iHeavyChargeExtraDamage;
+	kStream << m_iHeavyChargeCollateralFixed;
+	kStream << m_iHeavyChargeCollateralPercent;
 
 	//  Write mission list
 	kStream << m_missionQueue.getLength();
@@ -28955,4 +28969,37 @@ void CvUnit::ChangeSiegeInflictDamageChange(int iChange)
 void CvUnit::ChangeSiegeInflictDamageChangeMaxHPPercent(int iChange)
 {
 	m_iSiegeInflictDamageChangeMaxHPPercent += iChange;
+}
+
+int CvUnit::GetHeavyChargeAddMoves() const
+{
+	return m_iHeavyChargeAddMoves;
+}
+int CvUnit::GetHeavyChargeExtraDamage() const
+{
+	return m_iHeavyChargeExtraDamage;
+}
+int CvUnit::GetHeavyChargeCollateralFixed() const
+{
+	return m_iHeavyChargeCollateralFixed;
+}
+int CvUnit::GetHeavyChargeCollateralPercent() const
+{
+	return m_iHeavyChargeCollateralPercent;
+}
+void CvUnit::ChangeHeavyChargeAddMoves(int iChange)
+{
+	m_iHeavyChargeAddMoves += iChange;
+}
+void CvUnit::ChangeHeavyChargeExtraDamage(int iChange)
+{
+	m_iHeavyChargeExtraDamage += iChange;
+}
+void CvUnit::ChangeHeavyChargeCollateralFixed(int iChange)
+{
+	m_iHeavyChargeCollateralFixed += iChange;
+}
+void CvUnit::ChangeHeavyChargeCollateralPercent(int iChange)
+{
+	m_iHeavyChargeCollateralPercent += iChange;
 }

@@ -28,3 +28,8 @@ alter table Buildings add column 'SiegeKillCitizensModifier' integer default 0 n
 
 alter table PromotionCollections add column 'StackingFightBack' boolean not null default 0;
 alter table PromotionCollections_Entries add column 'StackingFightBackOnlyMelee' boolean not null default 0;
+
+alter table UnitPromotions add column 'HeavyChargeAddMoves' integer not null default 0;
+alter table UnitPromotions add column 'HeavyChargeExtraDamage' integer not null default 0;
+alter table UnitPromotions add column 'HeavyChargeCollateralFixed' integer not null default 0;
+alter table UnitPromotions add column 'HeavyChargeCollateralPercent' integer not null default 0;

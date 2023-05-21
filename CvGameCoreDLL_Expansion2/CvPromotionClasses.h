@@ -425,6 +425,11 @@ public:
 	int GetSiegeInflictDamageChange() const;
 	int GetSiegeInflictDamageChangeMaxHPPercent() const;
 
+	int GetHeavyChargeAddMoves() const;
+	int GetHeavyChargeExtraDamage() const;
+	int GetHeavyChargeCollateralFixed() const;
+	int GetHeavyChargeCollateralPercent() const;
+
 protected:
 	int m_iLayerAnimationPath;
 	int m_iPrereqPromotion;
@@ -791,6 +796,11 @@ protected:
 
 	int m_iSiegeInflictDamageChange = 0;
 	int m_iSiegeInflictDamageChangeMaxHPPercent = 0;
+
+	int m_iHeavyChargeAddMoves = 0;
+	int m_iHeavyChargeExtraDamage = 0;
+	int m_iHeavyChargeCollateralFixed = 0;
+	int m_iHeavyChargeCollateralPercent = 0;
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

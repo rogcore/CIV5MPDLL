@@ -987,6 +987,15 @@ public:
 	void ChangeSiegeInflictDamageChange(int iChange);
 	void ChangeSiegeInflictDamageChangeMaxHPPercent(int iChange);
 
+	int GetHeavyChargeAddMoves() const;
+	int GetHeavyChargeExtraDamage() const;
+	int GetHeavyChargeCollateralFixed() const;
+	int GetHeavyChargeCollateralPercent() const;
+	void ChangeHeavyChargeAddMoves(int iChange);
+	void ChangeHeavyChargeExtraDamage(int iChange);
+	void ChangeHeavyChargeCollateralFixed(int iChange);
+	void ChangeHeavyChargeCollateralPercent(int iChange);
+
 	int getAmphibCount() const;
 	bool isAmphib() const;
 	void changeAmphibCount(int iChange);
@@ -2227,6 +2236,11 @@ protected:
 
 	int m_iSiegeInflictDamageChange = 0;
 	int m_iSiegeInflictDamageChangeMaxHPPercent = 0;
+
+	int m_iHeavyChargeAddMoves = 0;
+	int m_iHeavyChargeExtraDamage = 0;
+	int m_iHeavyChargeCollateralFixed = 0;
+	int m_iHeavyChargeCollateralPercent = 0;
 	
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 	CvString m_strUnitName;

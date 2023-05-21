@@ -721,6 +721,11 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iSiegeInflictDamageChange = kResults.GetInt("SiegeInflictDamageChange");
 	m_iSiegeInflictDamageChangeMaxHPPercent = kResults.GetInt("SiegeInflictDamageChangeMaxHPPercent");
 
+	m_iHeavyChargeAddMoves = kResults.GetInt("HeavyChargeAddMoves");
+	m_iHeavyChargeExtraDamage = kResults.GetInt("HeavyChargeExtraDamage");
+	m_iHeavyChargeCollateralFixed = kResults.GetInt("HeavyChargeCollateralFixed");
+	m_iHeavyChargeCollateralPercent = kResults.GetInt("HeavyChargeCollateralPercent");
+
 	const char* szPromotionPrereq = kResults.GetText("PromotionPrereq");
 	m_iPrereqPromotion = GC.getInfoTypeForString(szPromotionPrereq, true);
 
@@ -3017,6 +3022,23 @@ int CvPromotionEntry::GetSiegeInflictDamageChange() const
 int CvPromotionEntry::GetSiegeInflictDamageChangeMaxHPPercent() const
 {
 	return m_iSiegeInflictDamageChangeMaxHPPercent;
+}
+
+int CvPromotionEntry::GetHeavyChargeAddMoves() const
+{
+	return m_iHeavyChargeAddMoves;
+}
+int CvPromotionEntry::GetHeavyChargeExtraDamage() const
+{
+	return m_iHeavyChargeExtraDamage;
+}
+int CvPromotionEntry::GetHeavyChargeCollateralFixed() const
+{
+	return m_iHeavyChargeCollateralFixed;
+}
+int CvPromotionEntry::GetHeavyChargeCollateralPercent() const
+{
+	return m_iHeavyChargeCollateralPercent;
 }
 
 #ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
