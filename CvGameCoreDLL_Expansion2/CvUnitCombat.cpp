@@ -4658,9 +4658,8 @@ void CvUnitCombat::DoCollateralDamage(const CvCombatInfo& kCombatInfo)
 	CvUnit* pDefenderUnit = kCombatInfo.getUnit(BATTLE_UNIT_DEFENDER);
 	CvCity* pDefenderCity = kCombatInfo.getCity(BATTLE_UNIT_DEFENDER);
 
-	// Only work when unit vs unit
+	// Only works if the attacker is a unit.
 	if (pAttackerCity != nullptr) return;
-	if (pDefenderCity != nullptr) return; // TODO: will support later
 
 	CvPlayerAI& kAttackPlayer = getAttackerPlayer(kCombatInfo);
 	CvPlayerAI& kDefensePlayer = getDefenderPlayer(kCombatInfo);
@@ -4679,6 +4678,17 @@ void CvUnitCombat::DoCollateralDamage(const CvCombatInfo& kCombatInfo)
 		int iDamageRateTimes100 = sCollateralInfo.iPercent;
 		int iUnitLimitPerTile = sCollateralInfo.iPlotUnitLimit;
 		int iFixed = sCollateralInfo.iFixed;
+
+		bool bOnlyCity = sCollateralInfo.bOnlyCity;
+		if (bOnlyCity)
+		{
+			if (pDefenderCity == nullptr) continue;
+			else pDefenderUnit = nullptr;
+		}
+
+		bool bOnlyUnit = sCollateralInfo.bOnlyUnit;
+		if (bOnlyUnit && pTargetPlot->isCity()) continue;
+
 		std::tr1::unordered_set<CvUnit*> dedupSet;
 
 		int iAffectedCounter = 0;

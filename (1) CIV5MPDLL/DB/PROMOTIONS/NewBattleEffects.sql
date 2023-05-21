@@ -10,6 +10,8 @@ ALTER TABLE UnitPromotions ADD COLUMN CollateralDamageFixed integer not null def
 ALTER TABLE UnitPromotions ADD COLUMN CollateralDamagePlotUnitLimit integer not null default 0;
 ALTER TABLE UnitPromotions ADD COLUMN CollateralDamageImmune boolean not null default 0;
 ALTER TABLE UnitPromotions ADD COLUMN CollateralXP int not null default 0;
+ALTER TABLE UnitPromotions ADD COLUMN CollateralOnlyCity boolean not null default 0;
+ALTER TABLE UnitPromotions ADD COLUMN CollateralOnlyUnit boolean not null default 1;
 
 create table PromotionCollections_AddEnemyPromotions (
     CollectionType text not null references PromotionCollections(Type),

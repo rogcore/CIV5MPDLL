@@ -414,6 +414,8 @@ public:
 	int GetCollateralDamagePlotUnitLimit() const;
 	bool GetCollateralDamageImmune() const;
 	int GetCollateralXP() const;
+	bool GetCollateralOnlyCity() const;
+	bool GetCollateralOnlyUnit() const;
 #endif
 
 	int GetAttackInflictDamageChange() const;
@@ -569,6 +571,8 @@ protected:
 	int m_iCollateralDamagePlotUnitLimit = 0;
 	bool m_iCollateralDamageImmune = 0;
 	int m_iCollateralXP = 0;
+	bool m_bCollateralOnlyCity = false;
+	bool m_bCollateralOnlyUnit = true;
 #endif
 
 #if defined(MOD_ROG_CORE)
@@ -951,18 +955,21 @@ struct SplashInfo {
 struct CollateralInfo {
 	PromotionTypes ePromotion;
 
-	int iPercent;
-	int iFixed;
-	int iPlotUnitLimit;
+	int iPercent = 0;
+	int iFixed = 0;
+	int iPlotUnitLimit = 0;
+	bool bOnlyUnit = true;
+	bool bOnlyCity = false;
 
 	CollateralInfo() = default;
 
-	// TODO:
 	CollateralInfo(const CvPromotionEntry& promotion) :
 		ePromotion{ (PromotionTypes)promotion.GetID() },
 		iPercent{ promotion.GetCollateralDamagePercent() },
 		iFixed{ promotion.GetCollateralDamageFixed() },
-		iPlotUnitLimit{ promotion.GetCollateralDamagePlotUnitLimit() } {}
+		iPlotUnitLimit{ promotion.GetCollateralDamagePlotUnitLimit() },
+		bOnlyCity {promotion.GetCollateralOnlyCity()},
+		bOnlyUnit {promotion.GetCollateralOnlyUnit()} {}
 
 	inline void read(FDataStream& kStream) {
 		int iPromotion;
@@ -971,6 +978,8 @@ struct CollateralInfo {
 		kStream >> iPercent;
 		kStream >> iFixed;
 		kStream >> iPlotUnitLimit;
+		kStream >> bOnlyUnit;
+		kStream >> bOnlyCity;
 	}
 
 	inline void write(FDataStream& kStream) const {
@@ -979,6 +988,8 @@ struct CollateralInfo {
 		kStream << iPercent;
 		kStream << iFixed;
 		kStream << iPlotUnitLimit;
+		kStream << bOnlyUnit;
+		kStream << bOnlyCity;
 	}
 };
 #endif

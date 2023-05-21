@@ -646,6 +646,8 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iCollateralDamagePlotUnitLimit = kResults.GetInt("CollateralDamagePlotUnitLimit");
 	m_iCollateralDamageImmune = kResults.GetBool("CollateralDamageImmune");
 	m_iCollateralXP = kResults.GetInt("CollateralXP");
+	m_bCollateralOnlyCity = kResults.GetBool("CollateralOnlyCity");
+	m_bCollateralOnlyUnit = kResults.GetBool("CollateralOnlyUnit");
 #endif
 
 #ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
@@ -2994,6 +2996,14 @@ bool CvPromotionEntry::GetCollateralDamageImmune() const
 int CvPromotionEntry::GetCollateralXP() const
 {
 	return m_iCollateralXP;
+}
+bool CvPromotionEntry::GetCollateralOnlyCity() const
+{
+	return m_bCollateralOnlyCity;
+}
+bool CvPromotionEntry::GetCollateralOnlyUnit() const
+{
+	return m_bCollateralOnlyUnit;
 }
 #endif
 
