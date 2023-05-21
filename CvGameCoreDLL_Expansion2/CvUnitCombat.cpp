@@ -5030,6 +5030,8 @@ void CvUnitCombat::DoStopAttacker(const CvCombatInfo& kCombatInfo)
 		return;
 	if (pDefenderUnit->getDomainType() != pAttackerUnit->getDomainType())
 		return;
+	if (pAttackerUnit->IsImmuneNegtivePromotions())
+		return;
 
 	bool ranged = kCombatInfo.getAttackIsRanged();
 	bool melee = !ranged;
