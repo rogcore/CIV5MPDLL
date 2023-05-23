@@ -1357,6 +1357,54 @@ if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 	m_iNumGoodyHutsPopped = 0;
 	m_iLastGameTurnAtFullHealth = -1;
 
+#ifdef MOD_PROMOTION_SPLASH_DAMAGE
+	m_asSplashInfoVec.clear();
+
+	m_iSplashImmuneRC = 0;
+	m_iSplashXP = 0;
+#endif
+
+#ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
+	m_asCollateralInfoVec.clear();
+
+	m_iCollateralImmuneRC = 0;
+	m_iCollateralXP = 0;
+#endif
+
+#ifdef MOD_PROMOTION_COLLECTIONS
+	m_sPromotionCollections.clear();
+#endif
+
+ #ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
+	m_iAddEnemyPromotionImmuneRC = 0;
+ #endif
+
+#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
+	m_mapAutoRemovePromotions.clear();
+	m_sPromotionsThatCanBeActionCleared.clear();
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	m_mapDestroyBuildings.clear();
+
+	m_iSiegeKillCitizensPercent = 0;
+	m_iSiegeKillCitizensFixed = 0;
+#endif
+
+	m_iAttackInflictDamageChange = 0;
+	m_iAttackInflictDamageChangeMaxHPPercent = 0;
+
+	m_iDefenseInflictDamageChange = 0;
+	m_iDefenseInflictDamageChangeMaxHPPercent = 0;
+
+	m_iSiegeInflictDamageChange = 0;
+	m_iSiegeInflictDamageChangeMaxHPPercent = 0;
+
+	m_iHeavyChargeAddMoves = 0;
+	m_iHeavyChargeExtraDamage = 0;
+	m_iHeavyChargeCollateralFixed = 0;
+	m_iHeavyChargeCollateralPercent = 0;
+
 	if(!bConstructorCall)
 	{
 		m_Promotions.Reset();
