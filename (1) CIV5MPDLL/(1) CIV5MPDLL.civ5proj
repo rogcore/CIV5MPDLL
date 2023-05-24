@@ -519,6 +519,10 @@
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
         <FileName>DB/SPECIALISTS/Specialist_Resources.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
         <FileName>DB/IMPROVEMENTS/Improvement_TradeRouteYieldChanges.sql</FileName>
       </Action>
     </ModActions>
