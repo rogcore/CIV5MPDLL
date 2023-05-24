@@ -2362,6 +2362,47 @@ bool CvUnit::getCaptureDefinition(CvUnitCaptureDefinition* pkCaptureDef, PlayerT
 	return pkCapturedUnit;
 }
 
+#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
+bool CvUnit::CanRemoveDebuff(const AutoRemoveInfo& kAutoRemoveInfo) const
+{
+	if (kAutoRemoveInfo.m_iTurnToRemove >= 0 && GC.getGame().getGameTurn() >= kAutoRemoveInfo.m_iTurnToRemove)
+	{
+		return true;
+	}
+	if (kAutoRemoveInfo.m_bRemoveAfterFullyHeal && getDamage() <= 0)
+	{
+		return true;
+	}
+	if (kAutoRemoveInfo.m_bRemoveLuaCheck && GAMEEVENTINVOKE_TESTANY(GAMEEVENT_CanRemovePromotion, kAutoRemoveInfo.m_ePromotion, getOwner(), GetID()) == GAMEEVENTRETURN_TRUE)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+void CvUnit::RemoveDebuffWhenDoTurn()
+{
+	if (!MOD_GLOBAL_PROMOTIONS_REMOVAL)
+		return;
+
+	if (m_mapAutoRemovePromotions.empty())
+		return;
+	
+	std::vector<PromotionTypes> vPromotionsToRemove;
+	for (auto iter = m_mapAutoRemovePromotions.begin(); iter != m_mapAutoRemovePromotions.end(); iter++)
+	{
+		if (!CanRemoveDebuff(iter->second)) continue;
+		vPromotionsToRemove.push_back(iter->first);
+	}
+
+	for (auto promotion : vPromotionsToRemove)
+	{
+		setHasPromotion(promotion, false);
+	}
+}
+#endif
+
 //	----------------------------------------------------------------------------
 void CvUnit::doTurn()
 {
@@ -2429,44 +2470,7 @@ void CvUnit::doTurn()
 #endif
 
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
-	if (MOD_GLOBAL_PROMOTIONS_REMOVAL)
-	{
-		std::vector<PromotionTypes> vPromotionsToRemove;
-		for (auto iter = m_mapAutoRemovePromotions.begin(); iter != m_mapAutoRemovePromotions.end(); iter++)
-		{
-			bool bDoRemove = false;
-
-			if (iter->second.m_iTurnToRemove >= 0 && GC.getGame().getGameTurn() >= iter->second.m_iTurnToRemove)
-			{
-				bDoRemove = true;
-				goto CHECK_AND_REMOVE;
-			}
-			if (iter->second.m_bRemoveAfterFullyHeal && getDamage() <= 0)
-			{
-				bDoRemove = true;
-				goto CHECK_AND_REMOVE;
-			}
-			if (iter->second.m_bRemoveLuaCheck)
-			{
-				if (GAMEEVENTINVOKE_TESTANY(GAMEEVENT_CanRemovePromotion, (int)iter->first, getOwner(), GetID()) == GAMEEVENTRETURN_TRUE)
-				{
-					bDoRemove = true;
-					goto CHECK_AND_REMOVE;
-				}
-			}
-
-		CHECK_AND_REMOVE:
-			if (!bDoRemove) continue;
-
-			vPromotionsToRemove.push_back(iter->first);
-		}
-
-		for (auto promotion : vPromotionsToRemove)
-		{
-			setHasPromotion(promotion, false);
-		}
-	}
-
+	RemoveDebuffWhenDoTurn();
 #endif
 
 	// Only increase our Fortification level if we've actually been told to Fortify
