@@ -872,6 +872,7 @@
     <!-- Some bug fixes cannot be turned on or off, those entries (*) are just here to get their entries into the CustomMod.log file -->
     <!-- * Fixes the bug where a city doesn't work its centre tile (v45) -->
     <Row Class="1" Name="BUGFIX_CITY_CENTRE_WORKING" Value="1"/>
+    <Row Class="1" Name="BUGFIX_CITY_NEGATIVE_YIELD_MODIFIED" Value="1"/>
 	<!-- * Fixes the bug of creating a capital from a puppet city, and leaving it that way (v73) -->
     <Row Class="1" Name="BUGFIX_NO_PUPPET_CAPITALS" Value="1"/>
     <!-- * Adds missing policy events when adopting an ideology (v33) -->

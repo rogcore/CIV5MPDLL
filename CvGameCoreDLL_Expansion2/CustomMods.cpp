@@ -564,6 +564,7 @@ int CustomMods::getOption(string sOption, int defValue) {
 		MOD_OPT_CACHE(POLICIY_PUBLIC_OPTION);
 
 		MOD_OPT_CACHE(TRAITS_GOLDEN_AGE_YIELD_MODIFIER);
+		MOD_OPT_CACHE(BUGFIX_CITY_NEGATIVE_YIELD_MODIFIED);
 		
 		m_bInit = true;
 	}

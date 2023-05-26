@@ -11446,8 +11446,17 @@ int CvCity::getBasicYieldRateTimes100(const YieldTypes eIndex, const bool bIgnor
 	iBaseYield += (GetYieldPerPopInEmpireTimes100(eIndex) * GET_PLAYER(m_eOwner).getTotalPopulation());
 #endif
 
+#ifdef MOD_BUGFIX_CITY_NEGATIVE_YIELD_MODIFIED
+	int iModifiedYield = iBaseYield;
+	if (!MOD_BUGFIX_CITY_NEGATIVE_YIELD_MODIFIED || iBaseYield > 0)
+	{
+		iModifiedYield *= getBaseYieldRateModifier(eIndex);
+		iModifiedYield /= 100;
+	}
+#else
 	int iModifiedYield = iBaseYield * getBaseYieldRateModifier(eIndex);
 	iModifiedYield /= 100;
+#endif
 
 #if !defined(MOD_PROCESS_STOCKPILE)
 	iModifiedYield += iProcessYield;
