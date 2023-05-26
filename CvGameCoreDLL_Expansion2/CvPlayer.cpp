@@ -24626,6 +24626,15 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	ChangeWarCasualtiesModifier(pPolicy->GetWarCasualtiesModifier() * iChange);
 #endif
 
+#ifdef MOD_POLICIY_PUBLIC_OPTION
+	if (pPolicy->GetIdeologyPressureModifier() != 0 || pPolicy->GetIdeologyUnhappinessModifier() != 0)
+	{
+		ChangeIdeologyPressureModifier(pPolicy->GetIdeologyPressureModifier() * iChange);
+		ChangeIdeologyUnhappinessModifier(pPolicy->GetIdeologyUnhappinessModifier() * iChange);
+		GetCulture()->DoPublicOpinion();
+	}
+#endif
+
 	if(pPolicy->IsOneShot())
 	{
 		if(m_pPlayerPolicies->HasOneShotPolicyFired(ePolicy))
@@ -26305,6 +26314,11 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iWarCasualtiesModifier;
 #endif
 
+#ifdef MOD_POLICIY_PUBLIC_OPTION
+	kStream >> m_iIdeologyPressureModifier;
+	kStream >> m_iIdeologyUnhappinessModifier;
+#endif
+
 #ifdef MOD_SPECIALIST_RESOURCES
 	kStream >> m_paiResourcesFromSpecialists;
 #endif
@@ -26841,6 +26855,11 @@ void CvPlayer::Write(FDataStream& kStream) const
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
 	kStream << m_iWarCasualtiesCounter;
 	kStream << m_iWarCasualtiesModifier;
+#endif
+
+#ifdef MOD_POLICIY_PUBLIC_OPTION
+	kStream << m_iIdeologyPressureModifier;
+	kStream << m_iIdeologyUnhappinessModifier;
 #endif
 
 #ifdef MOD_SPECIALIST_RESOURCES
@@ -29923,6 +29942,26 @@ void CvPlayer::ChangeWarCasualtiesModifier(const int iChange)
 	this->m_iWarCasualtiesModifier += iChange;
 }
 
+#endif
+
+
+#ifdef MOD_POLICIY_PUBLIC_OPTION
+int CvPlayer::GetIdeologyPressureModifier() const
+{
+	return m_iIdeologyPressureModifier;
+}
+int CvPlayer::GetIdeologyUnhappinessModifier() const
+{
+	return m_iIdeologyUnhappinessModifier;
+}
+void CvPlayer::ChangeIdeologyPressureModifier(int iChange)
+{
+	m_iIdeologyPressureModifier += iChange;
+}
+void CvPlayer::ChangeIdeologyUnhappinessModifier(int iChange)
+{
+	m_iIdeologyUnhappinessModifier += iChange;
+}
 #endif
 
 CvCity* CvPlayer::GetRandomCity()

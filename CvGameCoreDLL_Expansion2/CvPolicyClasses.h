@@ -274,6 +274,11 @@ public:
 	int GetWarCasualtiesModifier() const;
 #endif
 
+#ifdef MOD_POLICIY_PUBLIC_OPTION
+	int GetIdeologyPressureModifier() const;
+	int GetIdeologyUnhappinessModifier() const;
+#endif
+
 private:
 	int m_iTechPrereq;
 	int m_iCultureCost;
@@ -496,6 +501,12 @@ private:
 
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
 	int m_iWarCasualtiesModifier;
+#endif
+
+
+#ifdef MOD_POLICIY_PUBLIC_OPTION
+	int m_iIdeologyPressureModifier = 0;
+	int m_iIdeologyUnhappinessModifier = 0;
 #endif
 
 #ifdef MOD_API_TRADE_ROUTE_YIELD_RATE

@@ -3553,6 +3553,13 @@ void CvPlayerCulture::DoPublicOpinion()
 		if (iCulturalDominanceOverUs <= 0)
 			continue;
 
+#ifdef MOD_POLICIY_PUBLIC_OPTION
+		if (MOD_POLICIY_PUBLIC_OPTION)
+		{
+			iCulturalDominanceOverUs = (100 + kPlayer.GetIdeologyPressureModifier()) * iCulturalDominanceOverUs / 100;
+		}
+#endif
+
 		if (eOtherCivIdeology == eFreedomBranch)
 		{
 			iPressureForFreedom += iCulturalDominanceOverUs;
@@ -3688,11 +3695,8 @@ void CvPlayerCulture::DoPublicOpinion()
 			if (iCulturalDominanceOverUs <= 0 || iCulturalDominanceOverUs <= iGreatestDominance)
 				continue;
 
-			if (iCulturalDominanceOverUs > iGreatestDominance)
-			{
-				iGreatestDominance = iCulturalDominanceOverUs;
-				m_eOpinionBiggestInfluence = (PlayerTypes)iLoopPlayer;
-			}
+			iGreatestDominance = iCulturalDominanceOverUs;
+			m_eOpinionBiggestInfluence = (PlayerTypes)iLoopPlayer;
 		}
 	}
 
@@ -3979,7 +3983,14 @@ int CvPlayerCulture::ComputePublicOpinionUnhappiness(int iDissatisfaction, int &
 	}
 
 	CUSTOMLOG("ComputePublicOpinionUnhappiness: dissatisfaction=%i, perCity=%i, perPop=%i", iDissatisfaction, iPerCityUnhappy, iUnhappyPerXPop);
-	return max(m_pPlayer->getNumCities() * iPerCityUnhappy, m_pPlayer->getTotalPopulation() / iUnhappyPerXPop);
+	int iUnhapiness = max(m_pPlayer->getNumCities() * iPerCityUnhappy, m_pPlayer->getTotalPopulation() / iUnhappyPerXPop);
+#ifdef MOD_POLICIY_PUBLIC_OPTION
+		if (MOD_POLICIY_PUBLIC_OPTION)
+		{
+			iUnhapiness = (100 + m_pPlayer->GetIdeologyUnhappinessModifier()) * iUnhapiness / 100;
+		}
+#endif
+	return iUnhapiness;
 }
 
 // LOGGING FUNCTIONS

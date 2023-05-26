@@ -1956,6 +1956,13 @@ public:
 	void ChangeWarCasualtiesModifier(const int iChange);
 #endif
 
+#ifdef MOD_POLICIY_PUBLIC_OPTION
+	int GetIdeologyPressureModifier() const;
+	int GetIdeologyUnhappinessModifier() const;
+	void ChangeIdeologyPressureModifier(int iChange);
+	void ChangeIdeologyUnhappinessModifier(int iChange);
+#endif
+
 	CvCity* CvPlayer::GetRandomCity();
 
 protected:
@@ -2389,6 +2396,11 @@ protected:
 
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
 	int m_iWarCasualtiesModifier = 0;
+#endif
+
+#ifdef MOD_POLICIY_PUBLIC_OPTION
+	int m_iIdeologyPressureModifier = 0;
+	int m_iIdeologyUnhappinessModifier = 0;
 #endif
 
 	// Obsolete: only used to read old saves

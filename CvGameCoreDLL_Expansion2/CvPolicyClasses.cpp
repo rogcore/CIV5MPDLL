@@ -459,6 +459,11 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iWarCasualtiesModifier = kResults.GetInt("WarCasualtiesModifier");
 #endif
 
+#ifdef MOD_POLICIY_PUBLIC_OPTION
+	m_iIdeologyPressureModifier = kResults.GetInt("IdeologyPressureModifier");
+	m_iIdeologyUnhappinessModifier = kResults.GetInt("IdeologyUnhappinessModifier");
+#endif
+
 	const char* szFreeBuilding = kResults.GetText("FreeBuildingOnConquest");
 	if(szFreeBuilding)
 	{
@@ -2423,6 +2428,17 @@ int CvPolicyEntry::GetInternalTradeRouteDestYieldRate(const YieldTypes eYieldTyp
 int CvPolicyEntry::GetWarCasualtiesModifier() const
 {
 	return m_iWarCasualtiesModifier;
+}
+#endif
+
+#ifdef MOD_POLICIY_PUBLIC_OPTION
+int CvPolicyEntry::GetIdeologyPressureModifier() const
+{
+	return m_iIdeologyPressureModifier;
+}
+int CvPolicyEntry::GetIdeologyUnhappinessModifier() const
+{
+	return m_iIdeologyUnhappinessModifier;
 }
 #endif
 

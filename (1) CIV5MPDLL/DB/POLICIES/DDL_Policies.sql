@@ -11,3 +11,6 @@ create table Policy_InternalTradeRouteDestYieldRate (
     YieldType text not null,
     Rate integer not null
 );
+
+alter table Policies add column IdeologyPressureModifier integer not null default 0;
+alter table Policies add column IdeologyUnhappinessModifier integer not null default 0;
