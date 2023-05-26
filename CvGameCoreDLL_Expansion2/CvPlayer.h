@@ -1965,6 +1965,8 @@ public:
 
 	CvCity* CvPlayer::GetRandomCity();
 
+	int GetRazeSpeedModifier() const;
+
 protected:
 	class ConqueredByBoolField
 	{
