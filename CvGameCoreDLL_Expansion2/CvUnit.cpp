@@ -1415,6 +1415,10 @@ if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 	m_iHeavyChargeCollateralFixed = 0;
 	m_iHeavyChargeCollateralPercent = 0;
 
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+	m_bIsNewCapture = false;
+#endif
+
 	if(!bConstructorCall)
 	{
 		m_Promotions.Reset();
@@ -2217,6 +2221,11 @@ CvUnit *CvUnit::createCaptureUnit(const CvUnitCaptureDefinition &kCaptureDef)
 	CvUnit *pkCapturedUnit = kCapturingPlayer.initUnit(kCaptureDef.eCaptureUnitType, kCaptureDef.iX, kCaptureDef.iY);
 	if (pkCapturedUnit == nullptr)
 		return nullptr;
+	
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+	if (MOD_BATTLE_CAPTURE_NEW_RULE)
+		pkCapturedUnit->SetIsNewCapture(true);
+#endif
 
 	pkCapturedUnit->GetReligionData()->SetReligion(kCaptureDef.eReligion);
 	pkCapturedUnit->GetReligionData()->SetReligiousStrength(kCaptureDef.iReligiousStrength);
@@ -2227,10 +2236,12 @@ CvUnit *CvUnit::createCaptureUnit(const CvUnitCaptureDefinition &kCaptureDef)
 #if defined(MOD_API_EXTENSIONS)
 	pkCapturedUnit->setScenarioData(kCaptureDef.iScenarioData);
 
+	// always keep name
+	pkCapturedUnit->setName(kCaptureDef.sName);
+
 	// If we have a great person, use their details
 	if (pkCapturedUnit->IsGreatPerson())
 	{
-		pkCapturedUnit->setName(kCaptureDef.sName);
 #if defined(MOD_GLOBAL_NO_LOST_GREATWORKS)
 		if (MOD_GLOBAL_NO_LOST_GREATWORKS && pkCapturedUnit->HasUnusedGreatWork())
 		{
@@ -2267,8 +2278,22 @@ CvUnit *CvUnit::createCaptureUnit(const CvUnitCaptureDefinition &kCaptureDef)
 	bool bDisbanded = false;
 	if (pkCapturedUnit != NULL)
 	{
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+		if (MOD_BATTLE_CAPTURE_NEW_RULE)
+		{
+			int iMoveRandPercent = GC.getGame().getJonRandNum(25, "Capture Move Rand") + 1 + 25; // 26 - 50%
+			pkCapturedUnit->setMoves(pkCapturedUnit->maxMoves() * iMoveRandPercent / 100);
+			int iDamagePecent = 100 - (GC.getGame().getJonRandNum(25, "Capture Damage Rand") + 1 + 25); // 51 - 75%
+			pkCapturedUnit->setDamage(pkCapturedUnit->GetMaxHitPoints() * iDamagePecent / 100);
+		}
+		else
+		{
+			pkCapturedUnit->finishMoves();
+		}
+#else
 		pkCapturedUnit->finishMoves();
-
+#endif
+		
 		// Minor civs can't capture settlers, ever!
 		if (!bDisbanded && GET_PLAYER(pkCapturedUnit->getOwner()).isMinorCiv() && (pkCapturedUnit->isFound() || pkCapturedUnit->IsFoundAbroad()))
 		{
@@ -22813,6 +22838,17 @@ void CvUnit::SetTourismBlastStrength(int iValue)
 	m_iTourismBlastStrength = iValue;
 }
 
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+bool CvUnit::GetIsNewCapture() const
+{
+	return m_bIsNewCapture;
+}
+void CvUnit::SetIsNewCapture(bool value)
+{
+	m_bIsNewCapture = value;
+}
+#endif
+
 //	--------------------------------------------------------------------------------
 std::string CvUnit::getScriptData() const
 {
@@ -24560,6 +24596,9 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iHeavyChargeCollateralFixed;
 	kStream >> m_iHeavyChargeCollateralPercent;
 
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+	kStream >> m_bIsNewCapture;
+#endif
 	//  Read mission queue
 	UINT uSize;
 	kStream >> uSize;
@@ -24820,6 +24859,10 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iHeavyChargeExtraDamage;
 	kStream << m_iHeavyChargeCollateralFixed;
 	kStream << m_iHeavyChargeCollateralPercent;
+
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+	kStream << m_bIsNewCapture;
+#endif
 
 	//  Write mission list
 	kStream << m_missionQueue.getLength();
@@ -26884,6 +26927,11 @@ bool CvUnit::IsCanAttackRanged() const
 bool CvUnit::IsCanAttack() const
 {
 	VALIDATE_OBJECT
+
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+	if (MOD_BATTLE_CAPTURE_NEW_RULE && GetIsNewCapture()) return false;
+#endif
+
 	return IsCanAttackWithMove() || IsCanAttackRanged();
 }
 

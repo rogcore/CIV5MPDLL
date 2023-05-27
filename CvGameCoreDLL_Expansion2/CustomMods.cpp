@@ -565,6 +565,8 @@ int CustomMods::getOption(string sOption, int defValue) {
 
 		MOD_OPT_CACHE(TRAITS_GOLDEN_AGE_YIELD_MODIFIER);
 		MOD_OPT_CACHE(BUGFIX_CITY_NEGATIVE_YIELD_MODIFIED);
+
+		MOD_OPT_CACHE(BATTLE_CAPTURE_NEW_RULE);
 		
 		m_bInit = true;
 	}

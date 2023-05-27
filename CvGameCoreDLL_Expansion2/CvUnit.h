@@ -1370,6 +1370,11 @@ public:
 	int GetTourismBlastStrength() const;
 	void SetTourismBlastStrength(int iValue);
 
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+	bool GetIsNewCapture() const;
+	void SetIsNewCapture(bool value);
+#endif
+
 	// Arbitrary Script Data
 	std::string getScriptData() const;
 	void setScriptData(std::string szNewValue);
@@ -2269,6 +2274,10 @@ protected:
 #endif
 	GreatWorkType m_eGreatWork;
 	int m_iTourismBlastStrength;
+
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+	bool m_bIsNewCapture = false;
+#endif
 
 	mutable CvPathNodeArray m_kLastPath;
 	mutable uint m_uiLastPathCacheDest;
