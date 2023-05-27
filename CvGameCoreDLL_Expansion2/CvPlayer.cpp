@@ -25115,6 +25115,8 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 
 	ChangeGlobalHappinessFromFaithPercent(pPolicy->GetGlobalHappinessFromFaithPercent() * iChange);
 
+	ChangeHappinessInWLTKDCities(pPolicy->GetHappinessInWLTKDCities() * iChange);
+
 	// Store off number of newly built cities that will get a free building
 	ChangeNumCitiesFreeCultureBuilding(iNumCitiesFreeCultureBuilding);
 	ChangeNumCitiesFreeFoodBuilding(iNumCitiesFreeFoodBuilding);
@@ -26370,6 +26372,9 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_paiResourcesFromSpecialists;
 #endif
 
+	kStream >> m_iGlobalHappinessFromFaithPercent;
+	kStream >> m_iHappinessInWLTKDCities;
+
 	if(GetID() < MAX_MAJOR_CIVS)
 	{
 		if(!m_pDiplomacyRequests)
@@ -26915,6 +26920,9 @@ void CvPlayer::Write(FDataStream& kStream) const
 #ifdef MOD_SPECIALIST_RESOURCES
 	kStream << m_paiResourcesFromSpecialists;
 #endif
+
+	kStream << m_iGlobalHappinessFromFaithPercent;
+	kStream << m_iHappinessInWLTKDCities;
 }
 
 //	--------------------------------------------------------------------------------
@@ -30040,6 +30048,15 @@ int CvPlayer::GetHappinessFromFaith() const
 	}
 
 	return m_iGlobalHappinessFromFaithPercent * GetTotalFaithPerTurn() / 100;
+}
+
+int CvPlayer::GetHappinessInWLTKDCities() const
+{
+	return m_iHappinessInWLTKDCities;
+}
+void CvPlayer::ChangeHappinessInWLTKDCities(int iChange)
+{
+	m_iHappinessInWLTKDCities += iChange;
 }
 
 CvCity* CvPlayer::GetRandomCity()

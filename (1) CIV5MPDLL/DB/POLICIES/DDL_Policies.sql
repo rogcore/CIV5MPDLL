@@ -32,3 +32,5 @@ CREATE TABLE Policy_TradeRouteCityYieldModifier (
 );
 
 alter table Policies add column GlobalHappinessFromFaithPercent integer not null default 0;
+
+alter table Policies add column HappinessInWLTKDCities integer not null default 0;
