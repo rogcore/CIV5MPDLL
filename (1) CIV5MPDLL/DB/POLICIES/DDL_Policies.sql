@@ -30,3 +30,5 @@ CREATE TABLE Policy_TradeRouteCityYieldModifier (
 	foreign key (PolicyType) references Policies(Type),
 	foreign key (YieldType) references Yields(Type)
 );
+
+alter table Policies add column GlobalHappinessFromFaithPercent integer not null default 0;
