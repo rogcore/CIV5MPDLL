@@ -1963,6 +1963,8 @@ public:
 	void ChangeIdeologyUnhappinessModifier(int iChange);
 #endif
 
+	std::vector<PolicyYieldInfo>& GetCityWithWorldWonderYieldModifier();
+
 	CvCity* CvPlayer::GetRandomCity();
 
 	int GetRazeSpeedModifier() const;
@@ -2404,6 +2406,8 @@ protected:
 	int m_iIdeologyPressureModifier = 0;
 	int m_iIdeologyUnhappinessModifier = 0;
 #endif
+
+	std::vector<PolicyYieldInfo> m_vCityWithWorldWonderYieldModifier;
 
 	// Obsolete: only used to read old saves
 	FAutoVariable< std::vector< Firaxis::Array< int, NUM_YIELD_TYPES > >, CvPlayer> m_ppaaiBuildingClassYieldMod;

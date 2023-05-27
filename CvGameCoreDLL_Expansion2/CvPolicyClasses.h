@@ -279,6 +279,8 @@ public:
 	int GetIdeologyUnhappinessModifier() const;
 #endif
 
+	std::vector<PolicyYieldInfo>& GetCityWithWorldWonderYieldModifier();
+
 private:
 	int m_iTechPrereq;
 	int m_iCultureCost;
@@ -513,6 +515,8 @@ private:
 	Firaxis::Array<int, YieldTypes::NUM_YIELD_TYPES> m_piMinorsTradeRouteYieldRate;
 	Firaxis::Array<int, YieldTypes::NUM_YIELD_TYPES> m_piInternalTradeRouteDestYieldRate;
 #endif
+
+	std::vector<PolicyYieldInfo> m_vCityWithWorldWonderYieldModifier;
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

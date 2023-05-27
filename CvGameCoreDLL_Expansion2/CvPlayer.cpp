@@ -25071,6 +25071,28 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 #endif
 	}
 
+	if (iChange < 0)
+	{
+		for (auto it = m_vCityWithWorldWonderYieldModifier.begin(); it != m_vCityWithWorldWonderYieldModifier.end();)
+		{
+			if (it->ePolicy == (PolicyTypes)pPolicy->GetID())
+			{
+					it = m_vCityWithWorldWonderYieldModifier.erase(it);
+			}
+			else
+			{
+					it++;
+			}
+		}
+	}
+	else
+	{
+		for (const auto& info : pPolicy->GetCityWithWorldWonderYieldModifier())
+		{
+			m_vCityWithWorldWonderYieldModifier.push_back(info);
+		}
+	}
+
 	// Store off number of newly built cities that will get a free building
 	ChangeNumCitiesFreeCultureBuilding(iNumCitiesFreeCultureBuilding);
 	ChangeNumCitiesFreeFoodBuilding(iNumCitiesFreeFoodBuilding);
@@ -26319,6 +26341,8 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iIdeologyUnhappinessModifier;
 #endif
 
+	kStream >> m_vCityWithWorldWonderYieldModifier;
+
 #ifdef MOD_SPECIALIST_RESOURCES
 	kStream >> m_paiResourcesFromSpecialists;
 #endif
@@ -26861,6 +26885,8 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iIdeologyPressureModifier;
 	kStream << m_iIdeologyUnhappinessModifier;
 #endif
+
+	kStream << m_vCityWithWorldWonderYieldModifier;
 
 #ifdef MOD_SPECIALIST_RESOURCES
 	kStream << m_paiResourcesFromSpecialists;
@@ -29963,6 +29989,11 @@ void CvPlayer::ChangeIdeologyUnhappinessModifier(int iChange)
 	m_iIdeologyUnhappinessModifier += iChange;
 }
 #endif
+
+std::vector<PolicyYieldInfo>& CvPlayer::GetCityWithWorldWonderYieldModifier()
+{
+	return m_vCityWithWorldWonderYieldModifier;
+}
 
 CvCity* CvPlayer::GetRandomCity()
 {

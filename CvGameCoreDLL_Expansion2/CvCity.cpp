@@ -11268,6 +11268,23 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	}
 #endif
 
+	if (getNumWorldWonders() > 0)
+	{
+		auto& onwer = GET_PLAYER(getOwner());
+		if (!onwer.GetCityWithWorldWonderYieldModifier().empty())
+		{
+			iTempMod = 0;
+			for (const auto& info : onwer.GetCityWithWorldWonderYieldModifier())
+			{
+				if (info.eYield != eIndex) continue;
+				iTempMod += info.iYield;
+			}
+			iModifier += iTempMod;
+			if (iTempMod != 0 && toolTipSink)
+				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER", iTempMod);
+		}
+	}
+
 	// Religion Yield Rate Modifier
 	ReligionTypes eMajority = GetCityReligions()->GetReligiousMajority();
 	const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eMajority, getOwner());
