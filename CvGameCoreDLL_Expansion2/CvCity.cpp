@@ -11316,13 +11316,13 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	}
 #endif
 
+	auto& owner = GET_PLAYER(getOwner());
 	if (getNumWorldWonders() > 0)
 	{
-		auto& onwer = GET_PLAYER(getOwner());
-		if (!onwer.GetCityWithWorldWonderYieldModifier().empty())
+		if (!owner.GetCityWithWorldWonderYieldModifier().empty())
 		{
 			iTempMod = 0;
-			for (const auto& info : onwer.GetCityWithWorldWonderYieldModifier())
+			for (const auto& info : owner.GetCityWithWorldWonderYieldModifier())
 			{
 				if (info.eYield != eIndex) continue;
 				iTempMod += info.iYield;
@@ -11331,6 +11331,20 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 			if (iTempMod != 0 && toolTipSink)
 				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER", iTempMod);
 		}
+	}
+	
+	int iNumTradeRoutes = owner.GetTrade()->GetNumTradeRoutesUsed(true);
+	if (!owner.GetTradeRouteCityYieldModifier().empty() && iNumTradeRoutes > 0)
+	{
+		iTempMod = 0;
+		for (const auto& info : owner.GetTradeRouteCityYieldModifier())
+		{
+			if (info.eYield != eIndex) continue;
+			iTempMod += info.iYield * iNumTradeRoutes;
+		}
+		iModifier += iTempMod;
+		if (iTempMod != 0 && toolTipSink)
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_POLICY_TRADE_ROUTE_NUM", iTempMod);
 	}
 
 	// Religion Yield Rate Modifier

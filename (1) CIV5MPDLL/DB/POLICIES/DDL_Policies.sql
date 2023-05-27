@@ -22,3 +22,11 @@ CREATE TABLE Policy_CityWithWorldWonderYieldModifier (
 	foreign key (PolicyType) references Policies(Type),
 	foreign key (YieldType) references Yields(Type)
 );
+
+CREATE TABLE Policy_TradeRouteCityYieldModifier (
+	'PolicyType' text ,
+	'YieldType' text ,
+	'Yield' integer  not null ,
+	foreign key (PolicyType) references Policies(Type),
+	foreign key (YieldType) references Yields(Type)
+);

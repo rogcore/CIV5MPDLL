@@ -25087,12 +25087,27 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 					it++;
 			}
 		}
+		for (auto it = m_vTradeRouteCityYieldModifier.begin(); it != m_vTradeRouteCityYieldModifier.end();)
+		{
+			if (it->ePolicy == (PolicyTypes)pPolicy->GetID())
+			{
+					it = m_vTradeRouteCityYieldModifier.erase(it);
+			}
+			else
+			{
+					it++;
+			}
+		}
 	}
 	else
 	{
 		for (const auto& info : pPolicy->GetCityWithWorldWonderYieldModifier())
 		{
 			m_vCityWithWorldWonderYieldModifier.push_back(info);
+		}
+		for (const auto& info : pPolicy->GetTradeRouteCityYieldModifier())
+		{
+			m_vTradeRouteCityYieldModifier.push_back(info);
 		}
 	}
 
@@ -26345,6 +26360,7 @@ void CvPlayer::Read(FDataStream& kStream)
 #endif
 
 	kStream >> m_vCityWithWorldWonderYieldModifier;
+	kStream >> m_vTradeRouteCityYieldModifier;
 
 #ifdef MOD_SPECIALIST_RESOURCES
 	kStream >> m_paiResourcesFromSpecialists;
@@ -26890,6 +26906,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 #endif
 
 	kStream << m_vCityWithWorldWonderYieldModifier;
+	kStream << m_vTradeRouteCityYieldModifier;
 
 #ifdef MOD_SPECIALIST_RESOURCES
 	kStream << m_paiResourcesFromSpecialists;
@@ -29996,6 +30013,11 @@ void CvPlayer::ChangeIdeologyUnhappinessModifier(int iChange)
 std::vector<PolicyYieldInfo>& CvPlayer::GetCityWithWorldWonderYieldModifier()
 {
 	return m_vCityWithWorldWonderYieldModifier;
+}
+
+std::vector<PolicyYieldInfo>& CvPlayer::GetTradeRouteCityYieldModifier()
+{
+	return m_vTradeRouteCityYieldModifier;
 }
 
 CvCity* CvPlayer::GetRandomCity()
