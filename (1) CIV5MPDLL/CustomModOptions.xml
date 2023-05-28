@@ -955,6 +955,8 @@
 
     <Row Class="1" Name="BUGFIX_BUILDING_FREEBUILDING" Value="1"/>
 
+    <Row Class="1" Name="BUGFIX_INVISIBLE_UNIT_MOVE_ENEMY_CITY" Value="1"/>
+
     <Row Class="2" Name="API_BUILDING_ENABLE_PURCHASE_UNITS" Value="1"/>
 
 	<Row Class="2" Name="API_VP_ADJACENT_YIELD_BOOST" Value="1"/>

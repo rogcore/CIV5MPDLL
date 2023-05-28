@@ -569,6 +569,8 @@ int CustomMods::getOption(string sOption, int defValue) {
 		MOD_OPT_CACHE(BUGFIX_CITY_NEGATIVE_YIELD_MODIFIED);
 
 		MOD_OPT_CACHE(BATTLE_CAPTURE_NEW_RULE);
+
+		MOD_OPT_CACHE(BUGFIX_INVISIBLE_UNIT_MOVE_ENEMY_CITY);
 		
 		m_bInit = true;
 	}
