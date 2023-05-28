@@ -65,6 +65,10 @@ struct CvUnitCaptureDefinition
 	int iReligiousStrength;
 	int iSpreadsLeft;
 
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+	CvUnit* pCapturingUnit = nullptr;
+#endif
+
 	CvUnitCaptureDefinition()
 		: eOriginalOwner(NO_PLAYER)
 		, eOldPlayer(NO_PLAYER)
@@ -86,7 +90,11 @@ struct CvUnitCaptureDefinition
 #endif
 		, eReligion(NO_RELIGION)
 		, iReligiousStrength(0)
-		, iSpreadsLeft(0) { }
+		, iSpreadsLeft(0)
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+		, pCapturingUnit(nullptr)
+#endif
+		{ }
 
 	inline bool IsValid() const
 	{
@@ -1328,6 +1336,11 @@ public:
 	bool IsCapturedAsIs() const;
 	void SetCapturedAsIs(bool bSetValue);
 
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+	CvUnit* getCapturingUnit() const;
+	void setCapturingUnit(CvUnit* unit);
+#endif
+
 	const UnitTypes getUnitType() const;
 	CvUnitEntry& getUnitInfo() const;
 	UnitClassTypes getUnitClassType() const;
@@ -1845,7 +1858,7 @@ protected:
 	const MissionQueueNode* HeadMissionQueueNode() const;
 	MissionQueueNode* HeadMissionQueueNode();
 
-	bool	getCaptureDefinition(CvUnitCaptureDefinition* pkCaptureDef, PlayerTypes eCapturingPlayer = NO_PLAYER);
+	bool getCaptureDefinition(CvUnitCaptureDefinition* pkCaptureDef, PlayerTypes eCapturingPlayer = NO_PLAYER, CvUnit* pCapturingUnit = nullptr);
 	static CvUnit* createCaptureUnit(const CvUnitCaptureDefinition& kCaptureDef);
 
 	void	ClearPathCache();
@@ -2132,6 +2145,10 @@ protected:
 
 	FAutoVariable<TacticalAIMoveTypes, CvUnit> m_eTacticalMove;
 	FAutoVariable<PlayerTypes, CvUnit> m_eCapturingPlayer;
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+	CvUnit* m_pCapturingUnit;
+#endif
+
 	bool m_bCapturedAsIs;
 	FAutoVariable<UnitTypes, CvUnit> m_eLeaderUnitType;
 	FAutoVariable<InvisibleTypes, CvUnit> m_eInvisibleType;

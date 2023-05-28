@@ -1902,6 +1902,9 @@ void CvUnit::kill(bool bDelay, PlayerTypes ePlayer /*= NO_PLAYER*/)
 						if(pPlot->isValidDomainForLocation(*pLoopUnit))
 						{
 							pLoopUnit->setCapturingPlayer(getCapturingPlayer());	// KWG: Creating a new captured cargo, but how does its transport (this) then get attached to the new cargo?
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+							pLoopUnit->setCapturingUnit(getCapturingUnit());
+#endif
 						}
 
 						pLoopUnit->kill(false, ePlayer);
@@ -2143,7 +2146,7 @@ void CvUnit::kill(bool bDelay, PlayerTypes ePlayer /*= NO_PLAYER*/)
 
 //	---------------------------------------------------------------------------
 //	Get a definition that can be used to create a captured version of the unit.
-bool CvUnit::getCaptureDefinition(CvUnitCaptureDefinition* pkCaptureDef, PlayerTypes eCapturingPlayer /* = NO_PLAYER */)
+bool CvUnit::getCaptureDefinition(CvUnitCaptureDefinition* pkCaptureDef, PlayerTypes eCapturingPlayer /* = NO_PLAYER */, CvUnit* pCapturingUnit /*=nullptr*/)
 {
 	CvUnitCaptureDefinition kCaptureDef;
 	kCaptureDef.eOldPlayer = getOwner();
@@ -2208,6 +2211,13 @@ bool CvUnit::getCaptureDefinition(CvUnitCaptureDefinition* pkCaptureDef, PlayerT
 		kCaptureDef.iY = INVALID_PLOT_COORD;
 	}
 
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+	if (MOD_BATTLE_CAPTURE_NEW_RULE)
+	{
+		kCaptureDef.pCapturingUnit = pCapturingUnit ? pCapturingUnit : getCapturingUnit();
+	}
+#endif
+
 	if(pkCaptureDef)
 		*pkCaptureDef = kCaptureDef;
 
@@ -2240,7 +2250,20 @@ CvUnit *CvUnit::createCaptureUnit(const CvUnitCaptureDefinition &kCaptureDef)
 	
 #ifdef MOD_BATTLE_CAPTURE_NEW_RULE
 	if (MOD_BATTLE_CAPTURE_NEW_RULE)
+	{
 		pkCapturedUnit->SetIsNewCapture(true);
+		try // kCaptureDef.pCapturingUnit may not a valid pointer. For safety, try catch.
+		{
+			if (pkCapturedUnit && pkCapturedUnit->IsCombatUnit() && kCaptureDef.pCapturingUnit != nullptr)
+			{
+				pkCapturedUnit->setExperienceTimes100(kCaptureDef.pCapturingUnit->getExperienceTimes100() / 4);
+				pkCapturedUnit->setLevel(1);
+			}
+		}
+		catch (...)
+		{
+		}
+	}
 #endif
 
 	pkCapturedUnit->GetReligionData()->SetReligion(kCaptureDef.eReligion);
@@ -18330,9 +18353,12 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 										CvUnitCaptureDefinition kCaptureDef;
 										if(bDoCapture)
 										{
-											if(pLoopUnit->getCaptureDefinition(&kCaptureDef, getOwner()))
+											if(pLoopUnit->getCaptureDefinition(&kCaptureDef, getOwner()), this)
 												kCaptureUnitList.push_back(kCaptureDef);
 											pLoopUnit->setCapturingPlayer(NO_PLAYER);	// Make absolutely sure this is not valid so the kill does not do the capture.
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+											pLoopUnit->setCapturingUnit(nullptr);
+#endif
 										}
 
 										pLoopUnit->kill(false, getOwner());
@@ -22485,6 +22511,17 @@ void CvUnit::setCapturingPlayer(PlayerTypes eNewValue)
 	VALIDATE_OBJECT
 	m_eCapturingPlayer = eNewValue;
 }
+
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+CvUnit* CvUnit::getCapturingUnit() const
+{
+	return m_pCapturingUnit;
+}
+void CvUnit::setCapturingUnit(CvUnit* unit)
+{
+	m_pCapturingUnit = unit;
+}
+#endif
 
 //	--------------------------------------------------------------------------------
 bool CvUnit::IsCapturedAsIs() const
