@@ -256,11 +256,16 @@ namespace lua {
             int code = luaL_loadstring(l, pFormula->GetFormula().c_str());
             if (code != 0)
             {
+                const char* err_msg = lua_tostring(l, -1);
+                outEvaluator->LogMsg("%s: loadstring failed. formula=%s; err_msg=%s", pFormula->GetType(), pFormula->GetFormula().c_str(), err_msg);
+                lua_pop(l, 1);
                 lua_close(l);
                 return false;
             }
             if (!lua_isfunction(l, -1))
             {
+                outEvaluator->LogMsg("%s: init failed. top is not a function. formula=%s", pFormula->GetType(), pFormula->GetFormula().c_str());
+                lua_pop(l, 1);
                 lua_close(l);
                 return false;
             }
