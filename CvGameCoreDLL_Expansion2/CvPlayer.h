@@ -1981,6 +1981,26 @@ public:
 
 	int GetRazeSpeedModifier() const;
 
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	int GetUnhappinessModFromResource() const;
+	int CalculateUnhappinessModFromResource(CvResourceInfo* pInfo, int num) const;
+
+	int GetCityConnectionTradeRouteGoldModifierFromResource() const;
+	int CalculateCityConnectionTradeRouteGoldModifierFromResource(CvResourceInfo* pInfo, int num) const;
+
+	int GetHurryModifierFromResource(HurryTypes eIndex) const;
+	int CalculateGoldHurryModFromResource(CvResourceInfo* pInfo, int num) const;
+
+	int GetGlobalYieldModifierFromResource(YieldTypes eYield) const;
+	int CalculateGlobalYieldModifierFromResource(CvResourceInfo* pInfo, int num, YieldTypes eYield) const;
+
+	// modifiers from policies ...
+	int GetResourceUnhappinessModifier() const;
+	void ChangeResourceUnhappinessModifier(int value);
+	int GetResourceCityConnectionTradeRouteGoldModifier() const;
+	void ChangeResourceCityConnectionTradeRouteGoldModifier(int value);
+#endif
+
 protected:
 	class ConqueredByBoolField
 	{
@@ -2352,6 +2372,7 @@ protected:
 
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiNumResourceUsed;
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiNumResourceTotal;
+	std::vector<int> m_paiNumResourceAvailableCache;
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiResourceGiftedToMinors;
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiResourceExport;
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiResourceImport;
@@ -2567,6 +2588,11 @@ protected:
 
 #ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
 	int m_piPerMajorReligionFollowerYieldModifier[NUM_YIELD_TYPES];
+#endif
+
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	int m_iResourceUnhappinessModifier = 0;
+	int m_iResourceCityConnectionTradeRouteGoldModifier = 0;
 #endif
 };
 

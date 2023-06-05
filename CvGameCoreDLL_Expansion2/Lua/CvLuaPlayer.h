@@ -1204,6 +1204,12 @@ protected:
 #endif
 
 	LUAAPIEXTN(GetHappinessFromFaith, int);
+
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	LUAAPIEXTN(GetUnHappinessModFromResourceByIndex, int, eResourceType);
+	LUAAPIEXTN(GetCityConnectionTradeRouteGoldModifierFromResourceByIndex, int, eResourceType);
+	LUAAPIEXTN(GetGoldHurryCostModifierFromResourceByIndex, int, eResourceType);
+#endif
 };
 
 #endif //CVLUAPLAYER_H

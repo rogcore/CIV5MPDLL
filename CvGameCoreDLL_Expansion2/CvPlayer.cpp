@@ -760,6 +760,7 @@ void CvPlayer::init(PlayerTypes eID)
 	}
 
 	m_aiPlots.clear();
+
 	m_bfEverConqueredBy.ClearAll();
 
 	AI_init();
@@ -770,6 +771,7 @@ void CvPlayer::init(PlayerTypes eID)
 void CvPlayer::uninit()
 {
 	m_paiNumResourceUsed.clear();
+	m_paiNumResourceAvailableCache.clear();
 	m_paiNumResourceTotal.clear();
 	m_paiResourceGiftedToMinors.clear();
 	m_paiResourceExport.clear();
@@ -1286,6 +1288,9 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 		CvAssertMsg(0 < GC.getNumResourceInfos(), "GC.getNumResourceInfos() is not greater than zero but it is used to allocate memory in CvPlayer::reset");
 		m_paiNumResourceUsed.clear();
 		m_paiNumResourceUsed.resize(GC.getNumResourceInfos(), 0);
+
+		m_paiNumResourceAvailableCache.clear();
+		m_paiNumResourceAvailableCache.resize(GC.getNumResourceInfos(), 0);
 
 		m_paiNumResourceTotal.clear();
 		m_paiNumResourceTotal.resize(GC.getNumResourceInfos(), 0);
@@ -13411,7 +13416,14 @@ void CvPlayer::ChangeUnhappinessFromUnitsMod(int iChange)
 /// Unhappiness Mod (-50 = 50% of normal)
 int CvPlayer::GetUnhappinessMod() const
 {
-	return m_iUnhappinessMod;
+	int iTemp = 0;
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	if (MOD_RESOURCE_EXTRA_BUFF)
+	{
+		iTemp += GetUnhappinessModFromResource();
+	}
+#endif
+	return m_iUnhappinessMod + iTemp;
 }
 
 //	--------------------------------------------------------------------------------
@@ -20882,9 +20894,18 @@ int CvPlayer::getNumResourceAvailable(ResourceTypes eIndex, bool bIncludeImport)
 {
 	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
 	CvAssertMsg(eIndex < GC.getNumResourceInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
-	return getNumResourceTotal(eIndex, bIncludeImport) - getNumResourceUsed(eIndex);
+	int result = getNumResourceTotal(eIndex, bIncludeImport) - getNumResourceUsed(eIndex);
+	if (bIncludeImport)
+	{
+		int oldValue = m_paiNumResourceAvailableCache[eIndex];
+		if (oldValue != result)
+		{
+			std::vector<int>& tmp = const_cast<std::vector<int>&>(m_paiNumResourceAvailableCache);
+			tmp[eIndex] = result;
+		}
+	}
+	return result;
 }
-
 
 //	--------------------------------------------------------------------------------
 int CvPlayer::getResourceGiftedToMinors(ResourceTypes eIndex) const
@@ -21766,7 +21787,14 @@ int CvPlayer::getHurryModifier(HurryTypes eIndex) const
 {
 	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
 	CvAssertMsg(eIndex < GC.getNumHurryInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
-	return m_paiHurryModifier[eIndex];
+	int tmp = 0;
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	if (MOD_RESOURCE_EXTRA_BUFF)
+	{
+		tmp += GetHurryModifierFromResource(eIndex);
+	}
+#endif
+	return m_paiHurryModifier[eIndex] + tmp;
 }
 
 //	--------------------------------------------------------------------------------
@@ -25167,6 +25195,17 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	ChangeNumCitiesFreeCultureBuilding(iNumCitiesFreeCultureBuilding);
 	ChangeNumCitiesFreeFoodBuilding(iNumCitiesFreeFoodBuilding);
 
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	if (pPolicy->GetResourceCityConnectionTradeRouteGoldModifier() != 0)
+	{
+		ChangeResourceCityConnectionTradeRouteGoldModifier(pPolicy->GetResourceCityConnectionTradeRouteGoldModifier() * iChange);
+	}
+	if (pPolicy->GetResourceUnhappinessModifier() != 0)
+	{
+		ChangeResourceUnhappinessModifier(pPolicy->GetResourceUnhappinessModifier() * iChange);
+	}
+#endif
+
 	// Not really techs but this is what we use (for now)
 	for(iI = 0; iI < GC.getNUM_AND_TECH_PREREQS(); iI++)
 	{
@@ -26179,6 +26218,7 @@ void CvPlayer::Read(FDataStream& kStream)
 
 	CvAssertMsg((0 < GC.getNumResourceInfos()), "GC.getNumResourceInfos() is not greater than zero but it is expected to be in CvPlayer::read");
 	CvInfosSerializationHelper::ReadHashedDataArray(kStream, m_paiNumResourceUsed.dirtyGet());
+	kStream >> m_paiNumResourceAvailableCache;
 	CvInfosSerializationHelper::ReadHashedDataArray(kStream, m_paiNumResourceTotal.dirtyGet());
 	CvInfosSerializationHelper::ReadHashedDataArray(kStream, m_paiResourceGiftedToMinors.dirtyGet());
 	CvInfosSerializationHelper::ReadHashedDataArray(kStream, m_paiResourceExport.dirtyGet());
@@ -26399,6 +26439,12 @@ void CvPlayer::Read(FDataStream& kStream)
 
 	kStream >> m_strEmbarkedGraphicOverride;
 	kStream >> m_piPerMajorReligionFollowerYieldModifier;
+
+	#ifdef MOD_RESOURCE_EXTRA_BUFF
+	kStream >> m_iResourceUnhappinessModifier;
+	kStream >> m_iResourceCityConnectionTradeRouteGoldModifier;
+#endif
+
 	m_kPlayerAchievements.Read(kStream);
 
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
@@ -26754,6 +26800,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 
 	CvAssertMsg((0 < GC.getNumResourceInfos()), "GC.getNumResourceInfos() is not greater than zero but an array is being allocated in CvPlayer::write");
 	CvInfosSerializationHelper::WriteHashedDataArray<ResourceTypes, int>(kStream, m_paiNumResourceUsed);
+	kStream << m_paiNumResourceAvailableCache;
 	CvInfosSerializationHelper::WriteHashedDataArray<ResourceTypes, int>(kStream, m_paiNumResourceTotal);
 	CvInfosSerializationHelper::WriteHashedDataArray<ResourceTypes, int>(kStream, m_paiResourceGiftedToMinors);
 	CvInfosSerializationHelper::WriteHashedDataArray<ResourceTypes, int>(kStream, m_paiResourceExport);
@@ -26950,6 +26997,11 @@ void CvPlayer::Write(FDataStream& kStream) const
 
 	kStream << m_strEmbarkedGraphicOverride;
 	kStream << m_piPerMajorReligionFollowerYieldModifier;
+
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	kStream << m_iResourceUnhappinessModifier;
+	kStream << m_iResourceCityConnectionTradeRouteGoldModifier;
+#endif
 
 	m_kPlayerAchievements.Write(kStream);
 
@@ -30153,3 +30205,175 @@ int CvPlayer::GetRazeSpeedModifier() const
 {
 	return GetPlayerTraits()->GetRazeSpeedModifier() + GET_TEAM(getTeam()).GetRazeSpeedModifier();
 }
+
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+int CvPlayer::GetUnhappinessModFromResource() const
+{
+	int ret = 0;
+	for (auto* info : GC.getResourceInfo())
+	{
+		ret += CalculateUnhappinessModFromResource(info, m_paiNumResourceAvailableCache[info->GetID()]);
+	}
+	return 0;
+}
+
+int CvPlayer::CalculateUnhappinessModFromResource(CvResourceInfo* info, int num) const
+{
+	auto* evaluator = GC.GetLuaEvaluatorManager()->GetEvaluator(info->GetUnHappinessModifierFormula());
+	if (evaluator == nullptr)
+	{
+		return 0;
+	}
+
+	auto result = evaluator->Evaluate<int>(num, getNumCities());
+	if (!result.ok)
+	{
+		return 0;
+	}
+
+	if (result.value < 0)
+	{
+		return result.value * (100 + GetResourceUnhappinessModifier()) / 100;
+	}
+
+	return result.value;
+}
+
+int CvPlayer::GetCityConnectionTradeRouteGoldModifierFromResource() const
+{
+	int ret = 0;
+	for (auto* info : GC.getResourceInfo())
+	{
+		ret += CalculateCityConnectionTradeRouteGoldModifierFromResource(info, m_paiNumResourceAvailableCache[info->GetID()]);
+	}
+	return ret;
+}
+
+int CvPlayer::CalculateCityConnectionTradeRouteGoldModifierFromResource(CvResourceInfo* info, int num) const
+{
+	auto* evaluator = GC.GetLuaEvaluatorManager()->GetEvaluator(info->GetCityConnectionTradeRouteGoldModifierFormula());
+	if (evaluator == nullptr)
+	{
+		return 0;
+	}
+
+	auto result = evaluator->Evaluate<int>(num, getNumCities());
+	if (!result.ok)
+	{
+		return 0;
+	}
+
+	return result.value * (100 + GetResourceCityConnectionTradeRouteGoldModifier()) / 100;
+}
+
+int CvPlayer::GetHurryModifierFromResource(HurryTypes eIndex) const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < GC.getNumHurryInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
+	static HurryTypes eHurryGold = static_cast<HurryTypes>(GC.getInfoTypeForString("HURRY_GOLD"));
+	if (eIndex != eHurryGold)
+	{
+		return 0;
+	}
+
+	int ret = 0;
+	for (auto* info : GC.getResourceInfo())
+	{
+		ret += CalculateGoldHurryModFromResource(info, m_paiNumResourceAvailableCache[info->GetID()]);
+	}
+	return ret;
+}
+
+int CvPlayer::CalculateGoldHurryModFromResource(CvResourceInfo* pInfo, int num) const
+{
+	if (pInfo == nullptr || pInfo->GetGoldHurryCostModifierFormula() == NO_LUA_FORMULA)
+	{
+		return 0;
+	}
+
+	auto* evaluator = GC.GetLuaEvaluatorManager()->GetEvaluator(pInfo->GetGoldHurryCostModifierFormula());
+	if (evaluator == nullptr)
+	{
+		return 0;
+	}
+
+	auto result = evaluator->Evaluate<int>(num, getNumCities());
+	if (!result.ok)
+	{
+		return 0;
+	}
+
+	return result.value;
+}
+
+int CvPlayer::GetGlobalYieldModifierFromResource(YieldTypes eYield) const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+	int ret = 0;
+	for (auto* info : GC.getResourceInfo())
+	{
+		ret += CalculateGlobalYieldModifierFromResource(info, m_paiNumResourceAvailableCache[info->GetID()], eYield);
+	}
+	return ret;
+}
+
+int CvPlayer::CalculateGlobalYieldModifierFromResource(CvResourceInfo* pInfo, int num, YieldTypes eYield) const
+{
+	if (pInfo == nullptr || pInfo->GetGlobalYieldModifiers().empty())
+	{
+		return 0;
+	}
+
+	int ret = 0;
+	for (auto& yieldInfo : pInfo->GetGlobalYieldModifiers())
+	{
+		if (yieldInfo.eYield != eYield)
+		{
+			continue;
+		}
+
+		bool okEra = (yieldInfo.eStartEra == NO_ERA || GetCurrentEra() >= yieldInfo.eStartEra)
+			&& (yieldInfo.eEndEra == NO_ERA || GetCurrentEra() < yieldInfo.eEndEra);
+		if (!okEra)
+		{
+			continue;
+		}
+
+		auto* evaluator = GC.GetLuaEvaluatorManager()->GetEvaluator(yieldInfo.eFormula);
+		if (evaluator == nullptr)
+		{
+			continue;
+		}
+
+		auto result = evaluator->Evaluate<int>(num, getNumCities(), GET_TEAM( getTeam()).GetTeamTechs()->GetNumTechsKnown());
+		if (!result.ok)
+		{
+			continue;
+		}
+
+		ret += result.value;
+	}
+
+	return ret;
+}
+
+// modifiers from policies ...
+int CvPlayer::GetResourceUnhappinessModifier() const
+{
+	return m_iResourceUnhappinessModifier;
+}
+void CvPlayer::ChangeResourceUnhappinessModifier(int value)
+{
+	m_iResourceUnhappinessModifier += value;
+}
+int CvPlayer::GetResourceCityConnectionTradeRouteGoldModifier() const
+{
+	return m_iResourceCityConnectionTradeRouteGoldModifier;
+}
+void CvPlayer::ChangeResourceCityConnectionTradeRouteGoldModifier(int value)
+{
+	m_iResourceCityConnectionTradeRouteGoldModifier += value;
+}
+
+#endif
