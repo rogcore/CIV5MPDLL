@@ -48,3 +48,5 @@ create table Policy_HappinessYieldModifier (
     YieldType text references Yields(Type),
     YieldFormula text text references LuaFormula(Type)
 );
+
+alter table Policies add column InstantFoodThresholdPercent integer not null default 0;
