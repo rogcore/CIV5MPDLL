@@ -466,6 +466,8 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 
 	m_iInstantFoodThresholdPercent = kResults.GetInt("InstantFoodThresholdPercent");
 
+	m_eCaptureCityResistanceTurnsChangeFormula = static_cast<LuaFormulaTypes>(GC.getInfoTypeForString(kResults.GetText("CaptureCityResistanceTurnsChangeFormula")));
+
 	const char* szFreeBuilding = kResults.GetText("FreeBuildingOnConquest");
 	if(szFreeBuilding)
 	{
@@ -2579,6 +2581,11 @@ int CvPolicyEntry::GetIdeologyUnhappinessModifier() const
 int CvPolicyEntry::GetInstantFoodThresholdPercent() const
 {
 	return m_iInstantFoodThresholdPercent;
+}
+
+LuaFormulaTypes CvPolicyEntry::GetCaptureCityResistanceTurnsChangeFormula() const
+{
+	return m_eCaptureCityResistanceTurnsChangeFormula;
 }
 
 std::vector<PolicyYieldInfo>& CvPolicyEntry::GetCityWithWorldWonderYieldModifier()

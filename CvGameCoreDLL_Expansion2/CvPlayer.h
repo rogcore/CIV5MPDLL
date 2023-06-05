@@ -1978,6 +1978,11 @@ public:
 
 	int GetHappinessFromFaith() const;
 
+	LuaFormulaTypes GetCaptureCityResistanceTurnsChangeFormula() const;
+	void SetCaptureCityResistanceTurnsChangeFormula(LuaFormulaTypes value);
+
+	int GetCaptureCityResistanceTurnsChange(CvCity* city, int originalResistanceTurn, bool originalOwnerLostCaptal) const;
+
 	CvCity* CvPlayer::GetRandomCity();
 
 	int GetRazeSpeedModifier() const;
@@ -2602,6 +2607,9 @@ protected:
 	int m_iResourceUnhappinessModifier = 0;
 	int m_iResourceCityConnectionTradeRouteGoldModifier = 0;
 #endif
+
+	LuaFormulaTypes m_iCaptureCityResistanceTurnsChangeFormula = NO_LUA_FORMULA;
+
 };
 
 extern bool CancelActivePlayerEndTurn();

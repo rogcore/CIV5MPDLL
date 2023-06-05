@@ -280,6 +280,7 @@ public:
 #endif
 
 	int GetInstantFoodThresholdPercent() const;
+	LuaFormulaTypes GetCaptureCityResistanceTurnsChangeFormula() const;
 
 	std::vector<PolicyYieldInfo>& GetCityWithWorldWonderYieldModifier();
 	std::vector<PolicyYieldInfo>& GetTradeRouteCityYieldModifier();
@@ -527,6 +528,8 @@ private:
 #endif
 
 	int m_iInstantFoodThresholdPercent = 0;
+
+	LuaFormulaTypes m_eCaptureCityResistanceTurnsChangeFormula = NO_LUA_FORMULA;
 
 #ifdef MOD_API_TRADE_ROUTE_YIELD_RATE
 	Firaxis::Array<int, YieldTypes::NUM_YIELD_TYPES> m_piMinorsTradeRouteYieldRate;

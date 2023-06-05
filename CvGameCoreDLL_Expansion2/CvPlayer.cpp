@@ -3120,11 +3120,12 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 			pNewCity->SetOccupied(true);
 
 			int iInfluenceReduction = GetCulture()->GetInfluenceCityConquestReduction(eOldOwner);
-			int iResistanceTurns = pNewCity->getPopulation() * (100 - iInfluenceReduction) / 100;
+			int iOriginalResistanceTurns = pNewCity->getPopulation() * (100 - iInfluenceReduction) / 100;
+			int iTurnChange = GetCaptureCityResistanceTurnsChange(pNewCity, iOriginalResistanceTurns, GET_PLAYER(eOldOwner).IsHasLostCapital());
 
-			if (iResistanceTurns > 0)
+			if (iTurnChange + iOriginalResistanceTurns > 0)
 			{
-				pNewCity->ChangeResistanceTurns(iResistanceTurns);
+				pNewCity->ChangeResistanceTurns(iTurnChange + iOriginalResistanceTurns);
 			}
 		}
 
@@ -25487,6 +25488,18 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 		DoAdoptedGreatPersonCityStatePolicy();
 	}
 
+	if (pPolicy->GetCaptureCityResistanceTurnsChangeFormula() != NO_LUA_FORMULA)
+	{
+		if (iChange > 0)
+		{
+			SetCaptureCityResistanceTurnsChangeFormula(pPolicy->GetCaptureCityResistanceTurnsChangeFormula());
+		}
+		else
+		{
+			SetCaptureCityResistanceTurnsChangeFormula(NO_LUA_FORMULA);
+		}
+	}
+
 	// Add a Reformation belief if eligible
 #if defined(MOD_RELIGION_LOCAL_RELIGIONS)
 	if (isHuman() && pPolicy->IsAddReformationBelief() && GetReligions()->HasCreatedReligion(true) && !GetReligions()->HasAddedReformationBelief())
@@ -26469,6 +26482,8 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iResourceCityConnectionTradeRouteGoldModifier;
 #endif
 
+	kStream >> (int&)m_iCaptureCityResistanceTurnsChangeFormula;
+
 	m_kPlayerAchievements.Read(kStream);
 
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
@@ -27027,6 +27042,8 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iResourceUnhappinessModifier;
 	kStream << m_iResourceCityConnectionTradeRouteGoldModifier;
 #endif
+
+	kStream << (int)m_iCaptureCityResistanceTurnsChangeFormula;
 
 	m_kPlayerAchievements.Write(kStream);
 
@@ -30198,6 +30215,33 @@ int CvPlayer::GetHappinessFromFaith() const
 	}
 
 	return m_iGlobalHappinessFromFaithPercent * GetTotalFaithPerTurn() / 100;
+}
+
+LuaFormulaTypes CvPlayer::GetCaptureCityResistanceTurnsChangeFormula() const
+{
+	return m_iCaptureCityResistanceTurnsChangeFormula;
+}
+
+void CvPlayer::SetCaptureCityResistanceTurnsChangeFormula(LuaFormulaTypes value)
+{
+	m_iCaptureCityResistanceTurnsChangeFormula = value;
+}
+
+int CvPlayer::GetCaptureCityResistanceTurnsChange(CvCity* city, int originalResistanceTurn, bool originalOwnerLostCaptal) const
+{
+	auto* eval = GC.GetLuaEvaluatorManager()->GetEvaluator(GetCaptureCityResistanceTurnsChangeFormula());
+	if (eval == nullptr)
+	{
+		return 0;
+	}
+
+	auto result = eval->Evaluate<int>(city->getPopulation(), originalResistanceTurn, originalOwnerLostCaptal);
+	if (!result.ok)
+	{
+		return 0;
+	}
+
+	return result.value;
 }
 
 int CvPlayer::GetHappinessInWLTKDCities() const
