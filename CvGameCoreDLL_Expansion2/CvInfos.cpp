@@ -5502,6 +5502,11 @@ int CvYieldInfo::getGreakWorkYieldMod() const
 }
 #endif
 
+LuaFormulaTypes CvYieldInfo::GetExcessHappinessModifierFormula() const
+{
+	return m_eExcessHappinessModifierFormula;
+}
+
 //------------------------------------------------------------------------------
 bool CvYieldInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
@@ -5530,6 +5535,8 @@ bool CvYieldInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 		kResults.GetValue("GreakWorkYieldMod", m_iGreakWorkYieldMod);
 	}
 #endif
+
+	m_eExcessHappinessModifierFormula = static_cast<LuaFormulaTypes>(GC.getInfoTypeForString(kResults.GetText("ExcessHappinessModifierFormula")));
 
 	return true;
 }

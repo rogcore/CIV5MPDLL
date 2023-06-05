@@ -1680,6 +1680,8 @@ public:
 	int getAIWeightPercent() const;
 	int getGreakWorkYieldMod() const;
 
+	LuaFormulaTypes GetExcessHappinessModifierFormula() const;
+
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
 protected:
@@ -1702,6 +1704,8 @@ protected:
 #ifdef MOD_BALANCE_CORE
 	int m_iGreakWorkYieldMod;
 #endif
+
+	LuaFormulaTypes m_eExcessHappinessModifierFormula = NO_LUA_FORMULA;
 };
 
 

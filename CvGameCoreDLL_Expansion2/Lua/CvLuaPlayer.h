@@ -1210,6 +1210,9 @@ protected:
 	LUAAPIEXTN(GetCityConnectionTradeRouteGoldModifierFromResourceByIndex, int, eResourceType);
 	LUAAPIEXTN(GetGoldHurryCostModifierFromResourceByIndex, int, eResourceType);
 #endif
+
+	LUAAPIEXTN(GetYieldModifierFromHappiness, int, eYieldType);
+	LUAAPIEXTN(GetYieldModifierFromNumGreakWork, int, eYieldType);
 };
 
 #endif //CVLUAPLAYER_H

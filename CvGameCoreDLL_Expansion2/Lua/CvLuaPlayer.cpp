@@ -1290,6 +1290,9 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(GetCityConnectionTradeRouteGoldModifierFromResourceByIndex);
 	Method(GetGoldHurryCostModifierFromResourceByIndex);
 #endif
+
+	Method(GetYieldModifierFromHappiness);
+	Method(GetYieldModifierFromNumGreakWork);
 }
 //------------------------------------------------------------------------------
 void CvLuaPlayer::HandleMissingInstance(lua_State* L)
@@ -12448,3 +12451,21 @@ int CvLuaPlayer::lGetGoldHurryCostModifierFromResourceByIndex(lua_State* L)
 }
 
 #endif
+
+int CvLuaPlayer::lGetYieldModifierFromHappiness(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	YieldTypes eYield = static_cast<YieldTypes>(lua_tointeger(L, 2));
+	int result = pkPlayer->GetYieldModifierFromHappiness(GC.getYieldInfo(eYield));
+	lua_pushinteger(L, result);
+	return 1;
+}
+
+int CvLuaPlayer::lGetYieldModifierFromNumGreakWork(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	YieldTypes eYield = static_cast<YieldTypes>(lua_tointeger(L, 2));
+	int result = pkPlayer->GetYieldModifierFromNumGreakWork(GC.getYieldInfo(eYield));
+	lua_pushinteger(L, result);
+	return 1;
+}

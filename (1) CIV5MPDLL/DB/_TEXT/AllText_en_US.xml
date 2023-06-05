@@ -272,6 +272,12 @@
 				[NEWLINE][ICON_BULLET] Global Modifier for Resources: {1_Num}%
 			</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_HAPPINESS">
+			<Text>
+				[NEWLINE][ICON_BULLET] Global Modifier for Happiness: {1_Num}%
+			</Text>
+		</Row>
 	</Language_en_US>
 
 </GameData>

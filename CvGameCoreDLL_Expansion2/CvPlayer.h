@@ -2001,6 +2001,10 @@ public:
 	void ChangeResourceCityConnectionTradeRouteGoldModifier(int value);
 #endif
 
+	int GetYieldModifierFromHappiness(CvYieldInfo* info) const;
+
+	int GetYieldModifierFromNumGreakWork(CvYieldInfo* info) const;
+
 protected:
 	class ConqueredByBoolField
 	{

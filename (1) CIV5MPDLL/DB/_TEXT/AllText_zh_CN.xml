@@ -271,6 +271,12 @@
 				[NEWLINE][ICON_BULLET]战略资源修正: {1_Num}%
 			</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_HAPPINESS">
+			<Text>
+				[NEWLINE][ICON_BULLET]快乐度修正(全局): {1_Num}%
+			</Text>
+		</Row>
 		
 	</Language_zh_CN>
 

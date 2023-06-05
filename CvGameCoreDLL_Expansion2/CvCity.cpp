@@ -11262,6 +11262,8 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	VALIDATE_OBJECT
 	int iModifier = 0;
 	int iTempMod;
+	auto& owner = GET_PLAYER(getOwner());
+	CvYieldInfo* pYield = GC.getYieldInfo(eIndex);
 
 	// Yield Rate Modifier
 	iTempMod = getYieldRateModifier(eIndex);
@@ -11308,7 +11310,6 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	// Golden Age Yield Modifier
 	if (GET_PLAYER(getOwner()).isGoldenAge())
 	{
-		CvYieldInfo *pYield = GC.getYieldInfo(eIndex);
 		if (pYield)
 		{
 			iTempMod = pYield->getGoldenAgeYieldMod();
@@ -11328,20 +11329,24 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 #ifdef MOD_BALANCE_CORE
 	if (MOD_BALANCE_CORE)
 	{
-		const int iNumGWs = GET_PLAYER(getOwner()).GetCulture()->GetNumGreatWorks();
-		const int iYieldModFromGws = GC.getYieldInfo(eIndex)->getGreakWorkYieldMod();
-		if (iYieldModFromGws != 0 && iNumGWs != 0)
+		iTempMod = owner.GetYieldModifierFromNumGreakWork(pYield);
+		if (iTempMod != 0)
 		{
-			iTempMod = iYieldModFromGws * iNumGWs;
-			iModifier += iTempMod;
-
 			if (toolTipSink)
 				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_NUM_GREAT_WORK", iTempMod);
 		}
+		iModifier += iTempMod;
 	}
 #endif
 
-	auto& owner = GET_PLAYER(getOwner());
+	const int iModFromHappiness = owner.GetYieldModifierFromHappiness(pYield);
+	if (iModFromHappiness != 0)
+	{
+		iModifier += iModFromHappiness;
+		if (toolTipSink)
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_HAPPINESS", iModFromHappiness);
+	}
+
 	if (getNumWorldWonders() > 0)
 	{
 		if (!owner.GetCityWithWorldWonderYieldModifier().empty())

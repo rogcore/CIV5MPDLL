@@ -30377,3 +30377,27 @@ void CvPlayer::ChangeResourceCityConnectionTradeRouteGoldModifier(int value)
 }
 
 #endif
+
+int CvPlayer::GetYieldModifierFromHappiness(CvYieldInfo* info) const
+{
+	auto* evaluator = GC.GetLuaEvaluatorManager()->GetEvaluator(info->GetExcessHappinessModifierFormula());
+	if (evaluator == nullptr)
+	{
+		return 0;
+	}
+
+	auto result = evaluator->Evaluate<int>(GetExcessHappiness(), getNumCities());
+	if (!result.ok)
+	{
+		return 0;
+	}
+
+	return result.value;
+}
+
+int CvPlayer::GetYieldModifierFromNumGreakWork(CvYieldInfo* info) const
+{
+	int iNum = GetCulture()->GetNumGreatWorks();
+	const int iYieldModFromGws = info->getGreakWorkYieldMod();
+	return iNum * iYieldModFromGws;
+}
