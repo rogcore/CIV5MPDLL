@@ -25126,33 +25126,44 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 		{
 			if (it->ePolicy == (PolicyTypes)pPolicy->GetID())
 			{
-					it = m_vCityWithWorldWonderYieldModifier.erase(it);
+				it = m_vCityWithWorldWonderYieldModifier.erase(it);
 			}
 			else
 			{
-					it++;
+				it++;
 			}
 		}
 		for (auto it = m_vTradeRouteCityYieldModifier.begin(); it != m_vTradeRouteCityYieldModifier.end();)
 		{
 			if (it->ePolicy == (PolicyTypes)pPolicy->GetID())
 			{
-					it = m_vTradeRouteCityYieldModifier.erase(it);
+				it = m_vTradeRouteCityYieldModifier.erase(it);
 			}
 			else
 			{
-					it++;
+				it++;
 			}
 		}
 		for (auto it = m_vCityNumberCityYieldModifier.begin(); it != m_vCityNumberCityYieldModifier.end();)
 		{
 			if (it->ePolicy == (PolicyTypes)pPolicy->GetID())
 			{
-					it = m_vCityNumberCityYieldModifier.erase(it);
+				it = m_vCityNumberCityYieldModifier.erase(it);
 			}
 			else
 			{
-					it++;
+				it++;
+			}
+		}
+		for (auto it = m_vHappinessYieldModifier.begin(); it != m_vHappinessYieldModifier.end();)
+		{
+			if (it->ePolicy == (PolicyTypes)pPolicy->GetID())
+			{
+				it = m_vHappinessYieldModifier.erase(it);
+			}
+			else
+			{
+				it++;
 			}
 		}
 		for (auto it = m_vCityResourcesFromPolicy.begin(); it != m_vCityResourcesFromPolicy.end();)
@@ -25180,6 +25191,10 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 		for (const auto& info : pPolicy->GetCityNumberCityYieldModifier())
 		{
 			m_vCityNumberCityYieldModifier.push_back(info);
+		}
+		for (const auto& info : pPolicy->GetHappinessYieldModifier())
+		{
+			m_vHappinessYieldModifier.push_back(info);
 		}
 		for (const auto& info : pPolicy->GetCityResources())
 		{
@@ -26460,6 +26475,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_vCityWithWorldWonderYieldModifier;
 	kStream >> m_vTradeRouteCityYieldModifier;
 	kStream >> m_vCityNumberCityYieldModifier;
+	kStream >> m_vHappinessYieldModifier;
 
 	kStream >> m_vCityResourcesFromPolicy;
 
@@ -27018,6 +27034,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_vCityWithWorldWonderYieldModifier;
 	kStream << m_vTradeRouteCityYieldModifier;
 	kStream << m_vCityNumberCityYieldModifier;
+	kStream << m_vHappinessYieldModifier;
 
 	kStream << m_vCityResourcesFromPolicy;
 
@@ -30141,6 +30158,11 @@ std::vector<PolicyYieldInfo>& CvPlayer::GetCityNumberCityYieldModifier()
 	return m_vCityNumberCityYieldModifier;
 }
 
+std::vector<PolicyYieldInfo>& CvPlayer::GetHappinessYieldModifier()
+{
+	return m_vHappinessYieldModifier;
+}
+
 std::vector<PolicyResourceInfo>& CvPlayer::GetCityResourcesFromPolicy()
 {
 	return m_vCityResourcesFromPolicy;
@@ -30393,6 +30415,29 @@ int CvPlayer::GetYieldModifierFromHappiness(CvYieldInfo* info) const
 	}
 
 	return result.value;
+}
+
+int CvPlayer::GetYieldModifierFromHappinessPolicy(CvYieldInfo* info) const
+{
+	int ret = 0;
+	for (auto yieldEntry : m_vHappinessYieldModifier)
+	{
+		if (yieldEntry.eYield != info->GetID())
+		{
+			continue;
+		}
+		auto* evaluator = GC.GetLuaEvaluatorManager()->GetEvaluator(yieldEntry.eLuaFormula);
+		if (evaluator == nullptr)
+		{
+			continue;
+		}
+		auto result = evaluator->Evaluate<int>(GetExcessHappiness());
+		if (result.ok)
+		{
+			ret += result.value;
+		}
+	}
+	return ret;
 }
 
 int CvPlayer::GetYieldModifierFromNumGreakWork(CvYieldInfo* info) const

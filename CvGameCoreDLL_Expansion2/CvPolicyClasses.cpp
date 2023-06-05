@@ -968,6 +968,31 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	}
 
 	{
+		m_vHappinessYieldModifier.clear();
+		std::string sqlKey = "Policy - m_vHappinessYieldModifier";
+		Database::Results* pResults = kUtility.GetResults(sqlKey);
+		if(pResults == NULL)
+		{
+			const char* szSQL = "select * from Policy_HappinessYieldModifier where PolicyType = ?";
+			pResults = kUtility.PrepareResults(sqlKey, szSQL);
+		}
+
+		pResults->Bind(1, szPolicyType, false);
+
+		while(pResults->Step())
+		{
+			PolicyYieldInfo p;
+			p.eYield = (YieldTypes)GC.getInfoTypeForString(pResults->GetText("YieldType"));
+			p.iYield = 0;
+			p.ePolicy = (PolicyTypes)GetID();
+			p.eLuaFormula = (LuaFormulaTypes)GC.getInfoTypeForString(pResults->GetText("YieldFormula"));
+			m_vHappinessYieldModifier.push_back(p);
+		}
+
+		pResults->Reset();
+	}
+
+	{
 		m_vCityResources.clear();
 		std::string sqlKey = "m_vCityResources";
 		Database::Results* pResults = kUtility.GetResults(sqlKey);
@@ -2563,6 +2588,12 @@ std::vector<PolicyYieldInfo>& CvPolicyEntry::GetCityNumberCityYieldModifier()
 {
 	return m_vCityNumberCityYieldModifier;
 }
+
+std::vector<PolicyYieldInfo>& CvPolicyEntry::GetHappinessYieldModifier()
+{
+	return m_vHappinessYieldModifier;
+}
+
 
 std::vector<PolicyResourceInfo>& CvPolicyEntry::GetCityResources()
 {

@@ -1293,6 +1293,7 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 
 	Method(GetYieldModifierFromHappiness);
 	Method(GetYieldModifierFromNumGreakWork);
+	Method(GetYieldModifierFromHappinessPolicy);
 }
 //------------------------------------------------------------------------------
 void CvLuaPlayer::HandleMissingInstance(lua_State* L)
@@ -12466,6 +12467,15 @@ int CvLuaPlayer::lGetYieldModifierFromNumGreakWork(lua_State* L)
 	CvPlayerAI* pkPlayer = GetInstance(L);
 	YieldTypes eYield = static_cast<YieldTypes>(lua_tointeger(L, 2));
 	int result = pkPlayer->GetYieldModifierFromNumGreakWork(GC.getYieldInfo(eYield));
+	lua_pushinteger(L, result);
+	return 1;
+}
+
+int CvLuaPlayer::lGetYieldModifierFromHappinessPolicy(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	YieldTypes eYield = static_cast<YieldTypes>(lua_tointeger(L, 2));
+	int result = pkPlayer->GetYieldModifierFromHappinessPolicy(GC.getYieldInfo(eYield));
 	lua_pushinteger(L, result);
 	return 1;
 }

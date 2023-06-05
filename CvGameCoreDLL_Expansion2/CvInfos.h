@@ -2441,6 +2441,7 @@ struct PolicyYieldInfo
 	PolicyTypes ePolicy;
 	YieldTypes eYield;
 	int iYield;
+	LuaFormulaTypes eLuaFormula = NO_LUA_FORMULA;
 };
 
 inline FDataStream& operator<<(FDataStream& os, const PolicyYieldInfo& kYield)

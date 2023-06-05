@@ -11344,7 +11344,15 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	{
 		iModifier += iModFromHappiness;
 		if (toolTipSink)
-			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_HAPPINESS", iModFromHappiness);
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_HAPPINESS_GLOBAL", iModFromHappiness);
+	}
+
+	const int iModFromHappinessPolicy = owner.GetYieldModifierFromHappinessPolicy(pYield);
+	if (iModFromHappinessPolicy != 0)
+	{
+		iModifier += iModFromHappinessPolicy;
+		if (toolTipSink)
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_HAPPINESS_POLICY", iModFromHappinessPolicy);
 	}
 
 	if (getNumWorldWonders() > 0)

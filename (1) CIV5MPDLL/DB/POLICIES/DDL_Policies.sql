@@ -42,3 +42,9 @@ CREATE TABLE Policy_CityNumberCityYieldModifier (
 	foreign key (PolicyType) references Policies(Type),
 	foreign key (YieldType) references Yields(Type)
 );
+
+create table Policy_HappinessYieldModifier (
+    PolicyType text references Policies(Type),
+    YieldType text references Yields(Type),
+    YieldFormula text text references LuaFormula(Type)
+);

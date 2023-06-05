@@ -1213,6 +1213,7 @@ protected:
 
 	LUAAPIEXTN(GetYieldModifierFromHappiness, int, eYieldType);
 	LUAAPIEXTN(GetYieldModifierFromNumGreakWork, int, eYieldType);
+	LUAAPIEXTN(GetYieldModifierFromHappinessPolicy, int, eYieldType);
 };
 
 #endif //CVLUAPLAYER_H
