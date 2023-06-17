@@ -1354,7 +1354,7 @@ void CvUnitCombat::ResolveCityMeleeCombat(const CvCombatInfo& kCombatInfo, uint 
 	{
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 		DoBounsFromCombatDamage(kCombatInfo);
-		if(pkAttacker->GetLostAllMovesAttackCity() > 0)
+		if(MOD_PROMOTION_NEW_EFFECT_FOR_SP && pkAttacker->GetLostAllMovesAttackCity() > 0)
 		{
 			pkAttacker->setMoves(0);
 			if (pkAttacker->getOwner() == GC.getGame().getActivePlayer())
@@ -5164,6 +5164,7 @@ void CvUnitCombat::DoHeavyChargeEffects(CvUnit* attacker, CvUnit* defender, CvPl
 void CvUnitCombat::DoBounsFromCombatDamage(const CvCombatInfo & kCombatInfo)
 {
 	if (!MOD_PROMOTION_NEW_EFFECT_FOR_SP) return;
+	if (!ShouldDoNewBattleEffects(kCombatInfo)) return;
 	CvUnit* pAttackerUnit = kCombatInfo.getUnit(BATTLE_UNIT_ATTACKER);
 	CvUnit* pDefenderUnit = kCombatInfo.getUnit(BATTLE_UNIT_DEFENDER);
 	// Only work when unit vs unit
