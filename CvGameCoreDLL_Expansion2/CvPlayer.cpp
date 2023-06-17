@@ -11766,8 +11766,11 @@ int CvPlayer::GetTotalFaithPerTurn() const
 	int iFaithPerTurn = 0;
 
 	// If we're in anarchy, then no Faith is generated!
-	if(IsAnarchy())
+	if (IsAnarchy())
+	{
+		const_cast<CvPlayer*>(this)->SetCachedTotalFaithPerTurn(0);
 		return 0;
+	}
 
 	// Faith per turn from Cities
 	iFaithPerTurn += GetFaithPerTurnFromCities();
@@ -11783,6 +11786,7 @@ int CvPlayer::GetTotalFaithPerTurn() const
 	// Faith per turn from Religion (Founder beliefs)
 	iFaithPerTurn += GetFaithPerTurnFromReligion();
 
+	const_cast<CvPlayer*>(this)->SetCachedTotalFaithPerTurn(iFaithPerTurn);
 	return iFaithPerTurn;
 }
 
@@ -11933,6 +11937,16 @@ void CvPlayer::SetFaithEverGenerated(int iNewValue)
 void CvPlayer::ChangeFaithEverGenerated(int iChange)
 {
 	SetFaithEverGenerated(GetFaithEverGenerated() + iChange);
+}
+
+int CvPlayer::GetCachedTotalFaithPerTurn() const
+{
+	return m_iCachedTotalFaithPerTurn;
+}
+
+void CvPlayer::SetCachedTotalFaithPerTurn(int iValue)
+{
+	m_iCachedTotalFaithPerTurn = iValue;
 }
 
 //	--------------------------------------------------------------------------------
@@ -25914,6 +25928,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iCulturePerTechResearched;
 	kStream >> m_iFaith;
 	kStream >> m_iFaithEverGenerated;
+	kStream >> m_iCachedTotalFaithPerTurn;
 	kStream >> m_iHappiness;
 	kStream >> m_iUprisingCounter;
 	kStream >> m_iExtraHappinessPerLuxury;
@@ -26618,6 +26633,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iCulturePerTechResearched;
 	kStream << m_iFaith;
 	kStream << m_iFaithEverGenerated;
+	kStream << m_iCachedTotalFaithPerTurn;
 	kStream << m_iHappiness;
 	kStream << m_iUprisingCounter;
 	kStream << m_iExtraHappinessPerLuxury;
@@ -30288,7 +30304,7 @@ int CvPlayer::GetHappinessFromFaith() const
 		return 0;
 	}
 
-	return m_iGlobalHappinessFromFaithPercent * GetTotalFaithPerTurn() / 100;
+	return m_iGlobalHappinessFromFaithPercent * GetCachedTotalFaithPerTurn() / 100;
 }
 
 LuaFormulaTypes CvPlayer::GetCaptureCityResistanceTurnsChangeFormula() const
