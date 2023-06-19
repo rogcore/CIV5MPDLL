@@ -11543,7 +11543,7 @@ int CvCity::getHappinessModifier(YieldTypes eIndex) const
 
 	if (kPlayer.IsEmpireUnhappy())
 	{
-		int iUnhappy = -1 * kPlayer.GetExcessHappiness();
+		int iUnhappy = -1 * kPlayer.GetCachedExcessHappiness();
 
 		// Production and Gold slow down when Empire is Unhappy
 		if(eIndex == YIELD_PRODUCTION)

@@ -12021,7 +12021,19 @@ void CvPlayer::SetHappiness(int iNewValue)
 /// How much over our Happiness limit are we?
 int CvPlayer::GetExcessHappiness() const
 {
-	return GetHappiness() - GetUnhappiness();
+	int result = GetHappiness() - GetUnhappiness();
+	const_cast<CvPlayer*>(this)->SetCachedExcessHappiness(result);
+	return result;
+}
+
+int CvPlayer::GetCachedExcessHappiness() const
+{
+	return m_iCachedExcessHappiness;
+}
+
+void CvPlayer::SetCachedExcessHappiness(int value)
+{
+	m_iCachedExcessHappiness = value;
 }
 
 //	--------------------------------------------------------------------------------
@@ -25930,6 +25942,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iFaithEverGenerated;
 	kStream >> m_iCachedTotalFaithPerTurn;
 	kStream >> m_iHappiness;
+	kStream >> m_iCachedExcessHappiness;
 	kStream >> m_iUprisingCounter;
 	kStream >> m_iExtraHappinessPerLuxury;
 	kStream >> m_iUnhappinessFromUnits;
@@ -26635,6 +26648,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iFaithEverGenerated;
 	kStream << m_iCachedTotalFaithPerTurn;
 	kStream << m_iHappiness;
+	kStream << m_iCachedExcessHappiness;
 	kStream << m_iUprisingCounter;
 	kStream << m_iExtraHappinessPerLuxury;
 	kStream << m_iUnhappinessFromUnits;
@@ -30551,7 +30565,7 @@ int CvPlayer::GetYieldModifierFromHappiness(CvYieldInfo* info) const
 		return 0;
 	}
 
-	auto result = evaluator->Evaluate<int>(GetExcessHappiness(), getNumCities());
+	auto result = evaluator->Evaluate<int>(GetCachedExcessHappiness(), getNumCities());
 	if (!result.ok)
 	{
 		return 0;
@@ -30574,7 +30588,7 @@ int CvPlayer::GetYieldModifierFromHappinessPolicy(CvYieldInfo* info) const
 		{
 			continue;
 		}
-		auto result = evaluator->Evaluate<int>(GetExcessHappiness());
+		auto result = evaluator->Evaluate<int>(GetCachedExcessHappiness());
 		if (result.ok)
 		{
 			ret += result.value;
