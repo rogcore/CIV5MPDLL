@@ -1298,14 +1298,27 @@ int CvTraitEntry::GetPerMajorReligionFollowerYieldModifier(const YieldTypes eYie
 #ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
 int CvTraitEntry::GetSpreadReligionFromKilledUnitStrengthPercent() const
 {
-  return m_iSpreadReligionFromKilledUnitStrengthPercent;
+  	return m_iSpreadReligionFromKilledUnitStrengthPercent;
 }
 
 int CvTraitEntry::GetSpreadReligionRadius() const
 {
-  return m_iSpreadReligionRadius;
+  	return m_iSpreadReligionRadius;
 }
 #endif
+
+#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+int CvTraitEntry::GetInflictDamageChangePerCapturedHolyCity() const
+{
+  	return m_iInflictDamageChangePerCapturedHolyCity;
+}
+
+int CvTraitEntry::GetDamageChangePerCapturedHolyCity() const
+{
+  	return m_iDamageChangePerCapturedHolyCity;
+}
+#endif
+
 
 /// Load XML data
 bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
@@ -2031,8 +2044,13 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	}
 
 #ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
-  m_iSpreadReligionFromKilledUnitStrengthPercent = kResults.GetInt("SpreadReligionFromKilledUnitStrengthPercent");
-  m_iSpreadReligionRadius = kResults.GetInt("SpreadReligionRadius");
+	m_iSpreadReligionFromKilledUnitStrengthPercent = kResults.GetInt("SpreadReligionFromKilledUnitStrengthPercent");
+	m_iSpreadReligionRadius = kResults.GetInt("SpreadReligionRadius");
+#endif
+
+#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	m_iInflictDamageChangePerCapturedHolyCity = kResults.GetInt("InflictDamageChangePerCapturedHolyCity");
+	m_iDamageChangePerCapturedHolyCity = kResults.GetInt("DamageChangePerCapturedHolyCity");
 #endif
 
 	return true;
@@ -2339,8 +2357,13 @@ void CvPlayerTraits::InitPlayerTraits()
 #endif
 
 #ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
-      m_iSpreadReligionFromKilledUnitStrengthPercent = trait->GetSpreadReligionFromKilledUnitStrengthPercent();
-      m_iSpreadReligionRadius = trait->GetSpreadReligionRadius();
+			m_iSpreadReligionFromKilledUnitStrengthPercent = trait->GetSpreadReligionFromKilledUnitStrengthPercent();
+			m_iSpreadReligionRadius = trait->GetSpreadReligionRadius();
+#endif
+
+#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+			m_iInflictDamageChangePerCapturedHolyCity = trait->GetInflictDamageChangePerCapturedHolyCity();
+			m_iDamageChangePerCapturedHolyCity = trait->GetDamageChangePerCapturedHolyCity();
 #endif
 
 			for(int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
@@ -4347,8 +4370,13 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	kStream >> m_piPerMajorReligionFollowerYieldModifier;
 
 #ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
-  kStream >> m_iSpreadReligionFromKilledUnitStrengthPercent;
-  kStream >> m_iSpreadReligionRadius;
+	kStream >> m_iSpreadReligionFromKilledUnitStrengthPercent;
+	kStream >> m_iSpreadReligionRadius;
+#endif
+
+#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	kStream >> m_iInflictDamageChangePerCapturedHolyCity;
+	kStream >> m_iDamageChangePerCapturedHolyCity;
 #endif
 }
 
@@ -4574,8 +4602,13 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_piPerMajorReligionFollowerYieldModifier;
 
 #ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
-  kStream << m_iSpreadReligionFromKilledUnitStrengthPercent;
-  kStream << m_iSpreadReligionRadius;
+	kStream << m_iSpreadReligionFromKilledUnitStrengthPercent;
+	kStream << m_iSpreadReligionRadius;
+#endif
+
+#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	kStream << m_iInflictDamageChangePerCapturedHolyCity;
+	kStream << m_iDamageChangePerCapturedHolyCity;
 #endif
 }
 
@@ -4738,11 +4771,23 @@ bool CvPlayerTraits::ConvertBarbarianNavalUnit(UnitHandle pUnit)
 #ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
 int CvPlayerTraits::GetSpreadReligionFromKilledUnitStrengthPercent() const
 {
-  return m_iSpreadReligionFromKilledUnitStrengthPercent;
+	return m_iSpreadReligionFromKilledUnitStrengthPercent;
 }
 
 int CvPlayerTraits::GetSpreadReligionRadius() const
 {
-  return m_iSpreadReligionRadius;
+	return m_iSpreadReligionRadius;
+}
+#endif
+
+#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+int CvPlayerTraits::GetInflictDamageChangePerCapturedHolyCity() const
+{
+	return m_iInflictDamageChangePerCapturedHolyCity;
+}
+
+int CvPlayerTraits::GetDamageChangePerCapturedHolyCity() const
+{
+	return m_iDamageChangePerCapturedHolyCity;
 }
 #endif

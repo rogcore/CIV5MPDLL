@@ -5,6 +5,7 @@
 	All other marks and trademarks are the property of their respective owners.  
 	All rights reserved. 
 	------------------------------------------------------------------------------------------------------- */
+#include "CvCity.h"
 #include "CvGameCoreDLLPCH.h"
 #include "CvUnit.h"
 #include "CvUnitCombat.h"
@@ -4498,6 +4499,29 @@ void SiegeInflictDamageIntervene(InflictDamageContext* ctx)
 	}
 }
 
+#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+static void DamageInterveneFromTraitReligion(InflictDamageContext* ctx)
+{
+	if (!MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY) return;
+
+	if (ctx->pAttackerUnit)
+	{
+		CvPlayerAI& kAttacker = GET_PLAYER(ctx->pAttackerUnit->getOwner());
+		const int iHolyCityCount = kAttacker.GetCachedCapturedHolyCity();
+		*ctx->piAttackInflictDamage += kAttacker.GetPlayerTraits()->GetInflictDamageChangePerCapturedHolyCity() * iHolyCityCount;
+		*ctx->piDefenseInflictDamage += kAttacker.GetPlayerTraits()->GetDamageChangePerCapturedHolyCity() * iHolyCityCount;
+	}
+
+	if (ctx->pDefenderUnit)
+	{
+		CvPlayerAI& kDefender = GET_PLAYER(ctx->pDefenderUnit->getOwner());
+		const int iHolyCityCount = kDefender.GetCachedCapturedHolyCity();
+		*ctx->piAttackInflictDamage += kDefender.GetPlayerTraits()->GetDamageChangePerCapturedHolyCity() * iHolyCityCount;
+		*ctx->piDefenseInflictDamage += kDefender.GetPlayerTraits()->GetInflictDamageChangePerCapturedHolyCity() * iHolyCityCount;
+	}
+}
+#endif
+
 void CvUnitCombat::InterveneInflictDamage(InflictDamageContext* ctx)
 {
 	if (ctx == nullptr) return;
@@ -4506,6 +4530,10 @@ void CvUnitCombat::InterveneInflictDamage(InflictDamageContext* ctx)
 	UnitAttackInflictDamageIntervene(ctx);
 	UnitDefenseInflictDamageIntervene(ctx);
 	SiegeInflictDamageIntervene(ctx);
+
+#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	DamageInterveneFromTraitReligion(ctx);
+#endif
 
 	if (ctx->piAttackInflictDamage && *ctx->piAttackInflictDamage <= 0)
 	{

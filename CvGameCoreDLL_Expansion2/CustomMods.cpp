@@ -579,6 +579,7 @@ int CustomMods::getOption(string sOption, int defValue) {
 		MOD_OPT_CACHE(SP_SMART_AI);
 
 		MOD_OPT_CACHE(TRAITS_SPREAD_RELIGION_AFTER_KILLING);
+		MOD_OPT_CACHE(TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY);
 		
 		m_bInit = true;
 	}

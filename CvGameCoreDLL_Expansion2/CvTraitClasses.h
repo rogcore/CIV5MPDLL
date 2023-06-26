@@ -258,8 +258,13 @@ public:
 #endif
 
 #ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
-  int GetSpreadReligionFromKilledUnitStrengthPercent() const;
-  int GetSpreadReligionRadius() const;
+	int GetSpreadReligionFromKilledUnitStrengthPercent() const;
+	int GetSpreadReligionRadius() const;
+#endif
+
+#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	int GetInflictDamageChangePerCapturedHolyCity() const;
+	int GetDamageChangePerCapturedHolyCity() const;
 #endif
 
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
@@ -459,6 +464,11 @@ protected:
 #ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
   int m_iSpreadReligionFromKilledUnitStrengthPercent = 0;
   int m_iSpreadReligionRadius = 0;
+#endif
+
+#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+  int m_iInflictDamageChangePerCapturedHolyCity = 0;
+  int m_iDamageChangePerCapturedHolyCity = 0;
 #endif
 
 private:
@@ -1073,6 +1083,11 @@ public:
   int GetSpreadReligionRadius() const;
 #endif
 
+#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+  int GetInflictDamageChangePerCapturedHolyCity() const;
+  int GetDamageChangePerCapturedHolyCity() const;
+#endif
+
 	// Maya calendar routines
 	bool IsUsingMayaCalendar() const;
 	bool IsEndOfMayaLongCount();
@@ -1305,6 +1320,11 @@ private:
 #ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
   int m_iSpreadReligionFromKilledUnitStrengthPercent = 0;
   int m_iSpreadReligionRadius = 0;
+#endif
+
+#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+  int m_iInflictDamageChangePerCapturedHolyCity = 0;
+  int m_iDamageChangePerCapturedHolyCity = 0;
 #endif
 };
 
