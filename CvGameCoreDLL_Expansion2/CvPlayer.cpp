@@ -26679,6 +26679,10 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iGlobalHappinessFromFaithPercent;
 	kStream >> m_iHappinessInWLTKDCities;
 
+#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	kStream >> m_iCachedCapturedHolyCity;
+#endif
+
 	if(GetID() < MAX_MAJOR_CIVS)
 	{
 		if(!m_pDiplomacyRequests)
@@ -27249,6 +27253,10 @@ void CvPlayer::Write(FDataStream& kStream) const
 
 	kStream << m_iGlobalHappinessFromFaithPercent;
 	kStream << m_iHappinessInWLTKDCities;
+
+#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	kStream << m_iCachedCapturedHolyCity;
+#endif
 }
 
 //	--------------------------------------------------------------------------------
