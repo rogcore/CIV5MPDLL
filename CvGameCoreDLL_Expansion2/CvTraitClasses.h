@@ -262,9 +262,13 @@ public:
 	int GetSpreadReligionRadius() const;
 #endif
 
-#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
 	int GetInflictDamageChangePerCapturedHolyCity() const;
 	int GetDamageChangePerCapturedHolyCity() const;
+#endif
+
+#ifdef MOD_TRAITS_SIEGE_BONUS_IF_SAME_RELIGION
+	int GetSiegeDamagePercentIfSameReligion() const;
 #endif
 
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
@@ -462,13 +466,17 @@ protected:
 #endif
 
 #ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
-  int m_iSpreadReligionFromKilledUnitStrengthPercent = 0;
-  int m_iSpreadReligionRadius = 0;
+	int m_iSpreadReligionFromKilledUnitStrengthPercent = 0;
+	int m_iSpreadReligionRadius = 0;
 #endif
 
-#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
-  int m_iInflictDamageChangePerCapturedHolyCity = 0;
-  int m_iDamageChangePerCapturedHolyCity = 0;
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	int m_iInflictDamageChangePerCapturedHolyCity = 0;
+	int m_iDamageChangePerCapturedHolyCity = 0;
+#endif
+
+#ifdef MOD_TRAITS_SIEGE_BONUS_IF_SAME_RELIGION
+	int m_iSiegeDamagePercentIfSameReligion = 0;
 #endif
 
 private:
@@ -1079,13 +1087,17 @@ public:
 #endif
 
 #ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
-  int GetSpreadReligionFromKilledUnitStrengthPercent() const;
-  int GetSpreadReligionRadius() const;
+	int GetSpreadReligionFromKilledUnitStrengthPercent() const;
+	int GetSpreadReligionRadius() const;
 #endif
 
-#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
-  int GetInflictDamageChangePerCapturedHolyCity() const;
-  int GetDamageChangePerCapturedHolyCity() const;
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	int GetInflictDamageChangePerCapturedHolyCity() const;
+	int GetDamageChangePerCapturedHolyCity() const;
+#endif
+
+#ifdef MOD_TRAITS_SIEGE_BONUS_IF_SAME_RELIGION
+	int GetSiegeDamagePercentIfSameReligion() const;
 #endif
 
 	// Maya calendar routines
@@ -1318,13 +1330,17 @@ private:
 #endif
 
 #ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
-  int m_iSpreadReligionFromKilledUnitStrengthPercent = 0;
-  int m_iSpreadReligionRadius = 0;
+	int m_iSpreadReligionFromKilledUnitStrengthPercent = 0;
+	int m_iSpreadReligionRadius = 0;
 #endif
 
-#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
-  int m_iInflictDamageChangePerCapturedHolyCity = 0;
-  int m_iDamageChangePerCapturedHolyCity = 0;
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	int m_iInflictDamageChangePerCapturedHolyCity = 0;
+	int m_iDamageChangePerCapturedHolyCity = 0;
+#endif
+
+#ifdef MOD_TRAITS_SIEGE_BONUS_IF_SAME_RELIGION
+	int m_iSiegeDamagePercentIfSameReligion = 0;
 #endif
 };
 

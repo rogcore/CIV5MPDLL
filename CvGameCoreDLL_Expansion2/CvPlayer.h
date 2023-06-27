@@ -2023,7 +2023,7 @@ public:
 
 	int GetYieldModifierFromNumGreakWork(CvYieldInfo* info) const;
 
-#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
 	int GetCachedCapturedHolyCity() const;
 	void UpdateCachedCapturedHolyCity();
 #endif
@@ -2633,7 +2633,7 @@ protected:
 
 	LuaFormulaTypes m_iCaptureCityResistanceTurnsChangeFormula = NO_LUA_FORMULA;
 
-#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
   	int m_iCachedCapturedHolyCity = 0;
 #endif
 

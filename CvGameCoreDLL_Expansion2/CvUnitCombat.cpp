@@ -4499,25 +4499,46 @@ void SiegeInflictDamageIntervene(InflictDamageContext* ctx)
 	}
 }
 
-#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
 static void DamageInterveneFromTraitReligion(InflictDamageContext* ctx)
 {
-	if (!MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY) return;
+	if (!MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY) return;
 
 	if (ctx->pAttackerUnit)
 	{
 		CvPlayerAI& kAttacker = GET_PLAYER(ctx->pAttackerUnit->getOwner());
 		const int iHolyCityCount = kAttacker.GetCachedCapturedHolyCity();
-		*ctx->piAttackInflictDamage += kAttacker.GetPlayerTraits()->GetInflictDamageChangePerCapturedHolyCity() * iHolyCityCount;
-		*ctx->piDefenseInflictDamage += kAttacker.GetPlayerTraits()->GetDamageChangePerCapturedHolyCity() * iHolyCityCount;
+		if (ctx->piAttackInflictDamage)
+			*ctx->piAttackInflictDamage += kAttacker.GetPlayerTraits()->GetInflictDamageChangePerCapturedHolyCity() * iHolyCityCount;
+		if (ctx->piDefenseInflictDamage)
+			*ctx->piDefenseInflictDamage += kAttacker.GetPlayerTraits()->GetDamageChangePerCapturedHolyCity() * iHolyCityCount;
 	}
 
 	if (ctx->pDefenderUnit)
 	{
 		CvPlayerAI& kDefender = GET_PLAYER(ctx->pDefenderUnit->getOwner());
 		const int iHolyCityCount = kDefender.GetCachedCapturedHolyCity();
-		*ctx->piAttackInflictDamage += kDefender.GetPlayerTraits()->GetDamageChangePerCapturedHolyCity() * iHolyCityCount;
-		*ctx->piDefenseInflictDamage += kDefender.GetPlayerTraits()->GetInflictDamageChangePerCapturedHolyCity() * iHolyCityCount;
+		if (ctx->piAttackInflictDamage)
+			*ctx->piAttackInflictDamage += kDefender.GetPlayerTraits()->GetDamageChangePerCapturedHolyCity() * iHolyCityCount;
+		if (ctx->piDefenseInflictDamage)
+			*ctx->piDefenseInflictDamage += kDefender.GetPlayerTraits()->GetInflictDamageChangePerCapturedHolyCity() * iHolyCityCount;
+	}
+}
+#endif
+
+#ifdef MOD_TRAITS_SIEGE_BONUS_IF_SAME_RELIGION
+static void SiegeDamageInterveneIfSameReligion(InflictDamageContext* ctx)
+{
+	if (!MOD_TRAITS_SIEGE_BONUS_IF_SAME_RELIGION) return;
+	if (ctx->pAttackerUnit && ctx->pDefenderCity)
+	{
+		CvPlayerAI& kAttacker = GET_PLAYER(ctx->pAttackerUnit->getOwner());
+		const auto kReligion = kAttacker.GetReligions()->GetReligionCreatedByPlayer();
+		if (kReligion != NO_RELIGION && kReligion != RELIGION_PANTHEON && kAttacker.GetPlayerTraits()->GetSiegeDamagePercentIfSameReligion() != 0 && ctx->pDefenderCity->GetCityReligions()->GetReligiousMajority() == kReligion)
+		{
+			if (ctx->piAttackInflictDamage)
+				*ctx->piAttackInflictDamage += kAttacker.GetPlayerTraits()->GetSiegeDamagePercentIfSameReligion() * ctx->pDefenderCity->GetMaxHitPoints() / 100;
+		}
 	}
 }
 #endif
@@ -4531,8 +4552,12 @@ void CvUnitCombat::InterveneInflictDamage(InflictDamageContext* ctx)
 	UnitDefenseInflictDamageIntervene(ctx);
 	SiegeInflictDamageIntervene(ctx);
 
-#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
 	DamageInterveneFromTraitReligion(ctx);
+#endif
+
+#ifdef MOD_TRAITS_SIEGE_BONUS_IF_SAME_RELIGION
+	SiegeDamageInterveneIfSameReligion(ctx);
 #endif
 
 	if (ctx->piAttackInflictDamage && *ctx->piAttackInflictDamage <= 0)

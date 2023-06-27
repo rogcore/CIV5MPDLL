@@ -1109,8 +1109,8 @@ void CvGameReligions::FoundReligion(PlayerTypes ePlayer, ReligionTypes eReligion
 		}
 	}
 
-#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
-	if (MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY)
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	if (MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY)
 	{
 		kPlayer.UpdateCachedCapturedHolyCity();
 	}

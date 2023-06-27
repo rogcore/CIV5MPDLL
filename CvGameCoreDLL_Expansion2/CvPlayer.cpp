@@ -3249,8 +3249,8 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 	if (MOD_GLOBAL_CITY_SCALES && pNewCity) pNewCity->UpdateScaleBuildings();
 #endif
 
-#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
-	if (MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY && pNewCity && pNewCity->GetCityReligions()->IsHolyCityAnyReligion()) {
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	if (MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY && pNewCity && pNewCity->GetCityReligions()->IsHolyCityAnyReligion()) {
 		kOldCityPlayer.UpdateCachedCapturedHolyCity();
 		this->UpdateCachedCapturedHolyCity();
 	}
@@ -26679,7 +26679,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iGlobalHappinessFromFaithPercent;
 	kStream >> m_iHappinessInWLTKDCities;
 
-#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
 	kStream >> m_iCachedCapturedHolyCity;
 #endif
 
@@ -27254,7 +27254,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iGlobalHappinessFromFaithPercent;
 	kStream << m_iHappinessInWLTKDCities;
 
-#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
 	kStream << m_iCachedCapturedHolyCity;
 #endif
 }
@@ -30687,7 +30687,7 @@ int CvPlayer::GetYieldModifierFromNumGreakWork(CvYieldInfo* info) const
 	return iNum * iYieldModFromGws;
 }
 
-#ifdef MOD_TRAIT_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
 int CvPlayer::GetCachedCapturedHolyCity() const
 {
     return m_iCachedCapturedHolyCity;
