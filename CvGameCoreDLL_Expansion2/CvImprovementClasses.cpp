@@ -454,6 +454,30 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 	}
 #endif
 
+#ifdef MOD_IMPROVEMENTS_UNIT_XP_PER_TURN
+	{
+		std::string strKey = "Improvements - UnitXPPerTurn";
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select * from Improvement_UnitXPPerTurn where ImprovementType = ?");
+		}
+
+		pResults->Bind(1, szImprovementType, lenImprovementType, false);
+
+		while (pResults->Step())
+		{
+			UnitXPPerTurn info;
+			info.iValue = pResults->GetInt("Value");
+			info.eUnitType = static_cast<UnitTypes>(GC.getInfoTypeForString(pResults->GetText("UnitType")));
+			info.ePromotionType = static_cast<PromotionTypes>(GC.getInfoTypeForString(pResults->GetText("PromotionType")));
+			m_vUnitXPPerTurn.push_back(info);
+		}
+
+		pResults->Reset();
+	}
+#endif
+
 #if defined(MOD_ROG_CORE)
 	m_iWonderProductionModifier = kResults.GetInt("WonderProductionModifier");
 	m_iNearbyFriendHeal = kResults.GetInt("NearbyFriendHeal");
@@ -1901,6 +1925,13 @@ ImprovementTypes CvImprovementEntry::GetDowngradeImprovementType() const
 std::vector<CvImprovementEntry::YieldChangesPerUnit>& CvImprovementEntry::GetYieldChangesPerUnitVec()
 {
 	return m_vYieldChangesPerUnit;
+}
+#endif
+
+#ifdef MOD_IMPROVEMENTS_YIELD_CHANGE_PER_UNIT
+std::vector<CvImprovementEntry::UnitXPPerTurn>& CvImprovementEntry::GetUnitXPPerTurnVec()
+{
+	return m_vUnitXPPerTurn;
 }
 #endif
 

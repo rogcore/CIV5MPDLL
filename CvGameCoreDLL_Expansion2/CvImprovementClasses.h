@@ -268,6 +268,16 @@ public:
 	std::vector<YieldChangesPerUnit>& GetYieldChangesPerUnitVec();
 #endif
 
+#ifdef MOD_IMPROVEMENTS_UNIT_XP_PER_TURN
+	struct UnitXPPerTurn {
+		int iValue = 0;
+		UnitTypes eUnitType = NO_UNIT;
+		PromotionTypes ePromotionType = NO_PROMOTION;
+	};
+
+	std::vector<UnitXPPerTurn>& GetUnitXPPerTurnVec();
+#endif
+
 	//---------------------------------------PROTECTED MEMBER VARIABLES---------------------------------
 protected:
 	void InitImprovementResourceList(CvImprovementResourceInfo** ppImprovementResource, int iListLen);
@@ -436,6 +446,10 @@ protected:
 
 #ifdef MOD_IMPROVEMENTS_YIELD_CHANGE_PER_UNIT
 	std::vector<YieldChangesPerUnit> m_vYieldChangesPerUnit;
+#endif
+
+#ifdef MOD_IMPROVEMENTS_UNIT_XP_PER_TURN
+	std::vector<UnitXPPerTurn> m_vUnitXPPerTurn;
 #endif
 
 	CvImprovementResourceInfo* m_paImprovementResource;

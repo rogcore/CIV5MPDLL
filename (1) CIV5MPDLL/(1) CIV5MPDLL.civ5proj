@@ -570,6 +570,11 @@
         <Type>UpdateDatabase</Type>
         <FileName>DB/IMPROVEMENTS/Improvement_YieldChangesPerUnit.sql</FileName>
       </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/IMPROVEMENTS/Improvement_UnitXPPerTurn.sql</FileName>
+      </Action>
     </ModActions>
     <ModReferences />
     <ModBlockers>
@@ -951,6 +956,10 @@
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
     <Content Include="DB\IMPROVEMENTS\Improvement_TradeRouteYieldChanges.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\IMPROVEMENTS\Improvement_UnitXPPerTurn.sql">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>

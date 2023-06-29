@@ -1147,6 +1147,7 @@
     <Row Class="6" Name="TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS" Value="0"/>
 
     <Row Class="6" Name="IMPROVEMENTS_YIELD_CHANGE_PER_UNIT" Value="0"/>
+    <Row Class="6" Name="IMPROVEMENTS_UNIT_XP_PER_TURN" Value="0"/>
   </CustomModOptions>
 
   <CustomModPostDefines>
