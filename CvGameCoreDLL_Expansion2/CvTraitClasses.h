@@ -271,6 +271,10 @@ public:
 	int GetSiegeDamagePercentIfSameReligion() const;
 #endif
 
+#ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
+	int GetFaithPurchaseCostPercent() const;
+#endif
+
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
 protected:
@@ -477,6 +481,10 @@ protected:
 
 #ifdef MOD_TRAITS_SIEGE_BONUS_IF_SAME_RELIGION
 	int m_iSiegeDamagePercentIfSameReligion = 0;
+#endif
+
+#ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
+	int m_iFaithPurchaseCombatUnitCostPercent = 0;
 #endif
 
 private:
@@ -1100,6 +1108,10 @@ public:
 	int GetSiegeDamagePercentIfSameReligion() const;
 #endif
 
+#ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
+	int GetFaithPurchaseCombatUnitCostPercent() const;
+#endif
+
 	// Maya calendar routines
 	bool IsUsingMayaCalendar() const;
 	bool IsEndOfMayaLongCount();
@@ -1341,6 +1353,10 @@ private:
 
 #ifdef MOD_TRAITS_SIEGE_BONUS_IF_SAME_RELIGION
 	int m_iSiegeDamagePercentIfSameReligion = 0;
+#endif
+
+#ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
+	int m_iFaithPurchaseCombatUnitCostPercent = 0;
 #endif
 };
 

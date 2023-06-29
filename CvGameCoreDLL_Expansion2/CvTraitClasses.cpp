@@ -1326,6 +1326,13 @@ int CvTraitEntry::GetSiegeDamagePercentIfSameReligion () const
 }
 #endif
 
+#ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
+int CvTraitEntry::GetFaithPurchaseCostPercent() const
+{
+	return m_iFaithPurchaseCombatUnitCostPercent;
+}
+#endif
+
 /// Load XML data
 bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
@@ -2063,6 +2070,9 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	m_iSiegeDamagePercentIfSameReligion = kResults.GetInt("SiegeDamagePercentIfSameReligion");
 #endif
 
+#ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
+	m_iFaithPurchaseCombatUnitCostPercent = kResults.GetInt("FaithPurchaseCombatUnitCostPercent");
+#endif
 	return true;
 }
 
@@ -2378,6 +2388,10 @@ void CvPlayerTraits::InitPlayerTraits()
 
 #ifdef MOD_TRAITS_SIEGE_BONUS_IF_SAME_RELIGION
 			m_iSiegeDamagePercentIfSameReligion = trait->GetSiegeDamagePercentIfSameReligion();
+#endif
+
+#ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
+			m_iFaithPurchaseCombatUnitCostPercent = trait->GetFaithPurchaseCostPercent();
 #endif
 
 			for(int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
@@ -4396,6 +4410,10 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 #ifdef MOD_TRAITS_SIEGE_BONUS_IF_SAME_RELIGION
 	kStream >> m_iSiegeDamagePercentIfSameReligion;
 #endif
+
+#ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
+	kStream >> m_iFaithPurchaseCombatUnitCostPercent;
+#endif
 }
 
 /// Serialization write
@@ -4632,6 +4650,10 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 #ifdef MOD_TRAITS_SIEGE_BONUS_IF_SAME_RELIGION
 	kStream << m_iSiegeDamagePercentIfSameReligion;
 #endif
+
+#ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
+	kStream << m_iFaithPurchaseCombatUnitCostPercent;
+#endif
 }
 
 // PRIVATE METHODS
@@ -4815,8 +4837,15 @@ int CvPlayerTraits::GetDamageChangePerCapturedHolyCity() const
 #endif
 
 #ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
-int CvPlayerTraits::GetSiegeDamagePercentIfSameReligion () const
+int CvPlayerTraits::GetSiegeDamagePercentIfSameReligion() const
 {
-	return m_iSiegeDamagePercentIfSameReligion ;
+	return m_iSiegeDamagePercentIfSameReligion;
+}
+#endif
+
+#ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
+int CvPlayerTraits::GetFaithPurchaseCombatUnitCostPercent() const
+{
+	return m_iFaithPurchaseCombatUnitCostPercent;
 }
 #endif

@@ -8,3 +8,6 @@ alter table Traits add column DamageChangePerCapturedHolyCity integer not null d
 
 -- <Row Class="6" Name="TRAITS_SIEGE_BONUS_IF_SAME_RELIGION" Value="0"/>
 alter table Traits add column SiegeDamagePercentIfSameReligion integer not null default 0;
+
+-- <Row Class="6" Name="TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS" Value="0"/>
+alter table Traits add column FaithPurchaseCombatUnitCostPercent integer not null default 0;
