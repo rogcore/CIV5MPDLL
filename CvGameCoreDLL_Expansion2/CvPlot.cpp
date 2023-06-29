@@ -9099,6 +9099,37 @@ int CvPlot::calculateYield(YieldTypes eYield, bool bDisplay)
 				}
 			}
 #endif
+
+#if defined(MOD_IMPROVEMENTS_YIELD_CHANGE_PER_UNIT)
+			if (MOD_IMPROVEMENTS_YIELD_CHANGE_PER_UNIT && !pImprovement->GetYieldChangesPerUnitVec().empty())
+			{
+				int iChange = 0;
+				for (const auto& info : pImprovement->GetYieldChangesPerUnitVec())
+				{
+					if (info.eYieldType != eYield) continue;
+
+					for(int iUnitLoop = 0; iUnitLoop < getNumUnits(); iUnitLoop++)
+					{
+						bool ok = true;
+						CvUnit* loopUnit = getUnitByIndex(iUnitLoop);
+						if (ok && info.eUnitType != NO_UNIT && static_cast<UnitTypes>(loopUnit->getUnitInfo().GetID()) != info.eUnitType)
+						{
+							ok = false;
+						}
+						if (ok && info.ePromotionType != NO_PROMOTION && !loopUnit->HasPromotion(info.ePromotionType))
+						{
+							ok = false;
+						}
+
+						if (ok)
+						{
+							iChange += info.iYield;
+						}
+					}
+				}
+				iYield += iChange;
+			}
+#endif
 		}
 	}
 

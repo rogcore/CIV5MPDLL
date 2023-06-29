@@ -565,6 +565,11 @@
         <Type>UpdateDatabase</Type>
         <FileName>DB/TRAITS/CombatBonusFromReligion.sql</FileName>
       </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/IMPROVEMENTS/Improvement_YieldChangesPerUnit.sql</FileName>
+      </Action>
     </ModActions>
     <ModReferences />
     <ModBlockers>
@@ -954,6 +959,10 @@
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
     <Content Include="DB\IMPROVEMENTS\Improvements_Create_Item.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\IMPROVEMENTS\Improvement_YieldChangesPerUnit.sql">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
