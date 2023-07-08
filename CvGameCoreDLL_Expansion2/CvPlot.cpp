@@ -9454,6 +9454,7 @@ void CvPlot::updateYield()
 				if(isBeingWorked())
 				{
 					pWorkingCity->ChangeBaseYieldRateFromTerrain(((YieldTypes)iI), (getYield((YieldTypes)iI) - iOldYield));
+					pWorkingCity->UpdateCityYields((YieldTypes)iI);
 				}
 
 				// JON: New City Citizens AI shoulud update here 08/17/09
@@ -12177,19 +12178,17 @@ int CvPlot::getYieldWithBuild(BuildTypes eBuild, YieldTypes eYield, bool bWithUp
 		}
 	}
 
-	if(eRoute != NO_ROUTE)
+	if (eRoute != NO_ROUTE)
 	{
 		eImprovement = getImprovementType();
-		if(eImprovement != NO_IMPROVEMENT)
+		if (eImprovement != NO_IMPROVEMENT)
 		{
-			for(int iI = 0; iI < NUM_YIELD_TYPES; iI++)
+			iYield += GC.getImprovementInfo(eImprovement)->GetRouteYieldChanges(eRoute, eYield);
+			if (getRouteType() != NO_ROUTE)
 			{
-				iYield += GC.getImprovementInfo(eImprovement)->GetRouteYieldChanges(eRoute, iI);
-				if(getRouteType() != NO_ROUTE)
-				{
-					iYield -= GC.getImprovementInfo(eImprovement)->GetRouteYieldChanges(getRouteType(), iI);
-				}
+				iYield -= GC.getImprovementInfo(eImprovement)->GetRouteYieldChanges(getRouteType(), eYield);
 			}
+
 		}
 	}
 
