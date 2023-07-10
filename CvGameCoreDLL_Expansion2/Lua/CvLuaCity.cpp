@@ -313,6 +313,8 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(IsHasBuildingClass);
 	Method(SetNumRealBuildingClass);
 #endif
+	Method(GetLocalBuildingClassYield);
+
 	Method(GetNumActiveBuilding);
 	Method(GetID);
 	Method(GetX);
@@ -2313,6 +2315,22 @@ int CvLuaCity::lIsHasBuildingClass(lua_State* L)
 	return 1;
 }
 
+//------------------------------------------------------------------------------
+int CvLuaCity::lGetLocalBuildingClassYield(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const BuildingClassTypes eBuildingClassType = (BuildingClassTypes)lua_tointeger(L, 2);
+	const YieldTypes eIndex = (YieldTypes)lua_tointeger(L, 3);
+	int iResult = 0;
+	if (eBuildingClassType != NO_BUILDINGCLASS && eIndex != NO_YIELD)
+	{
+		iResult = pkCity->getLocalBuildingClassYield(eBuildingClassType, eIndex);
+	}
+
+	lua_pushinteger(L, iResult);
+	return 1;
+}
+
 //bool SetNumRealBuildingClass(BuildingClassTypes eBuildingClassType, int iNum);
 int CvLuaCity::lSetNumRealBuildingClass(lua_State* L)
 {
@@ -2751,7 +2769,10 @@ int CvLuaCity::lGetJONSCulturePerTurnFromBuildings(lua_State* L)
 //void ChangeJONSCulturePerTurnFromBuildings(int iChange);
 int CvLuaCity::lChangeJONSCulturePerTurnFromBuildings(lua_State* L)
 {
-	return BasicLuaMethod(L, &CvCity::ChangeJONSCulturePerTurnFromBuildings);
+	CvCity* pkCity = GetInstance(L);
+	int iChange = lua_tointeger(L, 2);
+	pkCity->ChangeBaseYieldRateFromBuildings(YIELD_CULTURE, iChange);
+	return 0;
 }
 //------------------------------------------------------------------------------
 //int GetJONSCulturePerTurnFromPolicies() const;
