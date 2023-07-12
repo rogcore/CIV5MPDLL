@@ -11453,6 +11453,15 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_CAPITAL", iTempMod);
 	}
 
+	if (GetWeLoveTheKingDayCounter() > 0)
+	{
+		iTempMod = 0;
+		iTempMod += GET_PLAYER(getOwner()).getCityLoveKingDayYieldMod(eIndex);
+		iModifier += iTempMod;
+		if (iTempMod != 0 && toolTipSink)
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_POLICY_CITY_LOVE_KING", iTempMod);
+	}
+
 	// Golden Age Yield Modifier
 	if (GET_PLAYER(getOwner()).isGoldenAge())
 	{
@@ -11544,6 +11553,10 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	}
 #endif
 	
+
+
+
+
 	int iNumTradeRoutes = owner.GetTrade()->GetNumTradeRoutesUsed(true);
 	if (!owner.GetTradeRouteCityYieldModifier().empty() && iNumTradeRoutes > 0)
 	{
@@ -15723,7 +15736,7 @@ void CvCity::Purchase(UnitTypes eUnitType, BuildingTypes eBuildingType, ProjectT
 			if (iResult != FFreeList::INVALID_INDEX)
 			{
 				CvUnit* pUnit = kPlayer.getUnit(iResult);
-				if (!pUnit->getUnitInfo().CanMoveAfterPurchase())
+				if (!pUnit->getUnitInfo().CanMoveAfterPurchase() && !kPlayer.IsPlayerMoveAfterCreated())
 				{
 					pUnit->setMoves(0);
 				}

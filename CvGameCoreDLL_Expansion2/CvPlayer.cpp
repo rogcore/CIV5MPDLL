@@ -355,6 +355,8 @@ CvPlayer::CvPlayer() :
 	, m_iNavalCombatExperienceTimes100(0)
 #endif
 
+	, m_iMoveAfterCreated(0)
+
 #if defined(MOD_ROG_CORE)
 	, m_iGlobalCityStrengthMod("CvPlayer::m_iGlobalCityStrengthMod", m_syncArchive)
 	, m_iGlobalRangedStrikeModifier("CvPlayer::m_iGlobalRangedStrikeModifier", m_syncArchive)
@@ -415,6 +417,7 @@ CvPlayer::CvPlayer() :
 	, m_ePersonalityType("CvPlayer::m_ePersonalityType", m_syncArchive)
 	, m_aiCityYieldChange("CvPlayer::m_aiCityYieldChange", m_syncArchive)
 
+	
 #if defined(MOD_ROG_CORE)
 	, m_aiDomainFreeExperiencePerGreatWorkGlobal("CvPlayer::m_aiDomainFreeExperiencePerGreatWorkGlobal", m_syncArchive)
 	, m_piDomainFreeExperience()
@@ -429,7 +432,7 @@ CvPlayer::CvPlayer() :
 
 	, m_aiYieldFromProcessModifierGlobal("CvPlayer::m_aiYieldFromProcessModifierGlobal", m_syncArchive)
 
-
+	, m_aiCityLoveKingDayYieldMod("CvPlayer::m_aiCityLoveKingDayYieldMod", m_syncArchive)
 	, m_aiYieldRateModifier("CvPlayer::m_aiYieldRateModifier", m_syncArchive)
 	, m_aiCapitalYieldRateModifier("CvPlayer::m_aiCapitalYieldRateModifier", m_syncArchive)
 	, m_aiExtraYieldThreshold("CvPlayer::m_aiExtraYieldThreshold", m_syncArchive)
@@ -1107,6 +1110,8 @@ void CvPlayer::uninit()
 	m_iNavalCombatExperienceTimes100 = 0;
 #endif
 
+	m_iMoveAfterCreated = 0;
+
 #if defined(MOD_ROG_CORE)
 	m_iGlobalCityStrengthMod = 0;
 	m_iGlobalRangedStrikeModifier = 0;
@@ -1245,6 +1250,9 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 
 	m_aiYieldFromProcessModifierGlobal.clear();
 	m_aiYieldFromProcessModifierGlobal.resize(NUM_YIELD_TYPES, 0);
+
+	m_aiCityLoveKingDayYieldMod.clear();
+	m_aiCityLoveKingDayYieldMod.resize(NUM_YIELD_TYPES, 0);
 
 	m_aiYieldRateModifier.clear();
 	m_aiYieldRateModifier.resize(NUM_YIELD_TYPES, 0);
@@ -9382,6 +9390,8 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 {
 	int iI, iJ;
 
+
+	
 	CvBuildingEntry* pBuildingInfo = GC.getBuildingInfo(eBuilding);
 	if(pBuildingInfo == NULL)
 		return;
@@ -9506,6 +9516,13 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 		}
 	}
 
+
+	if (pBuildingInfo->IsMoveAfterCreated())
+	{
+		ChangePlayerMoveAfterCreated(pBuildingInfo->IsMoveAfterCreated() ? iChange : 0);
+	}
+
+
 #if defined(MOD_ROG_CORE)
 	for (int iDomains = 0; iDomains < NUM_DOMAIN_TYPES; iDomains++)
 	{
@@ -9565,6 +9582,14 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	PromotionTypes eFreePromotion = (PromotionTypes) pBuildingInfo->GetFreePromotion();
 	if(eFreePromotion != NO_PROMOTION)
 		ChangeFreePromotionCount(eFreePromotion, iChange);
+
+	PromotionTypes eFreePromotion2 = (PromotionTypes)pBuildingInfo->GetFreePromotion2();
+	if (eFreePromotion2 != NO_PROMOTION)
+		ChangeFreePromotionCount(eFreePromotion2, iChange);
+
+	PromotionTypes eFreePromotion3 = (PromotionTypes)pBuildingInfo->GetFreePromotion2();
+	if (eFreePromotion3 != NO_PROMOTION)
+		ChangeFreePromotionCount(eFreePromotion3, iChange);
 
 	// Free Promotion Removed
 	PromotionTypes eFreePromotionRemoved = (PromotionTypes) pBuildingInfo->GetFreePromotionRemoved();
@@ -16535,6 +16560,21 @@ void CvPlayer::changeHalfSpecialistFoodCount(int iChange)
 	}
 }
 
+
+bool CvPlayer::IsPlayerMoveAfterCreated() const
+{
+	return m_iMoveAfterCreated > 0;
+}
+
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::ChangePlayerMoveAfterCreated(int iChange)
+{
+	m_iMoveAfterCreated += iChange;
+}
+
+
+
 #if defined(MOD_ROG_CORE)
 //	--------------------------------------------------------------------------------
 int CvPlayer::GetDomainFreeExperiencePerGreatWorkGlobal(DomainTypes eIndex) const
@@ -19652,7 +19692,32 @@ void CvPlayer::changeYieldRateModifier(YieldTypes eIndex, int iChange)
 }
 
 
+//	--------------------------------------------------------------------------------
+int CvPlayer::getCityLoveKingDayYieldMod(YieldTypes eIndex)	const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	return m_aiCityLoveKingDayYieldMod[eIndex];
+}
 
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::changeCityLoveKingDayYieldMod(YieldTypes eIndex, int iChange)
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+
+	if (iChange != 0)
+	{
+		m_aiCityLoveKingDayYieldMod.setAt(eIndex, m_aiCityLoveKingDayYieldMod[eIndex] + iChange);
+		invalidateYieldRankCache(eIndex);
+
+		if (getTeam() == GC.getGame().getActiveTeam())
+		{
+			GC.GetEngineUserInterface()->setDirty(CityInfo_DIRTY_BIT, true);
+		}
+	}
+}
 
 
 
@@ -24963,6 +25028,9 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 		if(iMod != 0)
 			ChangeYieldChangeWorldWonder(eYield, iMod);
 #endif
+		iMod = pPolicy->GetCityLoveKingDayYieldMod(iI) * iChange;
+		if (iMod != 0)
+			changeCityLoveKingDayYieldMod(eYield, (pPolicy->GetCityLoveKingDayYieldMod(iI) * iChange));
 
 #ifdef MOD_API_TRADE_ROUTE_YIELD_RATE
 		if (MOD_API_TRADE_ROUTE_YIELD_RATE)
@@ -26306,6 +26374,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	MOD_SERIALIZE_READ(74, kStream, m_iNavalCombatExperienceTimes100, m_iNavalCombatExperience*100);
 	MOD_SERIALIZE_READ(74, kStream, m_iLifetimeCombatExperienceTimes100, m_iLifetimeCombatExperience*100);
 #endif
+	kStream >> m_iMoveAfterCreated;
 	kStream >> m_iBorderObstacleCount;
 	kStream >> m_iNextOperationID;
 	kStream >> m_iCostNextPolicy;
@@ -26416,6 +26485,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_aiCapitalYieldChange;
 	kStream >> m_aiCapitalYieldPerPopChange;
 	kStream >> m_aiSeaPlotYield;
+	kStream >> m_aiCityLoveKingDayYieldMod;
 	kStream >> m_aiYieldRateModifier;
 	kStream >> m_aiCapitalYieldRateModifier;
 
@@ -26960,6 +27030,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	MOD_SERIALIZE_WRITE(kStream, m_iNavalCombatExperienceTimes100);
 	MOD_SERIALIZE_WRITE(kStream, m_iLifetimeCombatExperienceTimes100);
 #endif
+	kStream << m_iMoveAfterCreated;
 	kStream << m_iBorderObstacleCount;
 	kStream << m_iNextOperationID;
 	kStream << m_iCostNextPolicy;
@@ -27051,6 +27122,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_aiCapitalYieldChange;
 	kStream << m_aiCapitalYieldPerPopChange;
 	kStream << m_aiSeaPlotYield;
+	kStream << m_aiCityLoveKingDayYieldMod;
 	kStream << m_aiYieldRateModifier;
 	kStream << m_aiCapitalYieldRateModifier;
 

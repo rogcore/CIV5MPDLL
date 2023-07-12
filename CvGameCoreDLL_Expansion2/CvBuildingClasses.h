@@ -132,6 +132,8 @@ public:
 	int GetFreeBuildingClass() const;
 	int GetFreeBuildingThisCity() const;
 	int GetFreePromotion() const;
+	int GetFreePromotion2() const;
+	int GetFreePromotion3() const;
 	int GetTrainedFreePromotion() const;
 	int GetFreePromotionRemoved() const;
 	int GetProductionCost() const;
@@ -312,6 +314,7 @@ public:
 	bool IsAddsFreshWater() const;
 	bool IsPurchaseOnly() const;
 #endif
+	bool IsMoveAfterCreated() const;
 	bool IsMountain() const;
 	bool IsHill() const;
 	bool IsFlat() const;
@@ -483,6 +486,8 @@ private:
 	int m_iFreeBuildingClass;
 	int m_iFreeBuildingThisCity;
 	int m_iFreePromotion;
+	int m_iFreePromotion2;
+	int m_iFreePromotion3;
 	int m_iTrainedFreePromotion;
 	int m_iFreePromotionRemoved;
 	int m_iProductionCost;
@@ -664,6 +669,7 @@ private:
 	bool m_bAddsFreshWater;
 	bool m_bPurchaseOnly;
 #endif
+	bool m_bMoveAfterCreated;
 	bool m_bMountain;
 	bool m_bHill;
 	bool m_bFlat;

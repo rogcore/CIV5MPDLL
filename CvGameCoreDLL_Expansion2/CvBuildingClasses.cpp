@@ -51,6 +51,8 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_iFreeBuildingClass(NO_BUILDINGCLASS),
 	m_iFreeBuildingThisCity(NO_BUILDINGCLASS),
 	m_iFreePromotion(NO_PROMOTION),
+	m_iFreePromotion2(NO_PROMOTION),
+	m_iFreePromotion3(NO_PROMOTION),
 	m_iTrainedFreePromotion(NO_PROMOTION),
 	m_iFreePromotionRemoved(NO_PROMOTION),
 	m_iProductionCost(0),
@@ -143,6 +145,8 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_bAddsFreshWater(false),
 	m_bPurchaseOnly(false),
 #endif
+
+	m_bMoveAfterCreated(false),
 
 #if defined(MOD_ROG_CORE)
 	m_piGreatWorkYieldChange(NULL),
@@ -413,6 +417,8 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	}
 #endif
 
+	m_bMoveAfterCreated = kResults.GetBool("MoveAfterCreated");
+
 #if defined(MOD_ROG_CORE)
 	m_iExtraDamageHeal = kResults.GetInt("ExtraDamageHeal");
 	m_iRangedStrikeModifier = kResults.GetInt("RangedStrikeModifier");
@@ -629,6 +635,12 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 	szTextVal = kResults.GetText("FreePromotion");
 	m_iFreePromotion = GC.getInfoTypeForString(szTextVal, true);
+
+	szTextVal = kResults.GetText("FreePromotion2");
+	m_iFreePromotion2 = GC.getInfoTypeForString(szTextVal, true);
+
+	szTextVal = kResults.GetText("FreePromotion3");
+	m_iFreePromotion3 = GC.getInfoTypeForString(szTextVal, true);
 
 	szTextVal = kResults.GetText("TrainedFreePromotion");
 	m_iTrainedFreePromotion = GC.getInfoTypeForString(szTextVal, true);
@@ -1514,6 +1526,18 @@ int CvBuildingEntry::GetFreePromotion() const
 	return m_iFreePromotion;
 }
 
+/// Does this building give all units a promotion for free instantly?
+int CvBuildingEntry::GetFreePromotion2() const
+{
+	return m_iFreePromotion2;
+}
+
+/// Does this building give all units a promotion for free instantly?
+int CvBuildingEntry::GetFreePromotion3() const
+{
+	return m_iFreePromotion3;
+}
+
 /// Does this building give units a promotion when trained from this city?
 int CvBuildingEntry::GetTrainedFreePromotion() const
 {
@@ -2202,6 +2226,10 @@ bool CvBuildingEntry::IsPurchaseOnly() const
 }
 #endif
 
+bool CvBuildingEntry::IsMoveAfterCreated() const
+{
+	return m_bMoveAfterCreated;
+}
 
 
 #if defined(MOD_ROG_CORE)

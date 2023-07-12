@@ -790,6 +790,7 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 
 	Method(GetSeaPlotYield);
 	Method(GetYieldRateModifier);
+	Method(GetCityLoveKingDayYieldMod);
 	Method(GetCapitalYieldRateModifier);
 	Method(GetExtraYieldThreshold);
 
@@ -2830,7 +2831,8 @@ int CvLuaPlayer::lGetInfluenceSpyRankTooltip(lua_State* L)
 int CvLuaPlayer::lGetTourism(lua_State* L)
 {
 	CvPlayerAI* pkPlayer = GetInstance(L);
-	const int iResult = pkPlayer->GetCulture()->GetTourism();
+	int iResult = pkPlayer->GetCulture()->GetTourism();
+	iResult /= 100;
 	lua_pushinteger(L, iResult);
 	return 1;
 }
@@ -7539,6 +7541,12 @@ int CvLuaPlayer::lGetPlayerColors(lua_State* L)
 int CvLuaPlayer::lGetSeaPlotYield(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvPlayerAI::getSeaPlotYield);
+}
+//------------------------------------------------------------------------------
+//int getYieldRateModifier(YieldTypes eIndex);
+int CvLuaPlayer::lGetCityLoveKingDayYieldMod(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::getCityLoveKingDayYieldMod);
 }
 //------------------------------------------------------------------------------
 //int getYieldRateModifier(YieldTypes eIndex);

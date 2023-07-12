@@ -991,6 +991,9 @@ public:
 	bool isHalfSpecialistFood() const;
 	void changeHalfSpecialistFoodCount(int iChange);
 
+	bool IsPlayerMoveAfterCreated() const;
+	void ChangePlayerMoveAfterCreated(int iChange);
+
 #if defined(MOD_ROG_CORE)
 	void ChangeDomainFreeExperiencePerGreatWorkGlobal(DomainTypes eDomain, int iChange);
 	int GetDomainFreeExperiencePerGreatWorkGlobal(DomainTypes eDomain) const;
@@ -1276,6 +1279,9 @@ public:
 
 	int getSeaPlotYield(YieldTypes eIndex) const;
 	void changeSeaPlotYield(YieldTypes eIndex, int iChange);
+
+	int getCityLoveKingDayYieldMod(YieldTypes eIndex) const;
+	void changeCityLoveKingDayYieldMod(YieldTypes eIndex, int iChange);
 
 	int getYieldRateModifier(YieldTypes eIndex) const;
 	void changeYieldRateModifier(YieldTypes eIndex, int iChange);
@@ -2384,7 +2390,7 @@ protected:
 
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiYieldFromProcessModifierGlobal;
 
-
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiCityLoveKingDayYieldMod;
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiYieldRateModifier;
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiCapitalYieldRateModifier;
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiExtraYieldThreshold;
@@ -2400,6 +2406,8 @@ protected:
 #ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
 	std::vector<int> m_aiGoldenAgeYieldRateModifier;
 #endif
+
+	int m_iMoveAfterCreated;
 
 #if defined(MOD_ROG_CORE)
 	std::vector<int> m_aiWorldWonderCityYieldRateModifier;
