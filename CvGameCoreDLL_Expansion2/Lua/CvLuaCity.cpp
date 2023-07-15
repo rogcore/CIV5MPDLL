@@ -768,6 +768,16 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(GetCorruptionScore);
 	Method(GetCorruptionLevel);
 	Method(UpdateCorruption);
+	Method(CalculateTotalCorruptionScore);
+	Method(CalculateCorruptionScoreFromDistance);
+	Method(CalculateCorruptionScoreModifierFromSpy);
+	Method(GetCorruptionScoreChangeFromBuilding);
+	Method(GetCorruptionLevelChangeFromBuilding);
+	Method(CalculateCorruptionScoreFromResource);
+	Method(GetCorruptionScoreModifierFromPolicy);
+	Method(DecideCorruptionLevelForNormalCity);
+	Method(GetMaxCorruptionLevel);
+	Method(IsCorruptionLevelReduceByOne);
 #endif
 }
 //------------------------------------------------------------------------------
@@ -5041,4 +5051,23 @@ LUAAPIIMPL(City, CanGrowNormally)
 LUAAPIIMPL(City, GetCorruptionScore);
 LUAAPIIMPL(City, GetCorruptionLevel);
 LUAAPIIMPL(City, UpdateCorruption);
+LUAAPIIMPL(City, CalculateTotalCorruptionScore);
+LUAAPIIMPL(City, CalculateCorruptionScoreFromDistance);
+LUAAPIIMPL(City, CalculateCorruptionScoreModifierFromSpy);
+LUAAPIIMPL(City, GetCorruptionScoreChangeFromBuilding);
+LUAAPIIMPL(City, GetCorruptionLevelChangeFromBuilding);
+LUAAPIIMPL(City, CalculateCorruptionScoreFromResource);
+LUAAPIIMPL(City, GetCorruptionScoreModifierFromPolicy);
+LUAAPIIMPL(City, GetMaxCorruptionLevel);
+LUAAPIIMPL(City, IsCorruptionLevelReduceByOne);
+
+int CvLuaCity::lDecideCorruptionLevelForNormalCity(lua_State* L)
+{
+	CvCity* pCity = GetInstance(L);
+	int iScore = lua_tointeger(L, 2);
+	auto* pResult = pCity->DecideCorruptionLevelForNormalCity(iScore);
+	int iResult = pResult == nullptr ? INVALID_CORRUPTION : pResult->GetID();
+	lua_pushinteger(L, iResult);
+	return 1;
+}
 #endif
