@@ -1609,6 +1609,12 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 	{
 		AI_reset();
 	}
+
+	m_paiCorruptionLevelPolicyCostModifier.resize(GC.getNumCorruptionLevel(), 0);
+	for (size_t i = 0; i < GC.getNumCorruptionLevel(); i++)
+	{
+		m_paiCorruptionLevelPolicyCostModifier[i] = 0;
+	}
 }
 
 //	--------------------------------------------------------------------------------
@@ -15017,6 +15023,21 @@ void CvPlayer::recomputePolicyCostModifier()
 	iCost += GetPolicyCostMinorCivModifier();
 	iCost += GetPlayerTraits()->GetPolicyCostModifier();
 
+#ifdef MOD_GLOBAL_CORRUPTION
+	if (MOD_GLOBAL_CORRUPTION && EnableCorruption())
+	{
+		int iSum = 0;
+		CvCity* pLoopCity = nullptr;
+		int iLoop = 0;
+		for(pLoopCity = firstCity(&iLoop); pLoopCity != nullptr; pLoopCity = nextCity(&iLoop))
+		{
+			auto level = pLoopCity->GetCorruptionLevel();
+			iSum += GetCorruptionLevelPolicyCostModifier(level);
+		}
+		iCost += iSum;
+	}
+#endif
+
 	if(iCost < /*-75*/ GC.getPOLICY_COST_DISCOUNT_MAX())
 		iCost = /*-75*/ GC.getPOLICY_COST_DISCOUNT_MAX();
 
@@ -25201,6 +25222,10 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	int iInstanceFoodThresholdPercent = pPolicy->GetInstantFoodThresholdPercent();
 
 #ifdef MOD_GLOBAL_CORRUPTION
+	for (size_t i = 0; i < GC.getNumCorruptionLevel(); i++)
+	{
+		ChangeCorruptionLevelPolicyCostModifier((CorruptionLevelTypes)i, pPolicy->GetCorruptionLevelPolicyCostModifier((CorruptionLevelTypes)i) * iChange);
+	}
 	if (pPolicy->GetCorruptionLevelReduceByOne())
 	{
 		ChangeCorruptionLevelReduceByOneRC(iChange);
@@ -26813,6 +26838,7 @@ void CvPlayer::Read(FDataStream& kStream)
 #ifdef MOD_GLOBAL_CORRUPTION
 	kStream >> m_iCorruptionScoreModifierFromPolicy;
 	kStream >> m_iCorruptionLevelReduceByOneRC;
+	kStream >> m_paiCorruptionLevelPolicyCostModifier;
 #endif
 
 	if(GetID() < MAX_MAJOR_CIVS)
@@ -27398,6 +27424,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 #ifdef MOD_GLOBAL_CORRUPTION
 	kStream << m_iCorruptionScoreModifierFromPolicy;
 	kStream << m_iCorruptionLevelReduceByOneRC;
+	kStream << m_paiCorruptionLevelPolicyCostModifier;
 #endif
 }
 
@@ -30859,6 +30886,11 @@ void CvPlayer::UpdateCachedCapturedHolyCity()
 #endif
 
 #ifdef MOD_GLOBAL_CORRUPTION
+bool CvPlayer::EnableCorruption() const
+{
+	return isHuman();
+}
+
 int CvPlayer::GetCorruptionScoreModifierFromPolicy() const
 {
 	return m_iCorruptionScoreModifierFromPolicy;
@@ -30883,4 +30915,24 @@ void CvPlayer::ChangeCorruptionLevelReduceByOneRC(int change)
 {
 	m_iCorruptionLevelReduceByOneRC += change;
 }
+
+int CvPlayer::GetCorruptionLevelPolicyCostModifier(CorruptionLevelTypes level) const
+{
+	if (level < 0 || level >= GC.getNumCorruptionLevel())
+	{
+		return 0;
+	}
+
+	return m_paiCorruptionLevelPolicyCostModifier[level];
+}
+
+void CvPlayer::ChangeCorruptionLevelPolicyCostModifier(CorruptionLevelTypes level, int change)
+{
+	if (level < 0 || level >= GC.getNumCorruptionLevel())
+	{
+		return;
+	}
+	m_paiCorruptionLevelPolicyCostModifier[level] += change;
+}
+
 #endif

@@ -20255,7 +20255,7 @@ CorruptionLevelTypes CvCity::GetCorruptionLevel() const
 void CvCity::UpdateCorruption()
 {
 	CvPlayerAI& owner = GET_PLAYER(getOwner());
-	if (!owner.isHuman())
+	if (!owner.EnableCorruption())
 	{
 		return;
 	}
@@ -20279,9 +20279,11 @@ void CvCity::UpdateCorruption()
 		pNewLevel = DecideCorruptionLevelForNormalCity(newScore);
 	}
 
+	m_iCachedCorruptionScore = newScore;
+	m_eCachedCorruptionLevel = pNewLevel ? static_cast<CorruptionLevelTypes>(pNewLevel->GetID()) : INVALID_CORRUPTION;
+
 	if (pNewLevel == pOldLevel)
 	{
-		m_iCachedCorruptionScore = newScore;
 		return;
 	}
 
@@ -20316,9 +20318,6 @@ void CvCity::UpdateCorruption()
 			GetCityBuildings()->SetNumRealBuilding(publicSecurity, 1);
 		}
 	}
-
-	m_iCachedCorruptionScore = newScore;
-	m_eCachedCorruptionLevel = pNewLevel ? static_cast<CorruptionLevelTypes>(pNewLevel->GetID()) : INVALID_CORRUPTION;
 }
 
 int CvCity::CalculateCorruptionScoreFromResource() const
