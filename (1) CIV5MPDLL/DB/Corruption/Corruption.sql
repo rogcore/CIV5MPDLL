@@ -29,3 +29,5 @@ create table Policy_CorruptionLevelPolicyCostModifier (
     CorruptionLevelType text not null,
     Modifier integer not null default 0
 );
+
+INSERT INTO Defines(Name, Value) VALUES('CORRUPTION_SCORE_PER_DISTANCE', 100);

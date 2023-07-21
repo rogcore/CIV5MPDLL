@@ -20372,7 +20372,7 @@ int CvCity::CalculateCorruptionScoreFromDistance() const
 	int cityX = this->plot()->getX();
 	int cityY = this->plot()->getY();
 
-	return plotDistance(capX, capY, cityX, cityY);
+	return plotDistance(capX, capY, cityX, cityY) * GC.getCORRUPTION_SCORE_PER_DISTANCE();
 }
 
 int CvCity::CalculateCorruptionScoreModifierFromSpy() const
