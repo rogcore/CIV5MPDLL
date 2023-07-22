@@ -11852,20 +11852,6 @@ int CvCity::getYieldRateTimes100(YieldTypes eIndex, bool bIgnoreTrade, bool bSta
 			return 0;
 		}
 #endif
-
-
-#if defined(MOD_API_UNIFIED_YIELDS_MORE)
-		if (eIndex == YIELD_GREAT_GENERAL_POINTS)
-		{
-			return 0;
-		}
-		if (eIndex == YIELD_GREAT_ADMIRAL_POINTS)
-		{
-			return 0;
-		}
-#endif
-
-
 	}
 
 	int iProcessYield = 0;
