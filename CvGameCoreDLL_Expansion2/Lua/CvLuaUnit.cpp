@@ -444,6 +444,8 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(GetNumSpyAttackMod);
 	Method(GetNumWorkDefenseMod);
 	Method(GetNumWorkAttackMod);
+	Method(GetNumSpyStayDefenseMod);
+	Method(GetNumSpyStayAttackMod);
 	Method(GetNumWonderDefenseMod);
 	Method(GetNumWonderAttackMod);
 
@@ -3990,6 +3992,24 @@ int CvLuaUnit::lGetNumWorkAttackMod(lua_State* L)
 {
 	CvUnit* pkUnit = GetInstance(L);
 	const int bResult = pkUnit->GetNumWorkAttackMod();
+	lua_pushinteger(L, bResult);
+	return 1;
+}
+
+
+int CvLuaUnit::lGetNumSpyStayDefenseMod(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	const int bResult = pkUnit->GetNumSpyStayDefenseMod();
+	lua_pushinteger(L, bResult);
+	return 1;
+}
+
+//------------------------------------------------------------------------------
+int CvLuaUnit::lGetNumSpyStayAttackMod(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	const int bResult = pkUnit->GetNumSpyStayAttackMod();
 	lua_pushinteger(L, bResult);
 	return 1;
 }

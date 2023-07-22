@@ -351,6 +351,9 @@ CvUnit::CvUnit() :
 		, m_iNumWorkDefenseMod("CvUnit::m_iNumWorkDefenseMod", m_syncArchive)
 		, m_iNumWorkAttackMod("CvUnit::m_iNumWorkAttackMod", m_syncArchive)
 
+		, m_iNumSpyStayDefenseMod("CvUnit::m_iNumSpyStayDefenseMod", m_syncArchive)
+		, m_iNumSpyStayAttackMod("CvUnit::m_iNumSpyStayAttackMod", m_syncArchive)
+
 		, m_iNoResourcePunishment("CvUnit::m_iNoResourcePunishment", m_syncArchive)
 
 
@@ -1269,7 +1272,8 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 
 	m_iNumWorkDefenseMod = 0;
 	m_iNumWorkAttackMod = 0;
-
+	m_iNumSpyStayDefenseMod = 0;
+	m_iNumSpyStayAttackMod = 0;
 	m_iNoResourcePunishment = 0;
 
 
@@ -5965,6 +5969,32 @@ int CvUnit::GetNumWorkDefenseMod() const
 {
 	return m_iNumWorkDefenseMod;
 }
+
+
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeNumSpyStayAttackMod(int iValue)
+{
+	m_iNumSpyStayAttackMod += iValue;
+}
+
+//	--------------------------------------------------------------------------------
+int CvUnit::GetNumSpyStayAttackMod() const
+{
+	return m_iNumSpyStayAttackMod;
+}
+
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeNumSpyStayDefenseMod(int iValue)
+{
+	m_iNumSpyStayDefenseMod += iValue;
+}
+
+//	--------------------------------------------------------------------------------
+int CvUnit::GetNumSpyStayDefenseMod() const
+{
+	return m_iNumSpyStayDefenseMod;
+}
+
 
 
 // No penalty from being wounded, no combat bonus
@@ -13818,6 +13848,7 @@ int CvUnit::GetMaxAttackStrength(const CvPlot* pFromPlot, const CvPlot* pToPlot,
 	int iWonder;
 	int iWonderAttackModValue;
 
+
 	int iBonus;
 	if (kPlayer.GetEspionage()->GetNumSpies() > 0)
 	{
@@ -13835,6 +13866,8 @@ int CvUnit::GetMaxAttackStrength(const CvPlot* pFromPlot, const CvPlot* pToPlot,
 		iTempModifier = (iWork * iWorkAttackModValue);
 		iModifier += iTempModifier;
 	}
+
+
 
 	if (kPlayer.GetNumWorldWonders() > 0)
 	{
@@ -14038,6 +14071,15 @@ int CvUnit::GetMaxAttackStrength(const CvPlot* pFromPlot, const CvPlot* pToPlot,
 			else
 				iModifier += attackBelow50HealthModifier();
 
+
+		int iSpyStayAttackModValue;
+
+		if (GET_TEAM(getTeam()).HasSpyAtTeam(pDefender->getTeam()))
+		{
+			iSpyStayAttackModValue = GetNumSpyStayAttackMod();
+			iModifier += iSpyStayAttackModValue;
+		}
+
 #endif
 	}
 
@@ -14185,6 +14227,8 @@ int CvUnit::GetMaxDefenseStrength(const CvPlot* pInPlot, const CvUnit* pAttacker
 
 	int iWonder;
 	int iWonderDefenseModValue;
+
+
 
 	int iBonus;
 
@@ -14335,6 +14379,14 @@ int CvUnit::GetMaxDefenseStrength(const CvPlot* pInPlot, const CvUnit* pAttacker
 				iModifier += attackAbove50HealthModifier();
 			else
 				iModifier += attackBelow50HealthModifier();
+
+			int iSpyStayDefenseModValue;
+			if (GET_TEAM(getTeam()).HasSpyAtTeam(pAttacker->getTeam()))
+			{
+				iSpyStayDefenseModValue = GetNumSpyStayDefenseMod();
+				iModifier += iSpyStayDefenseModValue;
+			}
+
 		}
 #endif
 
@@ -14587,6 +14639,14 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 				iModifier += attackAbove50HealthModifier();
 			else
 				iModifier += attackBelow50HealthModifier();
+
+			int iSpyStayAttackModValue;
+
+			if (GET_TEAM(getTeam()).HasSpyAtTeam(pOtherUnit->getTeam()))
+			{
+				iSpyStayAttackModValue = GetNumSpyStayAttackMod();
+				iModifier += iSpyStayAttackModValue;
+			}
 		}
 #endif
 
@@ -14763,6 +14823,14 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 
 			iModifier += domainDefense(pOtherUnit->getDomainType());
 
+#if defined(MOD_ROG_CORE)
+			int iSpyStayDefenseModValue;
+			if (GET_TEAM(getTeam()).HasSpyAtTeam(pOtherUnit->getTeam()))
+			{
+				iSpyStayDefenseModValue = GetNumSpyStayDefenseMod();
+				iModifier += iSpyStayDefenseModValue;
+			}
+#endif
 
 			// Promotion-Promotion Modifier
 #if defined(MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS)
@@ -14912,6 +14980,8 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 		int iWonder;
 		int iWonderAttackModValue;
 
+	
+
 		int iBonus;
 
 		if (kPlayer.GetEspionage()->GetNumSpies() > 0)
@@ -14930,6 +15000,8 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 			iTempModifier = (iWork * iWorkAttackModValue);
 			iModifier += iTempModifier;
 		}
+
+
 
 		if (kPlayer.GetNumWorldWonders() > 0)
 		{
@@ -24332,7 +24404,8 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 
 		ChangeNumWorkAttackMod(thisPromotion.GetNumWorkAttackMod()* iChange);
 		ChangeNumWorkDefenseMod(thisPromotion.GetNumWorkDefenseMod()* iChange);
-
+		ChangeNumSpyStayAttackMod(thisPromotion.GetNumSpyStayAttackMod()* iChange);
+		ChangeNumSpyStayDefenseMod(thisPromotion.GetNumSpyStayDefenseMod()* iChange);
 		ChangeIsNoResourcePunishment(thisPromotion.IsNoResourcePunishment() ? iChange : 0);
 
 

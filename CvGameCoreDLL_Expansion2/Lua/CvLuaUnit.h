@@ -435,6 +435,8 @@ protected:
 	static int lGetNumSpyAttackMod(lua_State* L);
 	static int lGetNumWorkDefenseMod(lua_State* L);
 	static int lGetNumWorkAttackMod(lua_State* L);
+	static int lGetNumSpyStayDefenseMod(lua_State* L);
+	static int lGetNumSpyStayAttackMod(lua_State* L);
 	static int lGetNumWonderDefenseMod(lua_State* L);
 	static int lGetNumWonderAttackMod(lua_State* L);
 

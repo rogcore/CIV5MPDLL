@@ -1732,6 +1732,10 @@ public:
 	void ChangeNumWorkDefenseMod(int iValue);
 	int GetNumWorkDefenseMod() const;
 
+	void ChangeNumSpyStayAttackMod(int iValue);
+	int GetNumSpyStayAttackMod() const;
+	void ChangeNumSpyStayDefenseMod(int iValue);
+	int GetNumSpyStayDefenseMod() const;
 
 	bool IsNoResourcePunishment() const;
 	void ChangeIsNoResourcePunishment(int iChange);
@@ -2115,6 +2119,9 @@ protected:
 	FAutoVariable<int, CvUnit> m_iNumWonderAttackMod;
 	FAutoVariable<int, CvUnit> m_iNumWorkDefenseMod;
 	FAutoVariable<int, CvUnit> m_iNumWorkAttackMod;
+
+	FAutoVariable<int, CvUnit> m_iNumSpyStayDefenseMod;
+	FAutoVariable<int, CvUnit> m_iNumSpyStayAttackMod;
 
 	FAutoVariable<int, CvUnit> m_iNoResourcePunishment;
 

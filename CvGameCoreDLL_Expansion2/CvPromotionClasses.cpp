@@ -162,6 +162,9 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iNumWorkDefenseMod(0),
 	m_iNumWorkAttackMod(0),
 
+	m_iNumSpyStayDefenseMod(0),
+	m_iNumSpyStayAttackMod(0),
+
 	m_bNoResourcePunishment(false),
 
 
@@ -536,6 +539,9 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 
 			m_iNumWorkDefenseMod = kResults.GetInt("NumWorkDefenseMod");
 			m_iNumWorkAttackMod = kResults.GetInt("NumWorkAttackMod");
+
+			m_iNumSpyStayDefenseMod = kResults.GetInt("NumSpyStayDefenseMod");
+			m_iNumSpyStayAttackMod = kResults.GetInt("NumSpyStayAttackMod");
 
 			m_bNoResourcePunishment = kResults.GetBool("NoResourcePunishment");
 
@@ -1959,6 +1965,16 @@ int CvPromotionEntry::GetNumWorkAttackMod() const
 int CvPromotionEntry::GetNumWorkDefenseMod() const
 {
 	return m_iNumWorkDefenseMod;
+}
+
+int CvPromotionEntry::GetNumSpyStayAttackMod() const
+{
+	return m_iNumSpyStayAttackMod;
+}
+
+int CvPromotionEntry::GetNumSpyStayDefenseMod() const
+{
+	return m_iNumSpyStayDefenseMod;
 }
 
 bool CvPromotionEntry::IsNoResourcePunishment() const
