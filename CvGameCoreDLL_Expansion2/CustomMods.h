@@ -102,6 +102,7 @@
 // Enables the Unified Yields (YIELD_MORE) extensions 
 #define MOD_API_UNIFIED_YIELDS_MORE           (true)
 
+
 // Enables improvements to boost adjacent improvement's yield.
 #define MOD_API_VP_ADJACENT_YIELD_BOOST				gCustomMods.isAPI_VP_ADJACENT_YIELD_BOOST()
 

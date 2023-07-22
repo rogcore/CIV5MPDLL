@@ -133,7 +133,8 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 
 	Method(GetYieldModifierFromCrime);
 	Method(SetYieldModifierFromCrime);
-
+	Method(GetYieldFromHappiness);
+	Method(SetYieldFromHappiness);
 	Method(GetYieldFromHealth);
 	Method(SetYieldFromHealth);
 
@@ -568,6 +569,8 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(GetExtraSpecialistYieldOfType);
 
 	Method(GetDomainFreeExperience);
+	Method(GetDomainFreeExperienceFromGreatWorks);
+	Method(GetDomainFreeExperienceFromGreatWorksGlobal);
 	Method(GetDomainProductionModifier);
 
 	Method(IsEverOwned);
@@ -998,6 +1001,24 @@ int CvLuaCity::lHasLoyaltyState(lua_State* L)
 	const bool bValue = (pkCity->GetLoyaltyState() == iValue);
 	lua_pushboolean(L, bValue);
 
+	return 1;
+}
+
+
+int CvLuaCity::lGetYieldFromHappiness(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const YieldTypes eYield = (YieldTypes)lua_tointeger(L, 2);
+	const int iValue = pkCity->GetYieldFromHappiness(eYield);
+	lua_pushinteger(L, iValue);
+	return 1;
+}
+int CvLuaCity::lSetYieldFromHappiness(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iValue = lua_tointeger(L, 3);
+	const YieldTypes eYield = (YieldTypes)lua_tointeger(L, 2);
+	pkCity->SetYieldFromHappiness(eYield, iValue);
 	return 1;
 }
 
@@ -3850,6 +3871,21 @@ int CvLuaCity::lGetDomainFreeExperience(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvCity::getDomainFreeExperience);
 }
+
+//------------------------------------------------------------------------------
+//int getDomainFreeExperience(DomainTypes eIndex);
+int CvLuaCity::lGetDomainFreeExperienceFromGreatWorks(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvCity::getDomainFreeExperienceFromGreatWorks);
+}
+
+//------------------------------------------------------------------------------
+//int getDomainFreeExperience(DomainTypes eIndex);
+int CvLuaCity::lGetDomainFreeExperienceFromGreatWorksGlobal(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvCity::getDomainFreeExperienceFromGreatWorksGlobal);
+}
+
 //------------------------------------------------------------------------------
 //int getDomainProductionModifier(DomainTypes eIndex);
 int CvLuaCity::lGetDomainProductionModifier(lua_State* L)

@@ -436,6 +436,8 @@ protected:
 	static int lGetExtraSpecialistYieldOfType(lua_State* L);
 
 	static int lGetDomainFreeExperience(lua_State* L);
+	static int lGetDomainFreeExperienceFromGreatWorks(lua_State* L);
+	static int lGetDomainFreeExperienceFromGreatWorksGlobal(lua_State* L);
 	static int lGetDomainProductionModifier(lua_State* L);
 
 	static int lIsEverOwned(lua_State* L);
@@ -611,6 +613,8 @@ protected:
 	static int lGetYieldModifierFromCrime(lua_State* L);
 	static int lSetYieldModifierFromCrime(lua_State* L);
 
+	static int lGetYieldFromHappiness(lua_State* L);
+	static int lSetYieldFromHappiness(lua_State* L);
 	static int lGetYieldFromHealth(lua_State* L);
 	static int lSetYieldFromHealth(lua_State* L);
 
