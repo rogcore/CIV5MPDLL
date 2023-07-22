@@ -5129,16 +5129,13 @@ CvString CvCityCulture::GetTourismTooltip()
 		}
 	}
 
-	int iGreakWorkModifier = kCityPlayer.GetYieldModifierFromNumGreakWork(GC.getYieldInfo(YIELD_TOURISM));
-	if (iGreakWorkModifier > 0)
+	m_pCity->getBaseYieldRateModifier(YieldTypes::YIELD_TOURISM, 0, &szTemp);
+	if (szRtnValue.length() > 0)
 	{
-		if (szRtnValue.length() > 0)
-		{
-			szRtnValue += "[NEWLINE][NEWLINE]";
-		}
-		szTemp = GetLocalizedText("TXT_KEY_CO_CITY_TOURISM_NUM_GREAT_WORK", iGreakWorkModifier);
-		szRtnValue += szTemp;
+		szRtnValue += "[NEWLINE]";
 	}
+	szRtnValue += szTemp;
+
 	int iTechSpreadModifier = kCityPlayer.GetInfluenceSpreadModifier();
 	if (iTechSpreadModifier > 0)
 	{
