@@ -204,6 +204,10 @@ public:
 	int GetNumWorkDefenseMod() const;
 	int GetNumWorkAttackMod() const;
 
+	int GetNumSpyStayDefenseMod() const;
+	int GetNumSpyStayAttackMod() const;
+	
+
 	bool IsNoResourcePunishment() const;
 
 	int GetCurrentHitPointAttackMod() const;
@@ -631,6 +635,9 @@ protected:
 
 	int m_iNumWorkDefenseMod;
 	int m_iNumWorkAttackMod;
+
+	int m_iNumSpyStayDefenseMod;
+	int m_iNumSpyStayAttackMod;
 
 	bool m_bNoResourcePunishment;
 
