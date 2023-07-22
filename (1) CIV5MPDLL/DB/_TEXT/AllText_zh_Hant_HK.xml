@@ -355,5 +355,43 @@
 		<Row Tag="TXT_KEY_RESOLUTION_COLD_WAR_HELP">
 			<Text>意識形態分歧已將世界推入冷戰，經濟和政治派系正在根據各自秉持的意識形態而形成。[NEWLINE][NEWLINE]如果決議通過，所有文明只能與和他們意識形態相同的文明或結盟的城邦建立[ICON_INTERNATIONAL_TRADE]國際商路。並且，與結盟城邦的[ICON_INFLUENCE]影響力不再衰退。[NEWLINE][NEWLINE]在有文明研發完成原子理論之後即可提案。</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_REPORT">
+			<Text>[COLOR_WARNING_TEXT]-管理成本報告-[ENDCOLOR]</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_DISTANCE">
+			<Text>來自離心傾向: {1_score}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_BUILDING">
+			<Text>來自建築: {1_score}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_RESOURCE">
+			<Text>來自資源: {1_score}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_MOD_FROM_SPY">
+			<Text>來自間諜: {1_score}%</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_MOD_FROM_POLICY">
+			<Text>來自政策: {1_score}%</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_LEVEL_REDUCE_BY_ONE_GLOBAL">
+			<Text>市政廳等級變化（文明特性或政策）：-1</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_LEVEL_MAX_TRAIT">
+			<Text>最高市政廳等級：{1_level}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_LEVEL_CHANGE_FROM_BUILDING">
+			<Text>市政廳等級變化(來自建築)：{1_level}</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE">
+			<Text>管理成本（總計）: {1_score}</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_ANNEX_PUPPET_LEVEL_PREVIEW">
+			<Text>如果你吞併該城市，預計市政廳等級為：{1_level}</Text>
+		</Row>
 	</Language_zh_Hant_HK>
 </GameData>

@@ -358,6 +358,44 @@
 		<Row Tag="TXT_KEY_RESOLUTION_COLD_WAR_HELP">
 			<Text>Ideological differences have pushed the world into a cold war, and economic and political factions are forming based on ideology alone. [NEWLINE][NEWLINE]While this resolution is active, players may only make [ICON_INTERNATIONAL_TRADE] Trade Routes with civilizations that follow the same ideology, or with allied City-States. Furthermore, [ICON_INFLUENCE] Influence levels with allied City-States do not decline. [NEWLINE][NEWLINE]Available once any Civilization discovers Atomic Theory.</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_REPORT">
+			<Text>[COLOR_WARNING_TEXT]-Administrative Cost Report-[ENDCOLOR]</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_DISTANCE">
+			<Text>From Capital Distance: {1_score}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_BUILDING">
+			<Text>From Building: {1_score}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_RESOURCE">
+			<Text>From resource: {1_score}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_MOD_FROM_SPY">
+			<Text>From Spy: {1_score}%</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_MOD_FROM_POLICY">
+			<Text>From Policy: {1_score}%</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_LEVEL_REDUCE_BY_ONE_GLOBAL">
+			<Text>City hall level change (civ trait or policy): -1</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_LEVEL_MAX_TRAIT">
+			<Text>Maximum town hall level: {1_level}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_LEVEL_CHANGE_FROM_BUILDING">
+			<Text>City hall level change (from building): {1_level}</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE">
+			<Text>Administrative cost (total): {1_score}</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_ANNEX_PUPPET_LEVEL_PREVIEW">
+			<Text>If you annex this city, the estimated city hall level is: {1_level}</Text>
+		</Row>
 	</Language_en_US>
 
 </GameData>
