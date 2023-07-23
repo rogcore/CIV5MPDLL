@@ -807,6 +807,9 @@ public:
 
 
 #if defined(MOD_ROG_CORE)
+	void ChangeSpecialistRateModifier(SpecialistTypes eSpecialist, int iChange);
+	int GetSpecialistRateModifier(SpecialistTypes eSpecialist) const;
+
 	int getLocalBuildingClassYield(BuildingClassTypes eIndex1, YieldTypes eIndex2)	const;
 	void changeLocalBuildingClassYield(BuildingClassTypes eIndex1, YieldTypes eIndex2, int iChange);
 #endif
@@ -1390,7 +1393,10 @@ protected:
 	std::map<int, int> m_aiYieldPerPopInEmpire;
 
 	FAutoVariable<std::vector<int>, CvCity> m_aiResourceQuantityFromPOP;
+	int* m_piNumSpecFreeUnits;
+	std::vector<int> m_aiSpecialistRateModifier;
 #endif
+
 
 	FAutoVariable<std::vector<int>, CvCity> m_aiYieldFromProcessModifier;
 

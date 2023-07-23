@@ -1442,17 +1442,7 @@ void CvActiveResolution::DoEffects(PlayerTypes ePlayer)
 	if (GetEffects()->iOtherIdeologyRebellionMod != 0)
 	{
 		CvAssertMsg(eTargetIdeology != NO_POLICY_BRANCH_TYPE, "No target ideology when one was expected. Please send Anton your save file and version.");
-		/*
-		if (eTargetIdeology != NO_POLICY_BRANCH_TYPE)
-		{
-			if (GET_PLAYER(ePlayer).GetPlayerPolicies()->GetLateGamePolicyTree() == eTargetIdeology)
-			{
-				//antonjs: temp:
-				GET_PLAYER(ePlayer).GetTreasury()->ChangeGoldPerTurnFromDiplomacy(GetEffects()->iOtherIdeologyRebellionMod);
-			}
-		}
-		//antonjs: todo: OnIdeologyChanged()
-		*/
+
 	}
 	if (GetEffects()->iArtsyGreatPersonRateMod != 0)
 	{

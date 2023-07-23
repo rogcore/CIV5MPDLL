@@ -258,6 +258,10 @@ CvBuildingEntry::CvBuildingEntry(void):
 
 	m_piDomainFreeExperiencePerGreatWorkGlobal(NULL),
 	m_piDomainFreeExperienceGlobal(),
+
+
+	m_piNumSpecFreeUnits(NULL),
+	m_paiSpecificGreatPersonRateModifier(NULL),
 #endif
 
 
@@ -284,20 +288,18 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_paThemingBonusInfo(NULL),
 
 	m_iNumThemingBonuses(0),
-
 #ifdef MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD
 	m_bHasYieldFromOtherYield(false),
 #endif
-	m_iNumFreeUnit(0),
-	m_pFreeUnits(nullptr)
+	m_piNumFreeUnits(NULL)
 
 {
-#ifdef MOD_API_BUILDING_ENABLE_PURCHASE_UNITS
-		for (int i = 0; i < NUM_YIELD_TYPES; i++) {
-			m_iNumAllowPurchaseUnits[i] = 0;
-			m_piAllowPurchaseUnits[i] = nullptr;
-		}
-#endif
+	#ifdef MOD_API_BUILDING_ENABLE_PURCHASE_UNITS
+			for (int i = 0; i < NUM_YIELD_TYPES; i++) {
+				m_iNumAllowPurchaseUnits[i] = 0;
+				m_piAllowPurchaseUnits[i] = nullptr;
+			}
+	#endif
 }
 
 /// Destructor
@@ -357,6 +359,7 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	SAFE_DELETE_ARRAY(m_piYieldChangeWorldWonderGlobal);
 #endif
 
+	SAFE_DELETE_ARRAY(m_piNumFreeUnits);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiResourceYieldChange);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiFeatureYieldChange);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiSpecialistYieldChange);
@@ -376,6 +379,10 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiSpecialistYieldChangeLocal);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiBuildingClassYieldModifiers);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiBuildingClassLocalYieldChanges);
+
+
+	SAFE_DELETE_ARRAY(m_piNumSpecFreeUnits);
+	SAFE_DELETE_ARRAY(m_paiSpecificGreatPersonRateModifier);
 #endif
 
 
@@ -384,10 +391,6 @@ CvBuildingEntry::~CvBuildingEntry(void)
 #endif
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiBuildingClassYieldChanges);
 
-	if(m_pFreeUnits)
-	{
-		delete m_pFreeUnits;
-	}
 
 #ifdef MOD_API_BUILDING_ENABLE_PURCHASE_UNITS
 	if (MOD_API_BUILDING_ENABLE_PURCHASE_UNITS) {
@@ -714,7 +717,12 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 
 #if defined(MOD_ROG_CORE)
+	kUtility.PopulateArrayByValue(m_piNumFreeUnits, "Units", "Building_FreeUnits", "UnitType", "BuildingType", szBuildingType, "NumUnits");
 	kUtility.PopulateArrayByValue(m_piDomainFreeExperiencePerGreatWorkGlobal, "Domains", "Building_DomainFreeExperiencePerGreatWorkGlobal", "DomainType", "BuildingType", szBuildingType, "Experience", 0, NUM_DOMAIN_TYPES);
+
+	
+	kUtility.PopulateArrayByValue(m_paiSpecificGreatPersonRateModifier, "Specialists", "Building_SpecificGreatPersonRateModifier", "SpecialistType", "BuildingType", szBuildingType, "Modifier");
+	kUtility.PopulateArrayByValue(m_piNumSpecFreeUnits, "Units", "Building_FreeSpecUnits", "UnitType", "BuildingType", szBuildingType, "NumUnits");
 #endif
 
 
@@ -1029,41 +1037,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 
 #endif
-	//Building Free Units
-	{
-		std::string strKey("Building_FreeUnits_MaxRow");
-		Database::Results* pResults = kUtility.GetResults(strKey);
-		if (pResults == NULL)
-		{
-			pResults = kUtility.PrepareResults(strKey, "select count(*) from Building_FreeUnits where BuildingType = ?");
-		}
 
-		pResults->Bind(1, szBuildingType);
-		pResults->Step();
-		m_iNumFreeUnit = pResults->GetInt(0);
-		pResults->Reset();
-		m_pFreeUnits = new std::pair<UnitTypes, int>[m_iNumFreeUnit];
-	}
-	{
-		std::string strKey("Building_FreeUnits");
-		Database::Results* pResults = kUtility.GetResults(strKey);
-		if (pResults == NULL)
-		{
-			pResults = kUtility.PrepareResults(strKey, "select Units.ID as UnitID, NumUnits from Building_FreeUnits inner join Units on Units.Type = UnitType where BuildingType = ?");
-		}
-
-		pResults->Bind(1, szBuildingType);
-		int idx = 0;
-		while (pResults->Step())
-		{
-			const int UnitID = pResults->GetInt(0);
-			const int iUnitNum = pResults->GetInt(1);
-			m_pFreeUnits[idx] = std::make_pair((UnitTypes)UnitID, iUnitNum);
-			idx++;
-		}
-
-		pResults->Reset();
-	}
 
 #ifdef MOD_API_BUILDING_ENABLE_PURCHASE_UNITS
 	//Buildings enable city to purchase units.
@@ -3109,7 +3083,23 @@ int CvBuildingEntry::GetBuildingClassLocalYieldChange(int i, int j) const
 	return m_ppiBuildingClassLocalYieldChanges[i][j];
 }
 
+#if defined(MOD_ROG_CORE)
 
+// Free units which appear near the capital, can be any UnitType of other civs or not
+int CvBuildingEntry::GetNumFreeSpecialUnits(int i) const
+{
+	CvAssertMsg(i < GC.getNumUnitInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piNumSpecFreeUnits ? m_piNumSpecFreeUnits[i] : -1;
+}
+
+int CvBuildingEntry::GetSpecificGreatPersonRateModifier(int i) const
+{
+	CvAssertMsg(i < GC.getNumSpecialistInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_paiSpecificGreatPersonRateModifier ? m_paiSpecificGreatPersonRateModifier[i] : -1;
+}
+#endif
 
 /// Can it only built if there is a building of this class in the city?
 bool CvBuildingEntry::IsBuildingClassNeededInCity(int i) const
@@ -3120,13 +3110,11 @@ bool CvBuildingEntry::IsBuildingClassNeededInCity(int i) const
 }
 
 /// Free units which appear near city
-int CvBuildingEntry::GetNumFreeUnit() const
+int CvBuildingEntry::GetNumFreeUnit(int i) const
 {
-	return m_iNumFreeUnit;
-}
-std::pair<UnitTypes, int>* CvBuildingEntry::GetFreeUnits() const
-{
-	return m_pFreeUnits;
+	CvAssertMsg(i < GC.getNumUnitInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piNumFreeUnits ? m_piNumFreeUnits[i] : -1;
 }
 
 /// Change to Resource yield by type
