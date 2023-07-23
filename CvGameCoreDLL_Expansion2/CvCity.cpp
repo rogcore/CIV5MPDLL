@@ -401,6 +401,7 @@ CvCity::CvCity() :
 		, m_aiYieldFromHappiness()
 		, m_aiYieldFromHealth()
 		, m_aiYieldFromCrime()
+		, m_aiSpecialistRateModifier()
 		, m_aiStaticCityYield()
 #endif
 {
@@ -999,6 +1000,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_iBaseTourismBeforeModifiers = 0;
 
 #if defined(MOD_ROG_CORE)
+	m_aiSpecialistRateModifier.resize(GC.getNumSpecialistInfos());
 	m_iExtraDamageHeal = 0;
 	m_iCityBuildingRangeStrikeModifier = 0;
 
@@ -1285,6 +1287,9 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		for(iI = 0; iI < GC.getNumSpecialistInfos(); iI++)
 		{
 			m_paiSpecialistProduction.setAt(iI, 0);
+#if defined(MOD_ROG_CORE)
+			m_aiSpecialistRateModifier[iI] = 0;
+#endif
 		}
 
 		m_pCityBuildings->Init(GC.GetGameBuildings(), this);
@@ -6746,22 +6751,19 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			if(pBuildingInfo->IsCapital())
 				owningPlayer.setCapitalCity(this);
 
+	
 			// Free Units
-			CvUnit* pFreeUnit;
+			CvUnit* pFreeUnit = NULL;
 
-			int iFreeUnitLoop;
-
-			int iNumFreeUnit = pBuildingInfo->GetNumFreeUnit();
-			if(iNumFreeUnit > 0)
+			int iFreeUnitLoop = 0;
+			int iFreeSpecUnitLoop = 0;
+			for (int iUnitLoop = 0; iUnitLoop < GC.getNumUnitInfos(); iUnitLoop++)
 			{
-				std::pair<UnitTypes, int>* pFreeUnits = pBuildingInfo->GetFreeUnits();
-				for(int iUnitLoop = 0; iUnitLoop < iNumFreeUnit; iUnitLoop++)
+				const UnitTypes eUnit = static_cast<UnitTypes>(iUnitLoop);
+				CvUnitEntry* pkUnitInfo = GC.getUnitInfo(eUnit);
+				if (pkUnitInfo)
 				{
-					const UnitTypes eUnit = pFreeUnits[iUnitLoop].first;
-					CvUnitEntry* pkUnitInfo = GC.getUnitInfo(eUnit);
-					if(pkUnitInfo)
-					{
-						for(iFreeUnitLoop = 0; iFreeUnitLoop < pFreeUnits[iUnitLoop].second; iFreeUnitLoop++)
+						for(iFreeUnitLoop = 0; iFreeUnitLoop < pBuildingInfo->GetNumFreeUnit(iUnitLoop); iFreeUnitLoop++)
 						{
 							// Get the right unit of this class for this civ
 							const UnitTypes eFreeUnitType = (UnitTypes)thisCiv.getCivilizationUnits((UnitClassTypes)pkUnitInfo->GetUnitClassType());
@@ -6868,8 +6870,29 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 								}
 							}
 						}
+					//}
+				}
+#if defined(MOD_ROG_CORE)
+				for (iFreeSpecUnitLoop = 0; iFreeSpecUnitLoop < pBuildingInfo->GetNumFreeSpecialUnits(iUnitLoop); iFreeSpecUnitLoop++)
+				{
+					pFreeUnit = NULL;
+					const UnitTypes eFreeSpecUnitType = (UnitTypes)pkUnitInfo->GetUnitClassType();
+					if (eFreeSpecUnitType != NO_UNIT)
+					{
+						pFreeUnit = owningPlayer.initUnit(eUnit, getX(), getY());
+					}
+					bool bJumpSuccess = pFreeUnit->jumpToNearestValidPlot();
+					if (bJumpSuccess)
+					{
+						addProductionExperience(pFreeUnit);
+					}
+					else
+					{
+						pFreeUnit->kill(false);
 					}
 				}
+#endif
+
 			}
 
 			// Free building
@@ -7213,6 +7236,22 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 
 #if defined(MOD_API_UNIFIED_YIELDS)
 		CvBuildingClassInfo* pkBuildingClassInfo = GC.getBuildingClassInfo(eBuildingClass);
+#endif
+
+#if defined(MOD_ROG_CORE)
+		for (int iL = 0; iL < GC.getNumSpecialistInfos(); iL++)
+		{
+			SpecialistTypes eSpecialist = (SpecialistTypes)iL;
+			CvSpecialistInfo* pSpecialistInfo = GC.getSpecialistInfo((SpecialistTypes)iL);
+			if (pSpecialistInfo)
+			{
+				int iValue = pBuildingInfo->GetSpecificGreatPersonRateModifier((SpecialistTypes)iL);
+				if (iValue > 0)
+				{
+					ChangeSpecialistRateModifier(eSpecialist, (pBuildingInfo->GetSpecificGreatPersonRateModifier((SpecialistTypes)iL) * iChange));
+				}
+			}
+		}
 #endif
 
 		YieldTypes eYield;
@@ -12176,7 +12215,29 @@ void CvCity::ChangeYieldFromProcessModifier(YieldTypes eIndex1, int iChange)
 	}
 }
 
+/// Extra yield from building
+int CvCity::GetSpecialistRateModifier(SpecialistTypes eSpecialist) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eSpecialist >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eSpecialist < GC.getNumSpecialistInfos(), "eIndex expected to be < NUM_YIELD_TYPES");
+	return m_aiSpecialistRateModifier[eSpecialist];
+}
 
+//	--------------------------------------------------------------------------------
+/// Extra yield from building
+void CvCity::ChangeSpecialistRateModifier(SpecialistTypes eSpecialist, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eSpecialist >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eSpecialist < GC.getNumSpecialistInfos(), "eIndex expected to be < NUM_YIELD_TYPES");
+
+	if (iChange != 0)
+	{
+		m_aiSpecialistRateModifier[eSpecialist] = m_aiSpecialistRateModifier[eSpecialist] + iChange;
+		CvAssert(GetSpecialistRateModifier(eSpecialist) >= 0);
+	}
+}
 
 //	--------------------------------------------------------------------------------
 /// Base yield rate from Religion
@@ -17052,6 +17113,9 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_aiYieldPerPop;
 
 	kStream >> m_aiYieldFromProcessModifier;
+#if defined(MOD_ROG_CORE)
+	kStream >> m_aiSpecialistRateModifier;
+#endif
 
 	if (uiVersion >= 4)
 	{
@@ -17474,6 +17538,9 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_aiBaseYieldRateFromReligion;
 	kStream << m_aiYieldPerPop;
 	kStream << m_aiYieldFromProcessModifier;
+#if defined(MOD_ROG_CORE)
+	kStream << m_aiSpecialistRateModifier;
+#endif
 	kStream << m_aiYieldPerReligion;
 	kStream << m_aiYieldRateModifier;
 	kStream << m_aiPowerYieldRateModifier;
