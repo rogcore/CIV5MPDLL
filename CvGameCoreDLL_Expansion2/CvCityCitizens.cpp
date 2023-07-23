@@ -1745,6 +1745,11 @@ void CvCityCitizens::SetWorkingPlot(CvPlot* pPlot, bool bNewValue, bool bUseUnas
 					if (pPlot->getTerrainType() != NO_TERRAIN)
 					{
 						GetCity()->ChangeNumTerrainWorked(pPlot->getTerrainType(), 1);
+
+						if (pPlot->getFeatureType() == NO_FEATURE && !pPlot->isHills())
+						{
+							GetCity()->ChangeNumFeaturelessTerrainWorked(pPlot->getTerrainType(), 1);
+						}
 		
 					}
 					if (pPlot->getFeatureType() != NO_FEATURE)
@@ -1770,6 +1775,11 @@ void CvCityCitizens::SetWorkingPlot(CvPlot* pPlot, bool bNewValue, bool bUseUnas
 					if (pPlot->getTerrainType() != NO_TERRAIN)
 					{
 						GetCity()->ChangeNumTerrainWorked(pPlot->getTerrainType(), -1);
+
+						if (pPlot->getFeatureType() == NO_FEATURE && !pPlot->isHills())
+						{
+							GetCity()->ChangeNumFeaturelessTerrainWorked(pPlot->getTerrainType(), -1);
+						}
 					}
 					if (pPlot->getFeatureType() != NO_FEATURE)
 					{

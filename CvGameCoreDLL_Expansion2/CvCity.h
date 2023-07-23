@@ -204,6 +204,8 @@ public:
 	void ChangeNumTerrainWorked(TerrainTypes eTerrain, int iChange);
 	int GetNumTerrainWorked(TerrainTypes eTerrain);
 
+	void ChangeNumFeaturelessTerrainWorked(TerrainTypes eTerrain, int iChange);
+	int GetNumFeaturelessTerrainWorked(TerrainTypes eTerrain);
 
 	void ChangeNumFeatureWorked(FeatureTypes eFeature, int iChange);
 	int GetNumFeatureWorked(FeatureTypes eFeature);
@@ -1466,6 +1468,7 @@ protected:
 #endif
 
 	std::vector<int> m_paiNumTerrainWorked;
+	std::vector<int> m_paiNumFeaturelessTerrainWorked;
 	std::vector<int> m_paiNumFeatureWorked;
 
 	vector<SCityExtraYields> m_yieldChanges; //[NUM_YIELD_TYPES]

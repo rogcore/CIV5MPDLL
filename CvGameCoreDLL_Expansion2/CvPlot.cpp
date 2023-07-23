@@ -6500,6 +6500,18 @@ void CvPlot::setTerrainType(TerrainTypes eNewValue, bool bRecalculate, bool bReb
 		updateYield();
 		updateImpassable();
 
+#if defined(MOD_ROG_CORE)
+		CvCity* pOwningCity = getWorkingCity();
+
+		if (pOwningCity != NULL)
+		{
+			for (int iI = 0; iI < NUM_YIELD_TYPES; ++iI)
+			{
+				pOwningCity->UpdateYieldPerXTerrain((YieldTypes)iI, getTerrainType());
+			}
+		}
+#endif
+
 		if(bUpdateSight)
 		{
 			updateSeeFromSight(true);
@@ -6557,8 +6569,59 @@ void CvPlot::setFeatureType(FeatureTypes eNewValue, int iVariety)
 
 		m_eFeatureType = eNewValue;
 
+#if defined(MOD_ROG_CORE)
+		CvCity* pOwningCity = getWorkingCity();
+		if (pOwningCity != NULL)
+		{
+			//City already working this plot? Adjust features being worked as needed.
+			if (pOwningCity->GetCityCitizens()->IsWorkingPlot(this))
+			{
+				//New feature over old? Remove old, add new.
+				if (eOldFeature != NO_FEATURE)
+				{
+					pOwningCity->ChangeNumFeatureWorked(eOldFeature, -1);
+					//We added new improvement (wasn't deleted) - add here.
+					if (eNewValue != NO_FEATURE)
+					{
+						pOwningCity->ChangeNumFeatureWorked(eNewValue, 1);
+					}
+					else
+					{
+						if (getTerrainType() != NO_TERRAIN)
+						{
+							pOwningCity->ChangeNumFeaturelessTerrainWorked(getTerrainType(), 1);
+						}
+					}
+				}
+				//New improvement over nothing? Add it in.
+				else if (eNewValue != NO_FEATURE)
+				{
+					pOwningCity->ChangeNumFeatureWorked(eNewValue, 1);
+				}
+			}
+		}
+#endif
+
 		updateYield();
 		updateImpassable();
+
+
+#if defined(MOD_ROG_CORE)
+		if (pOwningCity != NULL)
+		{
+			for (int iI = 0; iI < NUM_YIELD_TYPES; ++iI)
+			{
+				pOwningCity->UpdateYieldPerXFeature((YieldTypes)iI, getFeatureType());
+			}
+		}
+
+		if (getOwner() != NO_PLAYER)
+		{
+			GET_PLAYER(getOwner()).countCityFeatures(eOldFeature);
+			if (eNewValue != NO_FEATURE)
+				GET_PLAYER(getOwner()).countCityFeatures(eNewValue);
+		}
+#endif
 
 		if(bUpdateSight)
 		{

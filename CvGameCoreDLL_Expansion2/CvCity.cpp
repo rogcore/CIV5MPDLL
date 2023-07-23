@@ -380,6 +380,7 @@ CvCity::CvCity() :
 	, m_bOwedFoodBuilding(false)
 #endif
 		, m_paiNumTerrainWorked()
+		, m_paiNumFeaturelessTerrainWorked()
 		, m_paiNumFeatureWorked()
 		, m_iNumNearbyMountains()
 		, m_iAdditionalFood()
@@ -1259,10 +1260,13 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		int iNumResourceInfos = GC.getNumResourceInfos();
 
 		m_paiNumTerrainWorked.clear();
+		m_paiNumFeaturelessTerrainWorked.clear();
+		m_paiNumFeaturelessTerrainWorked.resize(iNumTerrainInfos);
 		m_paiNumTerrainWorked.resize(iNumTerrainInfos);
 		for (iI = 0; iI < iNumTerrainInfos; iI++)
 		{
 			m_paiNumTerrainWorked[iI] = 0;
+			m_paiNumFeaturelessTerrainWorked[iI] = 0;
 		}
 
 		m_paiNumFeatureWorked.clear();
@@ -17337,6 +17341,7 @@ void CvCity::read(FDataStream& kStream)
 
 	kStream >> m_yieldChanges;
 	kStream >> m_paiNumTerrainWorked;
+	kStream >> m_paiNumFeaturelessTerrainWorked;
 	kStream >> m_paiNumFeatureWorked;
 	kStream >> m_iNumNearbyMountains;
 	kStream >> m_iAdditionalFood;
@@ -17675,6 +17680,7 @@ void CvCity::write(FDataStream& kStream) const
 
 	kStream << m_yieldChanges;
 	kStream << m_paiNumTerrainWorked;
+	kStream << m_paiNumFeaturelessTerrainWorked;
 	kStream << m_paiNumFeatureWorked;
 	kStream << m_iNumNearbyMountains;
 	kStream << m_iAdditionalFood;
@@ -20988,6 +20994,26 @@ void CvCity::ChangeNumTerrainWorked(TerrainTypes eTerrain, int iChange)
 	}
 }
 
+int CvCity::GetNumFeaturelessTerrainWorked(TerrainTypes eTerrain)
+{
+	CvAssertMsg(eTerrain >= 0, "eTerrain is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eTerrain < GC.getNumTerrainInfos(), "eTerrain is expected to be within maximum bounds (invalid Index)");
+	return m_paiNumFeaturelessTerrainWorked[eTerrain];
+}
+//	--------------------------------------------------------------------------------
+void CvCity::ChangeNumFeaturelessTerrainWorked(TerrainTypes eTerrain, int iChange)
+{
+	CvAssertMsg(eTerrain >= 0, "eTerrain is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eTerrain < GC.getNumTerrainInfos(), "eTerrain is expected to be within maximum bounds (invalid Index)");
+	m_paiNumFeaturelessTerrainWorked[eTerrain] = m_paiNumFeaturelessTerrainWorked[eTerrain] + iChange;
+	CvAssert(GetNumFeaturelessTerrainWorked(eTerrain) >= 0);
+
+	//Update yields
+	for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
+	{
+		UpdateYieldPerXTerrain(((YieldTypes)iI), eTerrain);
+	}
+}
 //	--------------------------------------------------------------------------------
 int CvCity::GetNumFeatureWorked(FeatureTypes eFeature)
 {
@@ -21111,11 +21137,9 @@ void CvCity::UpdateYieldPerXFeature(YieldTypes eYield, FeatureTypes eFeature)
 {
 	VALIDATE_OBJECT
 		int iYieldBase = 0;
-	int iYieldReligion = 0;
 
 	int iValidTiles = 0;
 	int iBaseYield = 0;
-	int iBaseYieldReligion = 0;
 
 
 	//If we passed in a feature, let's only refresh that.
@@ -21131,8 +21155,11 @@ void CvCity::UpdateYieldPerXFeature(YieldTypes eYield, FeatureTypes eFeature)
 			ChangeBaseYieldRateFromBuildings(eYield, -GetYieldPerXFeature(eFeature, eYield));
 			SetYieldPerXFeature(eFeature, eYield, 0);
 		}
-		else
+		if (iBaseYield > 0)
+		{
 			bTest = true;
+		}
+
 		if (bTest)
 		{
 			iValidTiles = GetNumFeatureWorked(eFeature);
@@ -21140,7 +21167,6 @@ void CvCity::UpdateYieldPerXFeature(YieldTypes eYield, FeatureTypes eFeature)
 			{
 				//Gain 1 yield per x valid tiles - so if 'x' is 3, and you have 3 tiles that match, you get 1 yield
 				iYieldBase = (iValidTiles * iBaseYield) / 100;
-				iYieldReligion = (iValidTiles * iBaseYieldReligion) / 100;
 
 				//iDifference determines +/- of difference of old value
 				int iBaseDifference = iYieldBase - GetYieldPerXFeature(eFeature, eYield);
@@ -21148,6 +21174,7 @@ void CvCity::UpdateYieldPerXFeature(YieldTypes eYield, FeatureTypes eFeature)
 				//Change base rate first
 				ChangeBaseYieldRateFromBuildings(eYield, iBaseDifference);
 				SetYieldPerXFeature(eFeature, eYield, iYieldBase);
+
 			}
 			else
 			{
@@ -21176,8 +21203,10 @@ void CvCity::UpdateYieldPerXFeature(YieldTypes eYield, FeatureTypes eFeature)
 				ChangeBaseYieldRateFromBuildings(eYield, -GetYieldPerXFeature(eFeature, eYield));
 				SetYieldPerXFeature(eFeature, eYield, 0);
 			}
-			else
+			if (iBaseYield > 0)
+			{
 				bTest = true;
+			}
 
 			if (bTest)
 			{
@@ -21186,7 +21215,6 @@ void CvCity::UpdateYieldPerXFeature(YieldTypes eYield, FeatureTypes eFeature)
 				{
 					//Gain 1 yield per x valid tiles - so if 'x' is 3, and you have 3 tiles that match, you get 1 yield
 					iYieldBase = (iValidTiles * iBaseYield) / 100;
-					iYieldReligion = (iValidTiles * iBaseYieldReligion) / 100;
 
 					//iDifference determines +/- of difference of old value
 					int iDifference = iYieldBase - GetYieldPerXFeature(eFeature, eYield);
