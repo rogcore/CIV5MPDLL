@@ -1395,7 +1395,6 @@ protected:
 	std::map<int, int> m_aiYieldPerPopInEmpire;
 
 	FAutoVariable<std::vector<int>, CvCity> m_aiResourceQuantityFromPOP;
-	int* m_piNumSpecFreeUnits;
 	std::vector<int> m_aiSpecialistRateModifier;
 #endif
 
