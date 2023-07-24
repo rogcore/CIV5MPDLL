@@ -124,7 +124,7 @@ CvTraitEntry::CvTraitEntry() :
 	m_eFreeUnitPrereqTech(NO_TECH),
 	m_eFreeBuilding(NO_BUILDING),
 	m_eFreeBuildingOnConquest(NO_BUILDING),
-
+	m_bTrainedAll(false),
 	m_bFightWellDamaged(false),
 	m_bMoveFriendlyWoodsAsRoad(false),
 	m_bFasterAlongRiver(false),
@@ -703,6 +703,12 @@ BuildingTypes CvTraitEntry::GetFreeBuildingOnConquest() const
 bool CvTraitEntry::IsFightWellDamaged() const
 {
 	return m_bFightWellDamaged;
+}
+
+/// Accessor:: does this civ get combat bonuses when damaged?
+bool CvTraitEntry::IsTrainedAll() const
+{
+	return m_bTrainedAll;
 }
 
 /// Accessor:: does this civ move units through forest as if it is road?
@@ -1519,7 +1525,7 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	{
 		m_eFreeBuildingOnConquest = (BuildingTypes)GC.getInfoTypeForString(szTextVal, true);
 	}
-
+	m_bTrainedAll = kResults.GetBool("TrainedAll");
 	m_bFightWellDamaged = kResults.GetBool("FightWellDamaged");
 	m_bMoveFriendlyWoodsAsRoad = kResults.GetBool("MoveFriendlyWoodsAsRoad");
 	m_bFasterAlongRiver = kResults.GetBool("FasterAlongRiver");
@@ -2283,6 +2289,10 @@ void CvPlayerTraits::InitPlayerTraits()
 				}
 			}
 #endif
+			if (trait->IsTrainedAll())
+			{
+				m_bTrainedAll = true;
+			}
 
 			if(trait->IsFightWellDamaged())
 			{
@@ -2291,6 +2301,7 @@ void CvPlayerTraits::InitPlayerTraits()
 				//int iWoundedUnitDamageMod = /*-50*/ GC.getTRAIT_WOUNDED_DAMAGE_MOD();
 				//m_pPlayer->ChangeWoundedUnitDamageMod(iWoundedUnitDamageMod);
 			}
+
 			if(trait->IsMoveFriendlyWoodsAsRoad())
 			{
 				m_bMoveFriendlyWoodsAsRoad = true;
@@ -2741,7 +2752,7 @@ void CvPlayerTraits::Reset()
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
 	m_iCiviliansFreePromotion = NO_PROMOTION;
 #endif
-
+	m_bTrainedAll = false;
 	m_bFightWellDamaged = false;
 	m_bMoveFriendlyWoodsAsRoad = false;
 	m_bFasterAlongRiver = false;
@@ -4173,7 +4184,7 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	MOD_SERIALIZE_READ(52, kStream, m_iSeaTradeRouteRangeBonus, 0);
 #endif
-
+	kStream >> m_bTrainedAll;
 	kStream >> m_bFightWellDamaged;
 	kStream >> m_bMoveFriendlyWoodsAsRoad;
 	kStream >> m_bFasterAlongRiver;
@@ -4539,7 +4550,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	MOD_SERIALIZE_WRITE(kStream, m_iSeaTradeRouteRangeBonus);
 #endif
-
+	kStream << m_bTrainedAll;
 	kStream << m_bFightWellDamaged;
 	kStream << m_bMoveFriendlyWoodsAsRoad;
 	kStream << m_bFasterAlongRiver;

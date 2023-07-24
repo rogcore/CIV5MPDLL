@@ -7973,18 +7973,53 @@ bool CvPlayer::canTrain(UnitTypes eUnit, bool bContinue, bool bTestVisible, bool
 		return false;
 	}
 
+
 	// Should we check whether this Unit has been blocked out by the civ XML?
 	if(!bIgnoreUniqueUnitStatus)
 	{
-		UnitTypes eThisPlayersUnitType = (UnitTypes) getCivilizationInfo().getCivilizationUnits(eUnitClass);
+		UnitTypes eThisPlayersUnitType = (UnitTypes) getCivilizationInfo().getCivilizationUnits(eUnitClass);	
 
-		// If the player isn't allowed to train this Unit (via XML) then return false
-		if(eThisPlayersUnitType != eUnit)
+#if defined(MOD_TRAIN_ALL_CORE)
+		if (MOD_TRAIN_ALL_CORE)
+		{
+			// If the player isn't allowed to train this Unit (via XML) then return false
+			if (eThisPlayersUnitType != eUnit && !GetPlayerTraits()->IsTrainedAll())
+			{
+				return false;
+			}
+
+			if (eThisPlayersUnitType != eUnit && GetPlayerTraits()->IsTrainedAll())
+			{
+				PlayerTypes eLoopPlayer = (PlayerTypes)63;
+				CvCivilizationInfo* pkInfo = GC.getCivilizationInfo(GET_PLAYER(eLoopPlayer).getCivilizationType());
+				if (pkInfo)
+				{
+					// Loop through all units
+					for (int iI = 0; iI < GC.getNumUnitClassInfos(); iI++)
+					{
+						if (pkInfo->isCivilizationUnitOverridden(iI))
+						{
+							UnitTypes eCivilizationUnit = static_cast<UnitTypes>(pkInfo->getCivilizationUnits(iI));
+							if (eCivilizationUnit != NO_UNIT && eCivilizationUnit == eUnit)
+							{
+								return false;
+							}
+						}
+					}
+				}
+
+			}
+			
+		}
+#else
+		if (eThisPlayersUnitType != eUnit)
 		{
 			return false;
 		}
+#endif
 	}
 
+		
 	if(!bIgnoreCost)
 	{
 		if(pUnitInfo.GetProductionCost() == -1)

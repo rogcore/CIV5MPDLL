@@ -514,7 +514,7 @@ int CustomMods::getOption(string sOption, int defValue) {
 
 		MOD_OPT_CACHE(ERA_EFFECTS_EXTENSIONS);
 
-
+		MOD_OPT_CACHE(TRAIN_ALL_CORE);
 		MOD_OPT_CACHE(ROG_CORE);
 		MOD_OPT_CACHE(MORE_NATURAL_WONDER);
 

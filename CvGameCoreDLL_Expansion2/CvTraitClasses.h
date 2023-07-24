@@ -148,6 +148,7 @@ public:
 	BuildingTypes GetFreeBuilding() const;
 	BuildingTypes GetFreeBuildingOnConquest() const;
 
+	bool IsTrainedAll() const;
 	bool IsFightWellDamaged() const;
 	bool IsMoveFriendlyWoodsAsRoad() const;
 	bool IsFasterAlongRiver() const;
@@ -384,6 +385,8 @@ protected:
 	BuildingTypes m_eFreeBuilding;
 	BuildingTypes m_eFreeBuildingOnConquest;
 
+	
+	bool m_bTrainedAll;
 	bool m_bFightWellDamaged;
 	bool m_bMoveFriendlyWoodsAsRoad;
 	bool m_bFasterAlongRiver;
@@ -874,6 +877,10 @@ public:
 		return m_iCiviliansFreePromotion;
 	}
 #endif
+	bool IsTrainedAll() const
+	{
+		return m_bTrainedAll;
+	};
 	bool IsFightWellDamaged() const
 	{
 		return m_bFightWellDamaged;
@@ -1251,7 +1258,7 @@ private:
 	int m_iCiviliansFreePromotion;
 #endif
 	// Saved
-
+	bool m_bTrainedAll;
 	bool m_bFightWellDamaged;
 	bool m_bMoveFriendlyWoodsAsRoad;
 	bool m_bFasterAlongRiver;

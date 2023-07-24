@@ -984,6 +984,8 @@
 
     <Row Class="2" Name="ROG_CORE" Value="1"/>
 
+<Row Class="2" Name="TRAIN_ALL_CORE" Value="0"/>
+
     <Row Class="4" Name="MORE_NATURAL_WONDER" Value="0"/>
 
     <Row Class="3"  Name="EVENTS_UNIT_CAN_RANGEATTACK" Value="0"/>
