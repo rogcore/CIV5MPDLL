@@ -535,6 +535,7 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(GetAttackBonusTurns);
 	Method(GetCultureBonusTurns);
 	Method(GetTourismBonusTurns);
+	Method(GetInternationalTourismTooltip);
 
 	Method(GetGoldenAgeProgressThreshold);
 	Method(GetGoldenAgeProgressMeter);
@@ -1297,6 +1298,8 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(GetYieldModifierFromHappiness);
 	Method(GetYieldModifierFromNumGreakWork);
 	Method(GetYieldModifierFromHappinessPolicy);
+
+	Method(GetGlobalYieldModifierFromResource);
 
 	Method(IsCorruptionLevelReduceByOne);
 	Method(GetCorruptionScoreModifierFromPolicy);
@@ -5737,6 +5740,17 @@ int CvLuaPlayer::lGetCultureBonusTurns(lua_State* L)
 int CvLuaPlayer::lGetTourismBonusTurns(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvPlayerAI::GetTourismBonusTurns);
+}
+
+//------------------------------------------------------------------------------
+//CvString GetInternationalTourismTooltip();
+int CvLuaPlayer::lGetInternationalTourismTooltip(lua_State* L)
+{
+	CvString toolTip;
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	toolTip = pkPlayer->GetInternationalTourismTooltip();
+	lua_pushstring(L, toolTip.c_str());
+	return 1;
 }
 
 //------------------------------------------------------------------------------
@@ -12471,6 +12485,15 @@ int CvLuaPlayer::lGetYieldModifierFromHappinessPolicy(lua_State* L)
 	CvPlayerAI* pkPlayer = GetInstance(L);
 	YieldTypes eYield = static_cast<YieldTypes>(lua_tointeger(L, 2));
 	int result = pkPlayer->GetYieldModifierFromHappinessPolicy(GC.getYieldInfo(eYield));
+	lua_pushinteger(L, result);
+	return 1;
+}
+
+int CvLuaPlayer::lGetGlobalYieldModifierFromResource(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	YieldTypes eYield = static_cast<YieldTypes>(lua_tointeger(L, 2));
+	int result = pkPlayer->GetGlobalYieldModifierFromResource(eYield);
 	lua_pushinteger(L, result);
 	return 1;
 }

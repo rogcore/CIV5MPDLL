@@ -435,6 +435,7 @@ protected:
 	static int lGetAttackBonusTurns(lua_State* L);
 	static int lGetCultureBonusTurns(lua_State* L);
 	static int lGetTourismBonusTurns(lua_State* L);
+	static int lGetInternationalTourismTooltip(lua_State* L);
 
 	static int lGetGoldenAgeProgressThreshold(lua_State* L);
 	static int lGetGoldenAgeProgressMeter(lua_State* L);
@@ -1217,6 +1218,8 @@ protected:
 	LUAAPIEXTN(GetYieldModifierFromHappiness, int, eYieldType);
 	LUAAPIEXTN(GetYieldModifierFromNumGreakWork, int, eYieldType);
 	LUAAPIEXTN(GetYieldModifierFromHappinessPolicy, int, eYieldType);
+
+	LUAAPIEXTN(GetGlobalYieldModifierFromResource, int, eYieldType);
 
 #ifdef MOD_GLOBAL_CORRUPTION
 	LUAAPIEXTN(IsCorruptionLevelReduceByOne, bool);
