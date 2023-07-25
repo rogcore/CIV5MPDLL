@@ -13314,3 +13314,466 @@ void CvPlot::ClearUnitPromotions(bool bOnlyFriendUnit)
 	}
 }
 #endif
+
+
+
+#if defined(MOD_API_EXTENSIONS)
+bool CvPlot::IsWithinDistanceOfUnit(PlayerTypes ePlayer, UnitTypes eOtherUnit, int iDistance, bool bIsFriendly, bool bIsEnemy) const
+{
+	int iX = getX(); int iY = getY();
+	CvUnit* pLoopUnit = NULL;
+	if (iDistance >= 0)
+	{
+		for (int iI = 0; iI < this->getNumUnits(); iI++)
+		{
+			pLoopUnit = this->getUnitByIndex(iI);
+			if (pLoopUnit != NULL)
+			{
+				if (pLoopUnit->getUnitType() == eOtherUnit)
+				{
+					if (bIsFriendly && GET_PLAYER(pLoopUnit->getOwner()).getTeam() == GET_PLAYER(ePlayer).getTeam())
+					{
+						return true;
+					}
+					else if (bIsEnemy && GET_TEAM(GET_PLAYER(pLoopUnit->getOwner()).getTeam()).isAtWar(GET_PLAYER(ePlayer).getTeam()))
+					{
+						return true;
+					}
+					else if (!bIsFriendly && !bIsEnemy)
+					{
+						return true;
+					}
+				}
+			}
+		}
+	}
+	for (int i = -iDistance; i <= iDistance; ++i)
+	{
+		for (int j = -iDistance; j <= iDistance; ++j)
+		{
+			CvPlot* pLoopPlot = ::plotXYWithRangeCheck(iX, iY, i, j, iDistance);
+
+			if (pLoopPlot != NULL && pLoopPlot->getNumUnits() != 0 && pLoopPlot != this)
+			{
+				for (int iI = 0; iI < pLoopPlot->getNumUnits(); iI++)
+				{
+					pLoopUnit = pLoopPlot->getUnitByIndex(iI);
+					if (pLoopUnit != NULL)
+					{
+						if (pLoopUnit->getUnitType() == eOtherUnit)
+						{
+							if (bIsFriendly && GET_PLAYER(pLoopUnit->getOwner()).getTeam() == GET_PLAYER(ePlayer).getTeam())
+							{
+								return true;
+							}
+							else if (bIsEnemy && GET_TEAM(GET_PLAYER(pLoopUnit->getOwner()).getTeam()).isAtWar(GET_PLAYER(ePlayer).getTeam()))
+							{
+								return true;
+							}
+							else if (!bIsFriendly && !bIsEnemy)
+							{
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool CvPlot::IsWithinDistanceOfCity(const CvUnit* eThisUnit, int iDistance, bool bIsFriendly, bool bIsEnemy) const
+{
+	if (eThisUnit != NULL)
+	{
+		for (int i = -iDistance; i <= iDistance; ++i)
+		{
+			for (int j = -iDistance; j <= iDistance; ++j)
+			{
+				int iX = eThisUnit->getX(); int iY = eThisUnit->getY();
+				CvPlot* pLoopPlot = ::plotXYWithRangeCheck(iX, iY, i, j, iDistance);
+				if (pLoopPlot != NULL)
+				{
+					if (pLoopPlot->isCity())
+					{
+						if (bIsFriendly && pLoopPlot->isFriendlyCity(*eThisUnit, true))
+						{
+							return true;
+						}
+						else if (bIsEnemy && pLoopPlot->isEnemyCity(*eThisUnit))
+						{
+							return true;
+						}
+						else if (!bIsFriendly && !bIsEnemy)
+						{
+							return true;
+						}
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool CvPlot::IsWithinDistanceOfUnitCombatType(PlayerTypes ePlayer, UnitCombatTypes eUnitCombat, int iDistance, bool bIsFriendly, bool bIsEnemy) const
+{
+	int iX = getX(); int iY = getY();
+	CvUnit* pLoopUnit = NULL;
+	if (iDistance >= 0)
+	{
+		for (int iI = 0; iI < this->getNumUnits(); iI++)
+		{
+			pLoopUnit = this->getUnitByIndex(iI);
+			if (pLoopUnit != NULL)
+			{
+				if (pLoopUnit->getUnitCombatType() == eUnitCombat)
+				{
+					if (bIsFriendly && GET_PLAYER(pLoopUnit->getOwner()).getTeam() == GET_PLAYER(ePlayer).getTeam())
+					{
+						return true;
+					}
+					else if (bIsEnemy && GET_TEAM(GET_PLAYER(pLoopUnit->getOwner()).getTeam()).isAtWar(GET_PLAYER(ePlayer).getTeam()))
+					{
+						return true;
+					}
+					else if (!bIsFriendly && !bIsEnemy)
+					{
+						return true;
+					}
+				}
+			}
+		}
+	}
+	for (int i = -iDistance; i <= iDistance; ++i)
+	{
+		for (int j = -iDistance; j <= iDistance; ++j)
+		{
+			CvPlot* pLoopPlot = ::plotXYWithRangeCheck(iX, iY, i, j, iDistance);
+
+			if (pLoopPlot != NULL && pLoopPlot->getNumUnits() != 0 && pLoopPlot != this)
+			{
+				for (int iI = 0; iI < pLoopPlot->getNumUnits(); iI++)
+				{
+					pLoopUnit = pLoopPlot->getUnitByIndex(iI);
+					if (pLoopUnit != NULL)
+					{
+						if (pLoopUnit->getUnitCombatType() == eUnitCombat)
+						{
+							if (bIsFriendly && GET_PLAYER(pLoopUnit->getOwner()).getTeam() == GET_PLAYER(ePlayer).getTeam())
+							{
+								return true;
+							}
+							else if (bIsEnemy && GET_TEAM(GET_PLAYER(pLoopUnit->getOwner()).getTeam()).isAtWar(GET_PLAYER(ePlayer).getTeam()))
+							{
+								return true;
+							}
+							else if (!bIsFriendly && !bIsEnemy)
+							{
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool CvPlot::IsWithinDistanceOfUnitClass(PlayerTypes ePlayer, UnitClassTypes eUnitClass, int iDistance, bool bIsFriendly, bool bIsEnemy) const
+{
+	int iX = getX(); int iY = getY();
+	CvUnit* pLoopUnit = NULL;
+	if (iDistance >= 0)
+	{
+		for (int iI = 0; iI < this->getNumUnits(); iI++)
+		{
+			pLoopUnit = this->getUnitByIndex(iI);
+			if (pLoopUnit != NULL)
+			{
+				if (pLoopUnit->getUnitClassType() == eUnitClass)
+				{
+					if (bIsFriendly && GET_PLAYER(pLoopUnit->getOwner()).getTeam() == GET_PLAYER(ePlayer).getTeam())
+					{
+						return true;
+					}
+					else if (bIsEnemy && GET_TEAM(GET_PLAYER(pLoopUnit->getOwner()).getTeam()).isAtWar(GET_PLAYER(ePlayer).getTeam()))
+					{
+						return true;
+					}
+					else if (!bIsFriendly && !bIsEnemy)
+					{
+						return true;
+					}
+				}
+			}
+		}
+	}
+	for (int i = -iDistance; i <= iDistance; ++i)
+	{
+		for (int j = -iDistance; j <= iDistance; ++j)
+		{
+			CvPlot* pLoopPlot = ::plotXYWithRangeCheck(iX, iY, i, j, iDistance);
+
+			if (pLoopPlot != NULL && pLoopPlot->getNumUnits() != 0 && pLoopPlot != this)
+			{
+				for (int iI = 0; iI < pLoopPlot->getNumUnits(); iI++)
+				{
+					pLoopUnit = pLoopPlot->getUnitByIndex(iI);
+					if (pLoopUnit != NULL)
+					{
+						if (pLoopUnit->getUnitClassType() == eUnitClass)
+						{
+							if (bIsFriendly && GET_PLAYER(pLoopUnit->getOwner()).getTeam() == GET_PLAYER(ePlayer).getTeam())
+							{
+								return true;
+							}
+							else if (bIsEnemy && GET_TEAM(GET_PLAYER(pLoopUnit->getOwner()).getTeam()).isAtWar(GET_PLAYER(ePlayer).getTeam()))
+							{
+								return true;
+							}
+							else if (!bIsFriendly && !bIsEnemy)
+							{
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool CvPlot::IsWithinDistanceOfUnitPromotion(PlayerTypes ePlayer, PromotionTypes eUnitPromotion, int iDistance, bool bIsFriendly, bool bIsEnemy) const
+{
+	int iX = getX(); int iY = getY();
+	CvUnit* pLoopUnit = NULL;
+	if (iDistance >= 0)
+	{
+		for (int iI = 0; iI < this->getNumUnits(); iI++)
+		{
+			pLoopUnit = this->getUnitByIndex(iI);
+			if (pLoopUnit != NULL)
+			{
+				for (int iPromotionLoop = 0; iPromotionLoop < GC.getNumPromotionInfos(); iPromotionLoop++)
+				{
+					const PromotionTypes ePromotion = (PromotionTypes)iPromotionLoop;
+					CvPromotionEntry* pkPromotionInfo = GC.getPromotionInfo(ePromotion);
+					if (pkPromotionInfo)
+					{
+						if (pLoopUnit->isHasPromotion(ePromotion) && ePromotion == eUnitPromotion)
+						{
+							if (bIsFriendly && GET_PLAYER(pLoopUnit->getOwner()).getTeam() == GET_PLAYER(ePlayer).getTeam())
+							{
+								return true;
+							}
+							else if (bIsEnemy && GET_TEAM(GET_PLAYER(pLoopUnit->getOwner()).getTeam()).isAtWar(GET_PLAYER(ePlayer).getTeam()))
+							{
+								return true;
+							}
+							else if (!bIsFriendly && !bIsEnemy)
+							{
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	for (int i = -iDistance; i <= iDistance; ++i)
+	{
+		for (int j = -iDistance; j <= iDistance; ++j)
+		{
+			CvPlot* pLoopPlot = ::plotXYWithRangeCheck(iX, iY, i, j, iDistance);
+
+			if (pLoopPlot != NULL && pLoopPlot->getNumUnits() != 0 && pLoopPlot != this)
+			{
+				for (int iI = 0; iI < pLoopPlot->getNumUnits(); iI++)
+				{
+					pLoopUnit = pLoopPlot->getUnitByIndex(iI);
+					if (pLoopUnit != NULL)
+					{
+						for (int iPromotionLoop = 0; iPromotionLoop < GC.getNumPromotionInfos(); iPromotionLoop++)
+						{
+							const PromotionTypes ePromotion = (PromotionTypes)iPromotionLoop;
+							CvPromotionEntry* pkPromotionInfo = GC.getPromotionInfo(ePromotion);
+							if (pkPromotionInfo)
+							{
+								if (pLoopUnit->isHasPromotion(ePromotion) && ePromotion == eUnitPromotion)
+								{
+									if (bIsFriendly && GET_PLAYER(pLoopUnit->getOwner()).getTeam() == GET_PLAYER(ePlayer).getTeam())
+									{
+										return true;
+									}
+									else if (bIsEnemy && GET_TEAM(GET_PLAYER(pLoopUnit->getOwner()).getTeam()).isAtWar(GET_PLAYER(ePlayer).getTeam()))
+									{
+										return true;
+									}
+									else if (!bIsFriendly && !bIsEnemy)
+									{
+										return true;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool CvPlot::IsAdjacentToUnit(PlayerTypes ePlayer, UnitTypes eOtherUnit, bool bIsFriendly, bool bIsEnemy) const
+{
+	int iX = getX(); int iY = getY();
+	CvUnit* pLoopUnit = NULL;
+	for (int iDirection = 0; iDirection < NUM_DIRECTION_TYPES; iDirection++)
+	{
+		CvPlot* pLoopPlot = plotDirection(iX, iY, (DirectionTypes)iDirection);
+
+		if (pLoopPlot != NULL && pLoopPlot->getNumUnits() != 0 && pLoopPlot != this)
+		{
+			for (int iI = 0; iI < pLoopPlot->getNumUnits(); iI++)
+			{
+				pLoopUnit = pLoopPlot->getUnitByIndex(iI);
+				if (pLoopUnit != NULL)
+				{
+					if (pLoopUnit->getUnitType() == eOtherUnit)
+					{
+						if (bIsFriendly && GET_PLAYER(pLoopUnit->getOwner()).getTeam() == GET_PLAYER(ePlayer).getTeam())
+						{
+							return true;
+						}
+						else if (bIsEnemy && GET_TEAM(GET_PLAYER(pLoopUnit->getOwner()).getTeam()).isAtWar(GET_PLAYER(ePlayer).getTeam()))
+						{
+							return true;
+						}
+						else if (!bIsFriendly && !bIsEnemy)
+						{
+							return true;
+						}
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool CvPlot::IsAdjacentToUnitCombatType(PlayerTypes ePlayer, UnitCombatTypes eUnitCombat, bool bIsFriendly, bool bIsEnemy) const
+{
+	int iX = getX(); int iY = getY();
+	CvUnit* pLoopUnit = NULL;
+	for (int iDirection = 0; iDirection < NUM_DIRECTION_TYPES; iDirection++)
+	{
+		CvPlot* pLoopPlot = plotDirection(iX, iY, (DirectionTypes)iDirection);
+
+		if (pLoopPlot != NULL && pLoopPlot->getNumUnits() != 0 && pLoopPlot != this)
+		{
+			for (int iI = 0; iI < pLoopPlot->getNumUnits(); iI++)
+			{
+				pLoopUnit = pLoopPlot->getUnitByIndex(iI);
+				if (pLoopUnit != NULL)
+				{
+					if (pLoopUnit->getUnitCombatType() == eUnitCombat)
+					{
+						if (bIsFriendly && GET_PLAYER(pLoopUnit->getOwner()).getTeam() == GET_PLAYER(ePlayer).getTeam())
+						{
+							return true;
+						}
+						else if (bIsEnemy && GET_TEAM(GET_PLAYER(pLoopUnit->getOwner()).getTeam()).isAtWar(GET_PLAYER(ePlayer).getTeam()))
+						{
+							return true;
+						}
+						else if (!bIsFriendly && !bIsEnemy)
+						{
+							return true;
+						}
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool CvPlot::IsAdjacentToUnitClass(PlayerTypes ePlayer, UnitClassTypes eUnitClass, bool bIsFriendly, bool bIsEnemy) const
+{
+	int iX = getX(); int iY = getY();
+	CvUnit* pLoopUnit = NULL;
+	for (int iDirection = 0; iDirection < NUM_DIRECTION_TYPES; iDirection++)
+	{
+		CvPlot* pLoopPlot = plotDirection(iX, iY, (DirectionTypes)iDirection);
+
+		if (pLoopPlot != NULL && pLoopPlot->getNumUnits() != 0 && pLoopPlot != this)
+		{
+			for (int iI = 0; iI < pLoopPlot->getNumUnits(); iI++)
+			{
+				pLoopUnit = pLoopPlot->getUnitByIndex(iI);
+				if (pLoopUnit != NULL)
+				{
+					if (pLoopUnit->getUnitClassType() == eUnitClass)
+					{
+						if (bIsFriendly && GET_PLAYER(pLoopUnit->getOwner()).getTeam() == GET_PLAYER(ePlayer).getTeam())
+						{
+							return true;
+						}
+						else if (bIsEnemy && GET_TEAM(GET_PLAYER(pLoopUnit->getOwner()).getTeam()).isAtWar(GET_PLAYER(ePlayer).getTeam()))
+						{
+							return true;
+						}
+						else if (!bIsFriendly && !bIsEnemy)
+						{
+							return true;
+						}
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool CvPlot::IsAdjacentToUnitPromotion(PlayerTypes ePlayer, PromotionTypes eUnitPromotion, bool bIsFriendly, bool bIsEnemy) const
+{
+	int iX = getX(); int iY = getY();
+	CvUnit* pLoopUnit = NULL;
+	for (int iDirection = 0; iDirection < NUM_DIRECTION_TYPES; iDirection++)
+	{
+		CvPlot* pLoopPlot = plotDirection(iX, iY, (DirectionTypes)iDirection);
+
+		if (pLoopPlot != NULL && pLoopPlot->getNumUnits() != 0 && pLoopPlot != this)
+		{
+			for (int iI = 0; iI < pLoopPlot->getNumUnits(); iI++)
+			{
+				pLoopUnit = pLoopPlot->getUnitByIndex(iI);
+				if (pLoopUnit != NULL)
+				{
+					if (pLoopUnit->isHasPromotion(eUnitPromotion))
+					{
+						if (bIsFriendly && GET_PLAYER(pLoopUnit->getOwner()).getTeam() == GET_PLAYER(ePlayer).getTeam())
+						{
+							return true;
+						}
+						else if (bIsEnemy && GET_TEAM(GET_PLAYER(pLoopUnit->getOwner()).getTeam()).isAtWar(GET_PLAYER(ePlayer).getTeam()))
+						{
+							return true;
+						}
+						else if (!bIsFriendly && !bIsEnemy)
+						{
+							return true;
+						}
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+#endif

@@ -776,6 +776,17 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(IsOnFeature);
 	Method(IsAdjacentToFeature);
 	Method(IsWithinDistanceOfFeature);
+
+	Method(IsWithinDistanceOfUnit);
+	Method(IsWithinDistanceOfUnitClass);
+	Method(IsWithinDistanceOfUnitCombatType);
+	Method(IsWithinDistanceOfUnitPromotion);
+	Method(IsAdjacentToUnit);
+	Method(IsAdjacentToUnitClass);
+	Method(IsAdjacentToUnitCombatType);
+	Method(IsAdjacentToUnitPromotion);
+	Method(IsWithinDistanceOfCity);
+
 	Method(IsOnImprovement);
 	Method(IsAdjacentToImprovement);
 	Method(IsWithinDistanceOfImprovement);
@@ -6082,6 +6093,18 @@ LUAAPIIMPL(Unit, IsUnitClass)
 LUAAPIIMPL(Unit, IsOnFeature)
 LUAAPIIMPL(Unit, IsAdjacentToFeature)
 LUAAPIIMPL(Unit, IsWithinDistanceOfFeature)
+
+
+LUAAPIIMPL(Unit, IsWithinDistanceOfUnit)
+LUAAPIIMPL(Unit, IsWithinDistanceOfUnitClass)
+LUAAPIIMPL(Unit, IsWithinDistanceOfUnitCombatType)
+LUAAPIIMPL(Unit, IsWithinDistanceOfUnitPromotion)
+LUAAPIIMPL(Unit, IsAdjacentToUnit)
+LUAAPIIMPL(Unit, IsAdjacentToUnitClass)
+LUAAPIIMPL(Unit, IsAdjacentToUnitCombatType)
+LUAAPIIMPL(Unit, IsAdjacentToUnitPromotion)
+LUAAPIIMPL(Unit, IsWithinDistanceOfCity)
+
 LUAAPIIMPL(Unit, IsOnImprovement)
 LUAAPIIMPL(Unit, IsAdjacentToImprovement)
 LUAAPIIMPL(Unit, IsWithinDistanceOfImprovement)
