@@ -697,6 +697,17 @@ protected:
 	LUAAPIEXTN(IsOnFeature, bool, iFeatureType);
 	LUAAPIEXTN(IsAdjacentToFeature, bool, iFeatureType);
 	LUAAPIEXTN(IsWithinDistanceOfFeature, bool, iFeatureType, iDistance);
+
+	LUAAPIEXTN(IsWithinDistanceOfUnit, iUnitType, iDistance, bool, bool);
+	LUAAPIEXTN(IsWithinDistanceOfUnitClass, iUnitClassType, iDistance, bool, bool);
+	LUAAPIEXTN(IsWithinDistanceOfUnitCombatType, iUnitCombatType, iDistance, bool, bool);
+	LUAAPIEXTN(IsWithinDistanceOfUnitPromotion, iPromotionType, iDistance, bool, bool);
+	LUAAPIEXTN(IsAdjacentToUnit, iUnitType, bool, bool);
+	LUAAPIEXTN(IsAdjacentToUnitClass, iUnitClassType, bool, bool);
+	LUAAPIEXTN(IsAdjacentToUnitCombatType, iUnitCombatType, bool, bool);
+	LUAAPIEXTN(IsAdjacentToUnitPromotion, iPromotionType, bool, bool);
+	LUAAPIEXTN(IsWithinDistanceOfCity, iDistance, bool, bool);
+
 	LUAAPIEXTN(IsOnImprovement, bool, iImprovementType);
 	LUAAPIEXTN(IsAdjacentToImprovement, bool, iImprovementType);
 	LUAAPIEXTN(IsWithinDistanceOfImprovement, bool, iImprovementType, iDistance);
