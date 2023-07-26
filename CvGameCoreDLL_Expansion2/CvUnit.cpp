@@ -767,6 +767,28 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 		}
 	}
 
+#if defined(MOD_ROG_CORE)
+	if (MOD_ROG_CORE)
+	{
+		if (isUnitTechUpgrade())
+		{
+			for (int iI = 0; iI < GC.getNumTechInfos(); iI++)
+			{
+				if ( m_pUnitInfo->GetTechCombatStrength((TechTypes)iI) > 0 && GET_TEAM(kPlayer.getTeam()).GetTeamTechs()->HasTech((TechTypes)iI) && (GetBaseCombatStrength() < m_pUnitInfo->GetTechCombatStrength((TechTypes)iI)))
+				{
+					SetBaseCombatStrength(m_pUnitInfo->GetTechCombatStrength((TechTypes)iI));
+				}
+
+				if (isRanged() && m_pUnitInfo->GetTechRangedCombatStrength((TechTypes)iI) > 0 && (GET_TEAM(kPlayer.getTeam()).GetTeamTechs()->HasTech((TechTypes)iI) &&  GetBaseRangedCombatStrength() < m_pUnitInfo->GetTechRangedCombatStrength((TechTypes)iI)))
+				{
+					SetBaseRangedCombatStrength(m_pUnitInfo->GetTechRangedCombatStrength((TechTypes)iI));
+				}
+			}
+
+		}
+	}
+#endif
+
 	// Free Promotions from Policies, Techs, etc.
 	for(iI = 0; iI < GC.getNumPromotionInfos(); iI++)
 	{
@@ -29811,7 +29833,11 @@ FDataStream& operator>>(FDataStream& loadFrom, CvUnit& writeTo)
 }
 
 
-
+bool CvUnit::isUnitTechUpgrade() const
+{
+	VALIDATE_OBJECT
+	return getUnitInfo().IsUnitTechUpgrade();
+}
 
 
 #if defined(MOD_ROG_CORE)

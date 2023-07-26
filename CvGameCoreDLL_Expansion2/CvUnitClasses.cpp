@@ -136,6 +136,9 @@ CvUnitEntry::CvUnitEntry(void) :
 	m_pbGreatPeoples(NULL),
 	m_pbBuildings(NULL),
 	m_pbBuildingClassRequireds(NULL),
+	m_piTechCombatStrength(NULL),
+	m_piTechRangedCombatStrength(NULL),
+	m_bUnitTechUpgrade(false),
 	m_piPrereqAndTechs(NULL),
 	m_piResourceQuantityRequirements(NULL),
 	m_piProductionTraits(NULL),
@@ -179,7 +182,8 @@ CvUnitEntry::~CvUnitEntry(void)
 	SAFE_DELETE_ARRAY(m_paszMiddleArtDefineTags);
 	SAFE_DELETE_ARRAY(m_paszUnitNames);
 	SAFE_DELETE_ARRAY(m_paeGreatWorks);
-
+	SAFE_DELETE_ARRAY(m_piTechCombatStrength);
+	SAFE_DELETE_ARRAY(m_piTechRangedCombatStrength);
 #if defined(MOD_BALANCE_CORE)
 	SAFE_DELETE_ARRAY(m_piScalingFromOwnedImprovements);
 #endif
@@ -332,7 +336,7 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 #if defined(MOD_EVENTS_CAN_MOVE_INTO)
 	m_bSendCanMoveIntoEvent = kResults.GetBool("SendCanMoveIntoEvent");
 #endif
-
+	m_bUnitTechUpgrade = kResults.GetBool("UnitTechUpgrade");
 	szTextVal = kResults.GetText("Domain");
 	m_iDomainType = GC.getInfoTypeForString(szTextVal, true);
 
@@ -397,6 +401,8 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 	kUtility.PopulateArrayByExistence(m_pbBuildings, "Buildings", "Unit_Buildings", "BuildingType", "UnitType", szUnitType);
 	kUtility.PopulateArrayByExistence(m_pbBuildingClassRequireds, "BuildingClasses", "Unit_BuildingClassRequireds", "BuildingClassType", "UnitType", szUnitType);
 
+	kUtility.PopulateArrayByValue(m_piTechCombatStrength, "Technologies", "Unit_TechCombatStrength", "TechType", "UnitType", szUnitType, "CombatStrength");
+	kUtility.PopulateArrayByValue(m_piTechRangedCombatStrength, "Technologies", "Unit_TechRangedCombatStrength", "TechType", "UnitType", szUnitType, "RangedCombatStrength");
 #if defined(MOD_BALANCE_CORE)
     if (MOD_BALANCE_CORE)
 	{
@@ -1250,6 +1256,27 @@ bool CvUnitEntry::GetBuildingClassRequireds(int i) const
 	CvAssertMsg(i < GC.getNumBuildingClassInfos(), "Index out of bounds");
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_pbBuildingClassRequireds ? m_pbBuildingClassRequireds[i] : false;
+}
+
+/// Does this Unit get a new combat strength when reaching a new Era?
+int CvUnitEntry::GetTechCombatStrength(int i) const
+{
+	CvAssertMsg(i < GC.getNumTechInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piTechCombatStrength ? m_piTechCombatStrength[i] : -1;
+}
+
+int CvUnitEntry::GetTechRangedCombatStrength(int i) const
+{
+	CvAssertMsg(i < GC.getNumTechInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piTechRangedCombatStrength ? m_piTechRangedCombatStrength[i] : -1;
+}
+
+
+bool CvUnitEntry::IsUnitTechUpgrade() const
+{
+	return m_bUnitTechUpgrade;
 }
 
 /// Initial set of promotions for this unit

@@ -1825,6 +1825,7 @@ public:
 		return m_pReligion;
 	};
 
+	bool isUnitTechUpgrade() const;
 	static void dispatchingNetMessage(bool dispatching);
 	static bool dispatchingNetMessage();
 

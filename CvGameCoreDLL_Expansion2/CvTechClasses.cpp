@@ -2003,6 +2003,38 @@ void CvTeamTechs::SetHasTech(TechTypes eIndex, bool bNewValue)
 	if(bNewValue)
 		SetLastTechAcquired(eIndex);
 
+#if defined(MOD_ROG_CORE)
+
+	if (MOD_ROG_CORE)
+	{
+		TeamTypes eTeamID = m_pTeam->GetID();
+		PlayerTypes eLeaderLoop = (PlayerTypes)GET_TEAM(eTeamID).getLeaderID();
+		CvPlayerAI& kPlayer = GET_PLAYER(eLeaderLoop);
+
+		if (kPlayer.isAlive())
+		{
+			int iLoop = 0;
+			for (CvUnit* pLoopUnit = kPlayer.firstUnit(&iLoop); pLoopUnit != NULL; pLoopUnit = kPlayer.nextUnit(&iLoop))
+			{
+				if (pLoopUnit->isUnitTechUpgrade())
+				{
+					if (GC.getUnitInfo(pLoopUnit->getUnitType())->GetTechCombatStrength(eIndex) > 0 && GET_TEAM(eTeamID).GetTeamTechs()->HasTech(eIndex) && pLoopUnit->GetBaseCombatStrength() < GC.getUnitInfo(pLoopUnit->getUnitType())->GetTechCombatStrength(eIndex) )
+					{
+						pLoopUnit->SetBaseCombatStrength(GC.getUnitInfo(pLoopUnit->getUnitType())->GetTechCombatStrength(eIndex));
+
+					}
+
+					if (pLoopUnit->isRanged() && (GC.getUnitInfo(pLoopUnit->getUnitType())->GetTechRangedCombatStrength(eIndex)) > 0 && (GET_TEAM(eTeamID)).GetTeamTechs()->HasTech(eIndex) && (pLoopUnit->GetBaseRangedCombatStrength() < GC.getUnitInfo(pLoopUnit->getUnitType())->GetTechRangedCombatStrength(eIndex)))
+					{
+						pLoopUnit->SetBaseRangedCombatStrength(GC.getUnitInfo(pLoopUnit->getUnitType())->GetTechRangedCombatStrength(eIndex));
+					}
+
+				}
+			}
+		}
+	}
+#endif
+
 	ICvEngineScriptSystem1* pkScriptSystem = gDLL->GetScriptSystem();
 	if(pkScriptSystem)
 	{
