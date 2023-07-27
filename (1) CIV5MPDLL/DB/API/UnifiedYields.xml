@@ -366,6 +366,9 @@
 		<Column name="Modifier" type="integer"/>
 	</Table>
 
+
+
+
 	<GreatPersons>
 		<Row>
 			<ID>0</ID>
@@ -549,7 +552,17 @@
 	</Table>
 
 
+	<Table name="Unit_TechCombatStrength">
+		<Column name="UnitType" type="text" reference="Units(Type)"/>
+		<Column name="TechType" type="text" reference="Technologies(Type)"/>
+		<Column name="CombatStrength" type="integer" default="0"/>
+	</Table>
 
+	<Table name="Unit_TechRangedCombatStrength">
+		<Column name="UnitType" type="text" reference="Units(Type)"/>
+		<Column name="TechType" type="text" reference="Technologies(Type)"/>
+		<Column name="RangedCombatStrength" type="integer" default="0"/>
+	</Table>
 
 
 
