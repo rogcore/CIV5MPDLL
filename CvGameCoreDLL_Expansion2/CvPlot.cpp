@@ -2436,6 +2436,11 @@ bool CvPlot::canHaveImprovement(ImprovementTypes eImprovement, TeamTypes eTeam, 
 		return false;
 	}
 
+	if(pkImprovementInfo->IsFreshWater() && !bIsFreshWater)
+	{
+		return false;
+	}
+
 	if(pkImprovementInfo->IsRequiresFlatlands() && !isFlatlands())
 	{
 		return false;
@@ -9341,9 +9346,14 @@ int CvPlot::calculateYield(YieldTypes eYield, bool bDisplay)
 		// Extra yield for terrain
 		if(getTerrainType() != NO_TERRAIN)
 		{
-			if(pWorkingCity != NULL && !isImpassable() && !isMountain())
+			if(pWorkingCity != NULL && !isImpassable())
 			{
-				iYield += pWorkingCity->GetTerrainExtraYield(getTerrainType(), eYield);
+				if(!isMountain())
+					iYield += pWorkingCity->GetTerrainExtraYield(getTerrainType(), eYield);		
+#if defined(MOD_GLOBAL_ALPINE_PASSES)
+				else if (MOD_GLOBAL_ALPINE_PASSES)
+					iYield += pWorkingCity->GetTerrainExtraYield(TERRAIN_MOUNTAIN, eYield);
+#endif
 			}
 		}
 
@@ -12361,9 +12371,14 @@ int CvPlot::getYieldWithBuild(BuildTypes eBuild, YieldTypes eYield, bool bWithUp
 		// Extra yield for terrain
 		if(getTerrainType() != NO_TERRAIN)
 		{
-			if(pWorkingCity != NULL && !isImpassable() && !isMountain())
+			if(pWorkingCity != NULL && !isImpassable())
 			{
-				iYield += pWorkingCity->GetTerrainExtraYield(getTerrainType(), eYield);
+				if(!isMountain())
+					iYield += pWorkingCity->GetTerrainExtraYield(getTerrainType(), eYield);				
+#if defined(MOD_GLOBAL_ALPINE_PASSES)
+				else if (MOD_GLOBAL_ALPINE_PASSES)
+					iYield += pWorkingCity->GetTerrainExtraYield(TERRAIN_MOUNTAIN, eYield);
+#endif
 			}
 			iYield += GET_PLAYER(ePlayer).GetPlayerTraits()->GetTerrainYieldChange(getTerrainType(), eYield);
 		}
