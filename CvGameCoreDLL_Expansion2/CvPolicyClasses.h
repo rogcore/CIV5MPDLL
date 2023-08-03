@@ -118,6 +118,11 @@ public:
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	int GetConversionModifier() const;
 #endif
+
+	int GetYieldModifierFromActiveSpies(int i) const;
+	int* GetYieldModifierFromActiveSpiesArray() const;
+
+
 	int GetGoldPerUnit() const;
 	int GetGoldPerMilitaryUnit() const;
 	int GetCityStrengthMod() const;
@@ -528,6 +533,7 @@ private:
 	int* m_piYieldChangesNaturalWonder;
 	int* m_piYieldChangeWorldWonder;
 #endif
+	int* m_piYieldModifierFromActiveSpies;
 	int** m_ppiBuildingClassYieldModifiers;
 	int** m_ppiBuildingClassYieldChanges;
 	int* m_piFlavorValue;

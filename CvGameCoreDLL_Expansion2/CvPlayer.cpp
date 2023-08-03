@@ -1240,6 +1240,8 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 	m_aiWorldWonderCityYieldRateModifier.clear();
 	m_aiWorldWonderCityYieldRateModifier.resize(NUM_YIELD_TYPES, 0);
 #endif
+	m_aiYieldModifierFromActiveSpies.clear();
+	m_aiYieldModifierFromActiveSpies.resize(NUM_YIELD_TYPES, 0);
 
 	m_aiCoastalCityYieldChange.clear();
 	m_aiCoastalCityYieldChange.resize(NUM_YIELD_TYPES, 0);
@@ -25285,6 +25287,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 			ChangeCityYieldChange(eYield, iMod * 100);
 #endif
 
+
 		iMod = pPolicy->GetCoastalCityYieldChange(iI) * iChange;
 		if(iMod != 0)
 			ChangeCoastalCityYieldChange(eYield, iMod);
@@ -25337,6 +25340,9 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 		iMod = pPolicy->GetCityLoveKingDayYieldMod(iI) * iChange;
 		if (iMod != 0)
 			changeCityLoveKingDayYieldMod(eYield, (pPolicy->GetCityLoveKingDayYieldMod(iI) * iChange));
+
+
+		changeYieldModifierFromActiveSpies(eYield, (pPolicy->GetYieldModifierFromActiveSpies(iI) * iChange));
 
 #ifdef MOD_API_TRADE_ROUTE_YIELD_RATE
 		if (MOD_API_TRADE_ROUTE_YIELD_RATE)
@@ -26813,7 +26819,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_aiWorldWonderCityYieldRateModifier;
 #endif
 
-
+	kStream >> m_aiYieldModifierFromActiveSpies;
 	kStream >> m_aiCoastalCityYieldChange;
 	kStream >> m_aiCapitalYieldChange;
 	kStream >> m_aiCapitalYieldPerPopChange;
@@ -27453,7 +27459,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 #ifdef MOD_ROG_CORE
 	kStream << m_aiWorldWonderCityYieldRateModifier;
 #endif
-
+	kStream << m_aiYieldModifierFromActiveSpies;
 	kStream << m_aiCoastalCityYieldChange;
 	kStream << m_aiCapitalYieldChange;
 	kStream << m_aiCapitalYieldPerPopChange;
@@ -31235,3 +31241,32 @@ void CvPlayer::ChangeCorruptionLevelPolicyCostModifier(CorruptionLevelTypes leve
 }
 
 #endif
+
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::getYieldModifierFromActiveSpies(YieldTypes eIndex)	const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	return m_aiYieldModifierFromActiveSpies[eIndex];
+}
+
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::changeYieldModifierFromActiveSpies(YieldTypes eIndex, int iChange)
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+
+	if (iChange != 0)
+	{
+		m_aiYieldModifierFromActiveSpies[eIndex] = m_aiYieldModifierFromActiveSpies[eIndex] + iChange;
+
+		invalidateYieldRankCache(eIndex);
+
+		if (getTeam() == GC.getGame().getActiveTeam())
+		{
+			GC.GetEngineUserInterface()->setDirty(CityInfo_DIRTY_BIT, true);
+		}
+	}
+}
