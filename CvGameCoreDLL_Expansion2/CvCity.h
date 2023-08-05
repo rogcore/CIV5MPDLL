@@ -775,6 +775,9 @@ public:
 	int GetBaseYieldRateFromSpecialists(YieldTypes eIndex) const;
 	void ChangeBaseYieldRateFromSpecialists(YieldTypes eIndex, int iChange);
 
+	int GetBaseYieldRateFromProjects(YieldTypes eIndex) const;
+	void ChangeBaseYieldRateFromProjects(YieldTypes eIndex, int iChange);
+
 	int GetBaseYieldRateFromMisc(YieldTypes eIndex) const;
 	void ChangeBaseYieldRateFromMisc(YieldTypes eIndex, int iChange);
 
@@ -1386,6 +1389,7 @@ protected:
 	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromTerrain;
 	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromBuildings;
 	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromSpecialists;
+	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromProjects;
 	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromMisc;
 	std::vector<int> m_aiBaseYieldRateFromReligion;
 	FAutoVariable<std::vector<int>, CvCity> m_aiYieldRateModifier;

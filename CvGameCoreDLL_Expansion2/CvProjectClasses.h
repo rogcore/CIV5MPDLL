@@ -57,6 +57,11 @@ public:
 	int GetVictoryMinThreshold(int i) const;
 	int GetProjectsNeeded(int i) const;
 
+	int GetYieldChange(int i) const;
+	int* GetYieldChangeArray() const;
+	int GetYieldModifier(int i) const;;
+	int* GetYieldModifierArray() const;
+
 protected:
 	int m_iVictoryPrereq;
 	int m_iTechPrereq;
@@ -85,6 +90,9 @@ protected:
 	int* m_piVictoryMinThreshold;
 	int* m_piProjectsNeeded;
 	int* m_piFlavorValue;
+
+	int* m_piYieldChange;
+	int* m_piYieldModifier;
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

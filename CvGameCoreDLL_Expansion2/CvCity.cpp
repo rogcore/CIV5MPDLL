@@ -323,6 +323,7 @@ CvCity::CvCity() :
 	, m_aiBaseYieldRateFromTerrain("CvCity::m_aiBaseYieldRateFromTerrain", m_syncArchive, true)
 	, m_aiBaseYieldRateFromBuildings("CvCity::m_aiBaseYieldRateFromBuildings", m_syncArchive)
 	, m_aiBaseYieldRateFromSpecialists("CvCity::m_aiBaseYieldRateFromSpecialists", m_syncArchive)
+	, m_aiBaseYieldRateFromProjects("CvCity::m_aiBaseYieldRateFromProjects", m_syncArchive)
 	, m_aiBaseYieldRateFromMisc("CvCity::m_aiBaseYieldRateFromMisc", m_syncArchive)
 	, m_aiYieldRateModifier("CvCity::m_aiYieldRateModifier", m_syncArchive)
 	, m_aiYieldPerPop("CvCity::m_aiYieldPerPop", m_syncArchive)
@@ -1121,6 +1122,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_aiBaseYieldRateFromTerrain.resize(NUM_YIELD_TYPES);
 	m_aiBaseYieldRateFromBuildings.resize(NUM_YIELD_TYPES);
 	m_aiBaseYieldRateFromSpecialists.resize(NUM_YIELD_TYPES);
+	m_aiBaseYieldRateFromProjects.resize(NUM_YIELD_TYPES);
 	m_aiBaseYieldRateFromMisc.resize(NUM_YIELD_TYPES);
 	m_aiBaseYieldRateFromReligion.resize(NUM_YIELD_TYPES);
 	m_aiYieldPerPop.resize(NUM_YIELD_TYPES);
@@ -1148,6 +1150,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		m_aiBaseYieldRateFromTerrain.setAt(iI, 0);
 		m_aiBaseYieldRateFromBuildings.setAt(iI, 0);
 		m_aiBaseYieldRateFromSpecialists.setAt(iI, 0);
+		m_aiBaseYieldRateFromProjects.setAt(iI, 0);
 		m_aiBaseYieldRateFromMisc.setAt(iI, 0);
 		m_aiBaseYieldRateFromReligion[iI] = 0;
 		m_aiYieldPerPop.setAt(iI, 0);
@@ -9172,10 +9175,12 @@ int CvCity::GetBaseJONSCulturePerTurn() const
 	iCulturePerTurn += GetJONSCulturePerTurnFromBuildings();
 	iCulturePerTurn += GetJONSCulturePerTurnFromPolicies();
 	iCulturePerTurn += GetJONSCulturePerTurnFromSpecialists();
+
 #if defined(MOD_API_UNIFIED_YIELDS)
 	// GetJONSCulturePerTurnFromSpecialists() uses the Specialists.CulturePerTurn column,
 	// GetBaseYieldRateFromSpecialists(YIELD_CULTURE) gets everything else!
 	iCulturePerTurn += GetBaseYieldRateFromSpecialists(YIELD_CULTURE);
+	iCulturePerTurn += GetBaseYieldRateFromProjects(YIELD_CULTURE);
 	iCulturePerTurn += (GetYieldPerPopTimes100(YIELD_CULTURE) * getPopulation()) / 100;
 #endif
 
@@ -9336,6 +9341,7 @@ int CvCity::GetFaithPerTurn(bool bStatic) const
 	}
 
 	int iFaith = GetFaithPerTurnFromBuildings();
+	iFaith += GetBaseYieldRateFromProjects(YIELD_FAITH);
 #if defined(MOD_API_UNIFIED_YIELDS)
 	iFaith += GetBaseYieldRateFromSpecialists(YIELD_FAITH);
 	iFaith += (GetYieldPerPopTimes100(YIELD_FAITH) * getPopulation()) / 100;
@@ -11538,10 +11544,11 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	if(iTempMod != 0 && toolTipSink)
 		GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD", iTempMod);
 
-	// Resource Yield Rate Modifier
+
+	// project Yield Rate Modifier
 	iTempMod = getResourceYieldRateModifier(eIndex);
 	iModifier += iTempMod;
-	if(iTempMod != 0 && toolTipSink)
+	if (iTempMod != 0 && toolTipSink)
 		GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_RESOURCES", iTempMod);
 
 	// Happiness Yield Rate Modifier
@@ -12031,6 +12038,7 @@ int CvCity::getBaseYieldRate(YieldTypes eIndex, const bool bIgnoreFromOtherYield
 	iValue += GetBaseYieldRateFromSpecialists(eIndex);
 	iValue += GetBaseYieldRateFromMisc(eIndex);
 	iValue += GetBaseYieldRateFromReligion(eIndex);
+	iValue += GetBaseYieldRateFromProjects(eIndex);
 
 #ifdef MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD
 	if (MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD && !bIgnoreFromOtherYield)
@@ -12141,6 +12149,13 @@ CvString CvCity::getYieldRateInfoTool(YieldTypes eIndex, bool bIgnoreTrade) cons
 	{
 		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_MISC", iBaseValue, YieldIcon);
 	}
+
+	iBaseValue = GetBaseYieldRateFromProjects(eIndex);
+	if (iBaseValue != 0)
+	{
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_PROJECTS", iBaseValue, YieldIcon);
+	}
+
 	iBaseValue = GetBaseYieldRateFromReligion(eIndex);
 	if(iBaseValue != 0)
 	{
@@ -15613,7 +15628,55 @@ void CvCity::changeProjectCount(ProjectTypes eProject, int iValue)
 	CvAssertMsg(eProject >= 0, "ePlayer expected to be >= 0");
 	CvAssertMsg(eProject < GC.getNumProjectInfos(), "ePlayer expected to be < NUM_DOMAIN_TYPES");
 	m_aiNumProjects[eProject] = m_aiNumProjects[eProject] + iValue;
+
+	YieldTypes eYield;
+	for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
+	{
+		eYield = (YieldTypes)iI;
+		CvProjectEntry* pProject = GC.getProjectInfo(eProject);
+		if (pProject != NULL)
+		{
+			ChangeBaseYieldRateFromProjects(eYield, (pProject->GetYieldChange(eYield) * iValue));
+			changeYieldRateModifier(eYield, (pProject->GetYieldModifier(eYield) * iValue));
+		}
+	}
 }
+
+//	--------------------------------------------------------------------------------
+/// Base yield rate from Specialists
+int CvCity::GetBaseYieldRateFromProjects(YieldTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+
+	return m_aiBaseYieldRateFromProjects[eIndex];
+}
+
+//	--------------------------------------------------------------------------------
+/// Base yield rate from Specialists
+void CvCity::ChangeBaseYieldRateFromProjects(YieldTypes eIndex, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+
+	if (iChange != 0)
+	{
+		m_aiBaseYieldRateFromProjects.setAt(eIndex, m_aiBaseYieldRateFromProjects[eIndex] + iChange);
+
+		if (getTeam() == GC.getGame().getActiveTeam())
+		{
+			if (isCitySelected())
+			{
+				DLLUI->setDirty(CityScreen_DIRTY_BIT, true);
+			}
+		}
+	}
+}
+
+
+
 
 int CvCity::getProjectCount(ProjectTypes eProject) const
 {
@@ -17337,6 +17400,7 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_aiBaseYieldRateFromTerrain;
 	kStream >> m_aiBaseYieldRateFromBuildings;
 	kStream >> m_aiBaseYieldRateFromSpecialists;
+	kStream >> m_aiBaseYieldRateFromProjects;
 	kStream >> m_aiBaseYieldRateFromMisc;
 	kStream >> m_aiBaseYieldRateFromReligion;
 	kStream >> m_aiYieldPerPop;
@@ -17765,6 +17829,7 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_aiBaseYieldRateFromTerrain;
 	kStream << m_aiBaseYieldRateFromBuildings;
 	kStream << m_aiBaseYieldRateFromSpecialists;
+	kStream << m_aiBaseYieldRateFromProjects;
 	kStream << m_aiBaseYieldRateFromMisc;
 	kStream << m_aiBaseYieldRateFromReligion;
 	kStream << m_aiYieldPerPop;

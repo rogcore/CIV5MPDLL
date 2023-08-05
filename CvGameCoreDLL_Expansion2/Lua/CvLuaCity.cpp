@@ -539,7 +539,7 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 
 	Method(GetBaseYieldRate);
 	Method(GetYieldRateInfoTool);
-
+	Method(GetBaseYieldRateFromProjects);
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_GLOBAL_GREATWORK_YIELDTYPES)
 	Method(GetBaseYieldRateFromGreatWorks);
 #endif
@@ -3751,6 +3751,12 @@ int CvLuaCity::lGetYieldRateInfoTool(lua_State* L)
 	lua_pushstring(L, toolTip.c_str());
 	return 1;
 }
+
+int CvLuaCity::lGetBaseYieldRateFromProjects(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvCity::GetBaseYieldRateFromProjects);
+}
+
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_GLOBAL_GREATWORK_YIELDTYPES)
 //------------------------------------------------------------------------------
 int CvLuaCity::lGetBaseYieldRateFromGreatWorks(lua_State* L)
