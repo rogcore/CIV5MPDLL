@@ -3,6 +3,20 @@
 <GameData>
 	<!-- See also: PlotYields.xml -->
 	
+
+	<Table name="Project_YieldModifiers">
+		<Column name="ProjectType" type="text" reference="Projects(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+
+	<Table name="Project_YieldChanges">
+		<Column name="ProjectType" type="text" reference="Projects(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+
+
 	<Table name="GreatPersons">
 		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
 		<Column name="Type" type="text" notnull="true" unique="true"/>
