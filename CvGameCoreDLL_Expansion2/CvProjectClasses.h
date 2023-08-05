@@ -32,6 +32,7 @@ public:
 	int GetAnyoneProjectPrereq() const;
 	void SetAnyoneProjectPrereq(int i);
 	int GetMaxGlobalInstances() const;
+	int CityMaxNum() const;
 	int GetMaxTeamInstances() const;
 	int GetProductionCost() const;
 	int GetNukeInterception() const;
@@ -42,6 +43,9 @@ public:
 	int GetFlavorValue(int i) const;
 	bool IsSpaceship() const;
 	bool IsAllowsNukes() const;
+	int CostScalerNumberOfRepeats() const;
+	int GetGoldMaintenance() const;
+	int CostScalerEra() const;
 	const char* GetMovieArtDef() const;
 
 	const char* GetCreateSound() const;
@@ -58,6 +62,7 @@ protected:
 	int m_iTechPrereq;
 	int m_iAnyoneProjectPrereq;
 	int m_iMaxGlobalInstances;
+	int m_iCityMaxNum;
 	int m_iMaxTeamInstances;
 	int m_iProductionCost;
 	int m_iNukeInterception;
@@ -68,7 +73,9 @@ protected:
 
 	bool m_bSpaceship;
 	bool m_bAllowsNukes;
-
+	int m_iGoldMaintenance;
+	int m_iCostScalerEra;
+	int m_iCostScalerNumRepeats;
 	CvString m_strCreateSound;
 	CvString m_strMovieArtDef;
 

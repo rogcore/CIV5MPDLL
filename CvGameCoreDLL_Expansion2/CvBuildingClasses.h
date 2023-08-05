@@ -317,6 +317,7 @@ public:
 #if defined(MOD_API_EXTENSIONS)
 	bool IsAddsFreshWater() const;
 	bool IsPurchaseOnly() const;
+	bool IsHumanOnly() const;
 #endif
 	bool IsMoveAfterCreated() const;
 	bool IsMountain() const;
@@ -677,6 +678,7 @@ private:
 #if defined(MOD_API_EXTENSIONS)
 	bool m_bAddsFreshWater;
 	bool m_bPurchaseOnly;
+	bool m_bHumanOnly;
 #endif
 	bool m_bMoveAfterCreated;
 	bool m_bMountain;

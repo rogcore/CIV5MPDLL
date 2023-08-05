@@ -144,6 +144,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 #if defined(MOD_API_EXTENSIONS)
 	m_bAddsFreshWater(false),
 	m_bPurchaseOnly(false),
+	m_bHumanOnly(false),
 #endif
 
 	m_bMoveAfterCreated(false),
@@ -419,6 +420,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	if (MOD_API_EXTENSIONS) {
 		m_bAddsFreshWater = kResults.GetBool("AddsFreshWater");
 		m_bPurchaseOnly = kResults.GetBool("PurchaseOnly");
+		m_bHumanOnly = kResults.GetBool("HumanOnly");
 	}
 #endif
 
@@ -2303,6 +2305,11 @@ bool CvBuildingEntry::IsPurchaseOnly() const
 {
 	return m_bPurchaseOnly;
 }
+
+bool CvBuildingEntry::IsHumanOnly() const
+{
+	return m_bHumanOnly;
+}
 #endif
 
 bool CvBuildingEntry::IsMoveAfterCreated() const
@@ -3759,6 +3766,17 @@ int CvCityBuildings::GetTotalBaseBuildingMaintenance() const
 		{
 			if(GetNumBuilding(eBuilding))
 				iTotalCost += (pkBuildingInfo->GetGoldMaintenance() * GetNumBuilding(eBuilding));
+		}
+	}
+
+	for (int iProjectLoop = 0; iProjectLoop < GC.getNumProjectInfos(); iProjectLoop++)
+	{
+		const ProjectTypes eProject = static_cast<ProjectTypes>(iProjectLoop);
+		CvProjectEntry* pkProject = GC.getProjectInfo(eProject);
+
+		if (pkProject && pkProject->GetGoldMaintenance() > 0)
+		{
+			iTotalCost += (m_pCity->getProjectCount(eProject) * pkProject->GetGoldMaintenance());
 		}
 	}
 

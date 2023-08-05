@@ -36,6 +36,7 @@ bool CvProjectEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility
 		return false;
 
 	m_iMaxGlobalInstances = kResults.GetInt("MaxGlobalInstances");
+	m_iCityMaxNum = kResults.GetInt("CityMaxNum");
 	m_iMaxTeamInstances = kResults.GetInt("MaxTeamInstances");
 	m_iProductionCost = kResults.GetInt("Cost");
 	m_iNukeInterception = kResults.GetInt("NukeInterception");
@@ -45,7 +46,9 @@ bool CvProjectEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility
 
 	m_bSpaceship = kResults.GetBool("Spaceship");
 	m_bAllowsNukes = kResults.GetBool("AllowsNukes");
-
+	m_iGoldMaintenance = kResults.GetInt("Maintenance");
+	m_iCostScalerEra = kResults.GetInt("CostScalerEra");
+	m_iCostScalerNumRepeats = kResults.GetInt("CostScalerNumRepeats");
 	m_strMovieArtDef = kResults.GetText("MovieDefineTag");
 
 	const char* szVictoryPrereq = kResults.GetText("VictoryPrereq");
@@ -123,6 +126,11 @@ void CvProjectEntry::SetAnyoneProjectPrereq(int i)
 	m_iAnyoneProjectPrereq = i;
 }
 
+int CvProjectEntry::CityMaxNum() const
+{
+	return m_iCityMaxNum;
+}
+
 /// Is there a maximum number of these in the world?
 int CvProjectEntry::GetMaxGlobalInstances() const
 {
@@ -196,6 +204,20 @@ bool CvProjectEntry::IsAllowsNukes() const
 {
 	return m_bAllowsNukes;
 }
+
+int CvProjectEntry::CostScalerEra() const
+{
+	return m_iCostScalerEra;
+}
+int CvProjectEntry::GetGoldMaintenance() const
+{
+	return m_iGoldMaintenance;
+}
+int CvProjectEntry::CostScalerNumberOfRepeats() const
+{
+	return m_iCostScalerNumRepeats;
+}
+
 
 /// Retrieve movie file name
 const char* CvProjectEntry::GetMovieArtDef() const

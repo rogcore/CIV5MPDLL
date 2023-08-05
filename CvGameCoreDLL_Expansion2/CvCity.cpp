@@ -220,6 +220,7 @@ CvCity::CvCity() :
 	, m_iLandTileTurnDamage("CvCity::m_iLandTileTurnDamage", m_syncArchive)
 #endif
 
+	, m_aiNumProjects()
 	, m_iNumAttacks("CvCity::m_iNumAttacks", m_syncArchive)
 	, m_iAttacksMade("CvCity::m_iAttacksMade", m_syncArchive)
 
@@ -999,7 +1000,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_iAdditionalFood = 0;
 	m_iBaseTourism = 0;
 	m_iBaseTourismBeforeModifiers = 0;
-
+	m_aiNumProjects.resize(GC.getNumProjectInfos());
 #if defined(MOD_ROG_CORE)
 	m_aiSpecialistRateModifier.resize(GC.getNumSpecialistInfos());
 	m_iExtraDamageHeal = 0;
@@ -1165,6 +1166,13 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		m_aiDomainFreeExperience.setAt(iI, 0);
 		m_aiDomainProductionModifier.setAt(iI, 0);
 	}
+
+
+	for (iI = 0; iI < GC.getNumProjectInfos(); iI++)
+	{
+		m_aiNumProjects[iI] = 0;
+	}
+
 
 	m_abEverOwned.resize(REALLY_MAX_PLAYERS);
 	for(iI = 0; iI < REALLY_MAX_PLAYERS; iI++)
@@ -3166,6 +3174,11 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 	{
 		return false;
 	}
+
+	if (!(GET_PLAYER(getOwner()).isHuman()) && pkBuildingInfo->IsHumanOnly())
+	{
+		return false;
+	}
 #endif
 
 	if(m_pCityBuildings->GetNumBuilding(eBuilding) >= GC.getCITY_MAX_NUM_BUILDINGS())
@@ -3345,6 +3358,13 @@ bool CvCity::canCreate(ProjectTypes eProject, bool bContinue, bool bTestVisible)
 	{
 		return false;
 	}
+
+
+	if ((getProjectCount(eProject) >= GC.getProjectInfo(eProject)->CityMaxNum()) && ((GC.getProjectInfo(eProject)->CityMaxNum()) >0) )
+	{
+		return false;
+	}
+	
 
 	ICvEngineScriptSystem1* pkScriptSystem = gDLL->GetScriptSystem();
 	if(pkScriptSystem)
@@ -5133,7 +5153,14 @@ int CvCity::getProductionNeeded(ProjectTypes eProject) const
 	VALIDATE_OBJECT
 	int iNumProductionNeeded = GET_PLAYER(getOwner()).getProductionNeeded(eProject);
 
-	return iNumProductionNeeded;
+	CvProjectEntry* pProject = GC.getProjectInfo(eProject);
+	if (pProject != NULL)
+	{
+		iNumProductionNeeded += pProject->CostScalerNumberOfRepeats() * getProjectCount(eProject);
+		iNumProductionNeeded += pProject->CostScalerEra() * GET_PLAYER(getOwner()).GetCurrentEra();
+	}
+
+	return max(1, iNumProductionNeeded);
 }
 
 //	--------------------------------------------------------------------------------
@@ -15487,6 +15514,8 @@ bool CvCity::CreateProject(ProjectTypes eProjectType)
 	CvTeam& thisTeam = GET_TEAM(getTeam());
 	thisTeam.changeProjectCount(eProjectType, 1);
 
+	changeProjectCount(eProjectType, 1);
+
 	ProjectTypes ApolloProgram = (ProjectTypes) GC.getSPACE_RACE_TRIGGER_PROJECT();
 	ProjectTypes capsuleID = (ProjectTypes) GC.getSPACESHIP_CAPSULE();
 	ProjectTypes boosterID = (ProjectTypes) GC.getSPACESHIP_BOOSTER();
@@ -15567,8 +15596,31 @@ bool CvCity::CreateProject(ProjectTypes eProjectType)
 			gDLL->GameplaySpaceshipEdited(pDllPlot.get(), spaceshipState);
 		}
 	}
+	CvProjectEntry* pProject = GC.getProjectInfo(eProjectType);
+	if (pProject)
+	{
+		GET_PLAYER(getOwner()).GetTreasury()->ChangeBaseBuildingGoldMaintenance(pProject->GetGoldMaintenance()); // Maintenance cost
+	}
+
+	GAMEEVENTINVOKE_HOOK(GAMEEVENT_CityProjectComplete, getOwner(), GetID(), eProjectType);
 
 	return true;
+}
+
+void CvCity::changeProjectCount(ProjectTypes eProject, int iValue)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eProject >= 0, "ePlayer expected to be >= 0");
+	CvAssertMsg(eProject < GC.getNumProjectInfos(), "ePlayer expected to be < NUM_DOMAIN_TYPES");
+	m_aiNumProjects[eProject] = m_aiNumProjects[eProject] + iValue;
+}
+
+int CvCity::getProjectCount(ProjectTypes eProject) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eProject >= 0, "ePlayer expected to be >= 0");
+	CvAssertMsg(eProject < GC.getNumProjectInfos(), "ePlayer expected to be < NUM_DOMAIN_TYPES");
+	return m_aiNumProjects[eProject];
 }
 
 //	--------------------------------------------------------------------------------
@@ -17290,6 +17342,7 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_aiYieldPerPop;
 
 	kStream >> m_aiYieldFromProcessModifier;
+	kStream >> m_aiNumProjects;
 #if defined(MOD_ROG_CORE)
 	kStream >> m_aiSpecialistRateModifier;
 #endif
@@ -17716,6 +17769,7 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_aiBaseYieldRateFromReligion;
 	kStream << m_aiYieldPerPop;
 	kStream << m_aiYieldFromProcessModifier;
+	kStream << m_aiNumProjects;
 #if defined(MOD_ROG_CORE)
 	kStream << m_aiSpecialistRateModifier;
 #endif

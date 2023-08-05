@@ -598,6 +598,7 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(GetSpecialistUpgradeThreshold);
 	Method(GetNumSpecialistsAllowedByBuilding);
 	Method(GetSpecialistCount);
+	Method(GetProjectCount);
 	Method(GetTotalSpecialistCount);
 	Method(GetSpecialistCityModifier);
 	Method(GetSpecialistGreatPersonProgress);
@@ -3566,6 +3567,8 @@ int CvLuaCity::lGetLocalHappiness(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvCity::GetLocalHappiness);
 }
+
+
 //------------------------------------------------------------------------------
 int CvLuaCity::lGetHappiness(lua_State* L)
 {
@@ -4171,6 +4174,18 @@ int CvLuaCity::lGetSpecialistCount(lua_State* L)
 	CvCity* pkCity = GetInstance(L);
 	const int iIndex = lua_tointeger(L, 2);
 	const int iResult = pkCity->GetCityCitizens()->GetSpecialistCount(toValue<SpecialistTypes>(L, 2));
+
+	lua_pushinteger(L, iResult);
+	return 1;
+}
+
+
+//int getProjectCount(ProjectTypes eProject);
+int CvLuaCity::lGetProjectCount(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iIndex = lua_tointeger(L, 2);
+	const int iResult = pkCity->getProjectCount(toValue<ProjectTypes>(L, 2));
 
 	lua_pushinteger(L, iResult);
 	return 1;

@@ -1027,6 +1027,8 @@ public:
 	int CreateUnit(UnitTypes eUnitType, UnitAITypes eAIType = NO_UNITAI, bool bUseToSatisfyOperation=true);
 	bool CreateBuilding(BuildingTypes eBuildType);
 	bool CreateProject(ProjectTypes eProjectType);
+	void changeProjectCount(ProjectTypes eProject, int iValue);
+	int getProjectCount(ProjectTypes eProject) const;
 
 	bool CanPlaceUnitHere(UnitTypes eUnitType);
 	bool IsCanPurchase(bool bTestPurchaseCost, bool bTestTrainable, UnitTypes eUnitType, BuildingTypes eBuildingType, ProjectTypes eProjectType, YieldTypes ePurchaseYield);
@@ -1389,7 +1391,7 @@ protected:
 	FAutoVariable<std::vector<int>, CvCity> m_aiYieldRateModifier;
 	FAutoVariable<std::vector<int>, CvCity> m_aiYieldPerPop;
 
-
+	std::vector<int> m_aiNumProjects;
 
 
 #if defined(MOD_ROG_CORE)
