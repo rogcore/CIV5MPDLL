@@ -467,5 +467,19 @@
 	               <Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_PROJECTS">
 			<Text>[NEWLINE]{1_Num}{2_IconString} 來自已完成計劃</Text>
 		</Row>
+
+
+		<Row Tag="TXT_KEY_VOLCAN_EVENT_TITLE">
+				<Text>火山爆發！</Text>
+			</Row>
+			<Row Tag="TXT_KEY_VOLCANO_EVENT_1">
+				<Text>一處火山發生了小規模噴發。</Text>
+			</Row>
+			<Row Tag="TXT_KEY_VOLCANO_EVENT_2">
+				<Text>一處火山發生了大規模噴發。</Text>
+			</Row>
+			<Row Tag="TXT_KEY_VOLCANO_EVENT_3">
+				<Text>一處火山發生了超大規模噴發。</Text>
+			</Row>
 	</Language_zh_Hant_HK>
 </GameData>

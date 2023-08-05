@@ -1568,6 +1568,7 @@ public:
 #endif
 
 #if defined(MOD_MORE_NATURAL_WONDER)
+	bool IsVolcano() const;
 	int getPromotionIfOwned() const;
 #endif
 
@@ -1635,6 +1636,7 @@ protected:
 	bool m_bRough;
 	bool m_bNaturalWonder;
 #if defined(MOD_MORE_NATURAL_WONDER)
+	bool m_bVolcano;
 	bool m_bPseudoNaturalWonder;
 	int m_iPromotionIfOwned;
 #endif

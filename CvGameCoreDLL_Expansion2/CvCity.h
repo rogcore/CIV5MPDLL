@@ -806,7 +806,8 @@ public:
 	int GetYieldPerPopInEmpireTimes100(YieldTypes eIndex) const;
 	void ChangeYieldPerPopInEmpireTimes100(YieldTypes eIndex, int iChange);
 #endif
-
+	int GetYieldFromInternalTR(YieldTypes eIndex1) const;
+	void ChangeYieldFromInternalTR(YieldTypes eIndex, int iChange);
 	int GetYieldFromProcessModifier(YieldTypes eIndex1) const;
 	void ChangeYieldFromProcessModifier(YieldTypes eIndex, int iChange);
 
@@ -1405,7 +1406,7 @@ protected:
 	std::vector<int> m_aiSpecialistRateModifier;
 #endif
 
-
+	std::vector<int> m_aiYieldFromInternalTR;
 	FAutoVariable<std::vector<int>, CvCity> m_aiYieldFromProcessModifier;
 
 

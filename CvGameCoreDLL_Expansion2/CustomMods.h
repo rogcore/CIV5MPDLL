@@ -795,7 +795,7 @@
 #define MOD_BUGFIX_INVISIBLE_UNIT_MOVE_ENEMY_CITY             gCustomMods.isBUGFIX_INVISIBLE_UNIT_MOVE_ENEMY_CITY()
 
 #define MOD_BALANCE_CORE                            gCustomMods.isBALANCE_CORE()
-
+#define MOD_VOLCANO_BREAK                            gCustomMods.isVOLCANO_BREAK()
 #define MOD_ERA_EFFECTS_EXTENSIONS                  gCustomMods.isERA_EFFECTS_EXTENSIONS()
 
 // Enables improvements create sources or new improvement when built (CIV5MPDLL)
@@ -1614,7 +1614,7 @@ public:
 	MOD_OPT_DECL(BUGFIX_BUILDING_FREEBUILDING);
 
 	MOD_OPT_DECL(BALANCE_CORE);
-
+	MOD_OPT_DECL(VOLCANO_BREAK);
 	MOD_OPT_DECL(ERA_EFFECTS_EXTENSIONS);
 	MOD_OPT_DECL(TRAIN_ALL_CORE);
 	MOD_OPT_DECL(ROG_CORE);

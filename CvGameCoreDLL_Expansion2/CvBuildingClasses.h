@@ -218,19 +218,15 @@ public:
 	int GetLandTileTurnDamage() const;
 #endif
 
-
-
 	int GetResourceQuantityFromPOP(int i) const;
 	int GetYieldChangeWorldWonder(int i) const;
 	int GetYieldChangeWorldWonderGlobal(int i) const;
-
+	int GetYieldFromInternal(int i) const;
+	int* GetYieldFromInternalArray() const;
 	int GetYieldFromProcessModifier(int i) const;
 	int* GetYieldFromProcessModifierArray() const;
-
 	int GetYieldFromProcessModifierGlobal(int i) const;
 	int* GetYieldFromProcessModifierArrayGlobal() const;
-
-
 	int GetResourceYieldChangeGlobal(int iResource, int iYieldType) const;
 	int GetImprovementYieldChange(int i, int j) const;
 	int* GetImprovementYieldChangeArray(int i) const;
@@ -587,7 +583,7 @@ private:
 	int** m_ppaiYieldPerXFeature;
 	int** m_ppaiSpecialistYieldChangeLocal;
 #endif
-
+	int* m_piYieldFromInternal;
 	int* m_piYieldFromProcessModifier;
 	int* m_piYieldFromProcessModifierGlobal;
 

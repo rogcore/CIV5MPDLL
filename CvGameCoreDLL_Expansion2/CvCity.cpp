@@ -358,6 +358,7 @@ CvCity::CvCity() :
 	, m_strName("")
 	, m_orderQueue()
 	, m_aaiBuildingSpecialistUpgradeProgresses(0)
+	, m_aiYieldFromInternalTR()
 	, m_aiYieldFromProcessModifier("CvCity::m_aiYieldFromProcessModifier", m_syncArchive)
 
 	, m_pCityBuildings(FNEW(CvCityBuildings, c_eCiv5GameplayDLL, 0))
@@ -497,18 +498,16 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 		for(int iDY = -iRange; iDY <= iRange; iDY++)
 		{
 			CvPlot* pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, iRange);
-			if(pLoopPlot != NULL)
+
+			if (pLoopPlot != NULL)
 			{
-				if(pLoopPlot != NULL)
+				if (pLoopPlot->getOwner() == NO_PLAYER)
 				{
-					if(pLoopPlot->getOwner() == NO_PLAYER)
-					{
-						pLoopPlot->setOwner(getOwner(), m_iID, bBumpUnits);
-					}
-					if(pLoopPlot->getOwner() == getOwner())
-					{
-						pLoopPlot->SetCityPurchaseID(m_iID);
-					}
+					pLoopPlot->setOwner(getOwner(), m_iID, bBumpUnits);
+				}
+				if (pLoopPlot->getOwner() == getOwner())
+				{
+					pLoopPlot->SetCityPurchaseID(m_iID);
 				}
 			}
 		}
@@ -1127,7 +1126,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_aiBaseYieldRateFromReligion.resize(NUM_YIELD_TYPES);
 	m_aiYieldPerPop.resize(NUM_YIELD_TYPES);
 
-
+	m_aiYieldFromInternalTR.resize(NUM_YIELD_TYPES);
 	m_aiYieldFromProcessModifier.resize(NUM_YIELD_TYPES);
 
 
@@ -1251,7 +1250,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		m_aiResourceQuantityFromPOP.clear();
 		m_aiResourceQuantityFromPOP.resize(iNumResources);
 #endif
-
+		m_aiYieldFromInternalTR[iI] = 0;
 		m_aiYieldFromProcessModifier.setAt(iI, 0);
 
 
@@ -1948,7 +1947,11 @@ void CvCity::doTurn()
 	CvPlot* pLoopPlot;
 	int iI;
 
-	if(getDamage() > 0)
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	if (getDamage() > 0 && !HasPlague())
+#else
+	if (getDamage() > 0 )
+#endif
 	{
 		CvAssertMsg(m_iDamage <= GetMaxHitPoints(), "Somehow a city has more damage than hit points. Please show this to a gameplay programmer immediately.");
 
@@ -7321,7 +7324,10 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			changeYieldRateModifier(eYield, pPolicies->GetBuildingClassYieldModifier(eBuildingClass, eYield) * iChange);
 			ChangeBaseYieldRateFromBuildings(eYield, pPolicies->GetBuildingClassYieldChange(eBuildingClass, eYield) * iChange);
 
-
+			if ((pBuildingInfo->GetYieldFromInternal(eYield) > 0))
+			{
+				ChangeYieldFromInternalTR(eYield, (pBuildingInfo->GetYieldFromInternal(eYield) * iChange));
+			}
 #if defined(MOD_ROG_CORE)
 			ChangeYieldPerPopInEmpireTimes100(eYield, pBuildingInfo->GetYieldChangePerPopInEmpire(eYield)* iChange);
 
@@ -12407,7 +12413,28 @@ void CvCity::ChangeBaseYieldRateFromMisc(YieldTypes eIndex, int iChange)
 }
 
 
+int CvCity::GetYieldFromInternalTR(YieldTypes eIndex1) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex1 >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex1 < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
 
+	return m_aiYieldFromInternalTR[eIndex1];
+}
+
+//	--------------------------------------------------------------------------------
+/// Extra yield from building
+void CvCity::ChangeYieldFromInternalTR(YieldTypes eIndex1, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex1 >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex1 < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	if (iChange != 0)
+	{
+		m_aiYieldFromInternalTR[eIndex1] = m_aiYieldFromInternalTR[eIndex1] + iChange;
+		CvAssert(GetYieldFromInternalTR(eIndex1) >= 0);
+	}
+}
 
 //	--------------------------------------------------------------------------------
 /// process Extra yield from building
@@ -17404,7 +17431,7 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_aiBaseYieldRateFromMisc;
 	kStream >> m_aiBaseYieldRateFromReligion;
 	kStream >> m_aiYieldPerPop;
-
+	kStream >> m_aiYieldFromInternalTR;
 	kStream >> m_aiYieldFromProcessModifier;
 	kStream >> m_aiNumProjects;
 #if defined(MOD_ROG_CORE)
@@ -17833,6 +17860,7 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_aiBaseYieldRateFromMisc;
 	kStream << m_aiBaseYieldRateFromReligion;
 	kStream << m_aiYieldPerPop;
+	kStream << m_aiYieldFromInternalTR;
 	kStream << m_aiYieldFromProcessModifier;
 	kStream << m_aiNumProjects;
 #if defined(MOD_ROG_CORE)

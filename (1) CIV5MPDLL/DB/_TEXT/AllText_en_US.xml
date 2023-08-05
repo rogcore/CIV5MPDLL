@@ -462,6 +462,20 @@
                                <Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_PROJECTS">
 			<Text>[NEWLINE]{1_Num}{2_IconString} from Projects</Text>
 		</Row>
+
+
+<Row Tag="TXT_KEY_VOLCAN_EVENT_TITLE">
+				<Text>Volcanic eruptions！</Text>
+			</Row>
+			<Row Tag="TXT_KEY_VOLCANO_EVENT_1">
+				<Text>A small eruption of a volcano occurred。</Text>
+			</Row>
+			<Row Tag="TXT_KEY_VOLCANO_EVENT_2">
+				<Text>A large eruption of a volcano occurred。</Text>
+			</Row>
+			<Row Tag="TXT_KEY_VOLCANO_EVENT_3">
+				<Text>A supermassive eruption of a volcano occurred。</Text>
+			</Row>
 	</Language_en_US>
 
 </GameData>

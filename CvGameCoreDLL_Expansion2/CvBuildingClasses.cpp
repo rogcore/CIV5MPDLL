@@ -180,7 +180,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
 	m_bAnyWater(false),
 #endif
-
+	m_piYieldFromInternal(NULL),
 	m_piYieldFromProcessModifier(NULL),
 	m_piYieldFromProcessModifierGlobal(NULL),
 
@@ -349,7 +349,7 @@ CvBuildingEntry::~CvBuildingEntry(void)
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
 	SAFE_DELETE_ARRAY(m_piInstantYield);
 #endif
-
+	SAFE_DELETE_ARRAY(m_piYieldFromInternal);
 	SAFE_DELETE_ARRAY(m_piYieldFromProcessModifier);
 	SAFE_DELETE_ARRAY(m_piYieldFromProcessModifierGlobal);
 
@@ -693,7 +693,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	kUtility.SetYields(m_piYieldChangePerPop, "Building_YieldChangesPerPop", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldChangePerReligion, "Building_YieldChangesPerReligion", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldModifier, "Building_YieldModifiers", "BuildingType", szBuildingType);
-
+	kUtility.SetYields(m_piYieldFromInternal, "Building_YieldFromInternalTR", "BuildingType", szBuildingType);
 #if defined(MOD_ROG_CORE)
 	kUtility.SetYields(m_piYieldModifierFromWonder, "Building_CityWithWorldWonderYieldModifierGlobal", "BuildingType", szBuildingType);
 #endif
@@ -2592,7 +2592,17 @@ int* CvBuildingEntry::GetYieldChangePerPopArray() const
 	return m_piYieldChangePerPop;
 }
 
-
+int CvBuildingEntry::GetYieldFromInternal(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromInternal[i];
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromInternalArray() const
+{
+	return m_piYieldFromInternal;
+}
 
 /// Does this Policy grant yields from constructing buildings?
 int CvBuildingEntry::GetYieldFromProcessModifier(int i) const
