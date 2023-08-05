@@ -1905,6 +1905,10 @@ public:
 	int CountAllOriginalCapitalCity();
 #endif
 
+	int getYieldModifierFromActiveSpies(YieldTypes eIndex)	const;
+	void changeYieldModifierFromActiveSpies(YieldTypes eIndex, int iChange);
+
+
 #if defined(MOD_ROG_CORE)
 	int GetNumWorldWonders();
 #endif
@@ -2432,6 +2436,7 @@ protected:
 
 	std::map<int, int> m_piDomainFreeExperience;
 #endif
+	std::vector<int> m_aiYieldModifierFromActiveSpies;
 
 	std::vector<FeatureTypes> m_ownedNaturalWonders;
 

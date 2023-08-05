@@ -2,6 +2,9 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_en_US>
+	               <Row Tag="TXT_KEY_PRODMOD_SPIES">
+			<Text>[NEWLINE][ICON_BULLET]Active Spies Modifier: {1_Num}%</Text>
+		</Row>
 
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_HEALTH_MOD">
 			<Text>[NEWLINE][ICON_BULLET]City Modifier for Health: {1_Num}%</Text>
@@ -9,7 +12,7 @@
 
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_CRIME_MOD">
     		<Text>[NEWLINE][ICON_BULLET]City Modifier for Crime: {1_Num}%</Text>
-    	</Row>
+    	                 </Row>
 		<Row Tag="TXT_KEY_UNIT_PLAGUE_TRANSFER">
 			<Text>A virulent plague was spread from your {1_Unit} to their {2_Unit} during combat!</Text>
 		</Row>

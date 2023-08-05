@@ -221,6 +221,7 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_piYieldChangesNaturalWonder(NULL),
 	m_piYieldChangeWorldWonder(NULL),
 #endif
+	m_piYieldModifierFromActiveSpies(NULL),
 	m_ppiBuildingClassYieldModifiers(NULL),
 	m_ppiBuildingClassYieldChanges(NULL),
 	m_piCityLoveKingDayYieldMod(NULL),
@@ -278,6 +279,7 @@ CvPolicyEntry::~CvPolicyEntry(void)
 	SAFE_DELETE_ARRAY(m_piYieldChangesNaturalWonder);
 	SAFE_DELETE_ARRAY(m_piYieldChangeWorldWonder);
 #endif
+	SAFE_DELETE_ARRAY(m_piYieldModifierFromActiveSpies);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiBuildingClassYieldModifiers);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiBuildingClassYieldChanges);
 	if(m_pFreeUnitClasses)
@@ -846,7 +848,7 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	kUtility.SetYields(m_piYieldChangesNaturalWonder, "Policy_YieldChangesNaturalWonder", "PolicyType", szPolicyType);
 	kUtility.SetYields(m_piYieldChangeWorldWonder, "Policy_YieldChangeWorldWonder", "PolicyType", szPolicyType);
 #endif
-
+	kUtility.SetYields(m_piYieldModifierFromActiveSpies, "Policy_YieldModifierFromActiveSpies", "PolicyType", szPolicyType);
 	//ImprovementCultureChanges
 	kUtility.PopulateArrayByValue(m_piImprovementCultureChange, "Improvements", "Policy_ImprovementCultureChanges", "ImprovementType", "PolicyType", szPolicyType, "CultureChange");
 
@@ -5349,4 +5351,17 @@ int PolicyHelpers::GetNumFreePolicies(PolicyBranchTypes eBranch)
 	}
 
 	return iFreePolicies;
+}
+
+
+int CvPolicyEntry::GetYieldModifierFromActiveSpies(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldModifierFromActiveSpies ? m_piYieldModifierFromActiveSpies[i] : 0;
+}
+
+int* CvPolicyEntry::GetYieldModifierFromActiveSpiesArray() const
+{
+	return m_piYieldModifierFromActiveSpies;
 }
