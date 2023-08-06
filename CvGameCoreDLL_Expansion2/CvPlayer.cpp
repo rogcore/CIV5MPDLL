@@ -7807,6 +7807,15 @@ bool CvPlayer::canFound(int iX, int iY, bool bTestVisible) const
 	}
 #endif
 
+#if defined(MOD_MORE_NATURAL_WONDER)
+	if (MOD_MORE_NATURAL_WONDER) {
+		if (pPlot->IsVolcano())
+		{
+			return false;
+		}
+	}
+#endif
+
 	// Has the AI agreed to not settle here?
 	if(!isMinorCiv() && !isBarbarian())
 	{
