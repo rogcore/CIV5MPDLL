@@ -155,7 +155,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_iExtraDamageHeal(0),
 	m_iRangedStrikeModifier(0),
 	m_iPopulationChange(0),
-
+	m_iMinorCivFriendship(0),
 	m_iResetDamageValue(0),
 	m_iReduceDamageValue(0),
 
@@ -255,11 +255,12 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piDomainFreeExperiencePerGreatWork(NULL),
 
 #if defined(MOD_ROG_CORE)
-	m_piYieldModifierFromWonder(NULL),
+	m_piYieldFromConstruction(NULL),
+	m_piYieldFromUnitProduction(NULL),
 
+	m_piYieldModifierFromWonder(NULL),
 	m_piDomainFreeExperiencePerGreatWorkGlobal(NULL),
 	m_piDomainFreeExperienceGlobal(),
-
 	m_paiSpecificGreatPersonRateModifier(NULL),
 #endif
 
@@ -330,8 +331,10 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	SAFE_DELETE_ARRAY(m_piDomainFreeExperiencePerGreatWork);
 
 #if defined(MOD_ROG_CORE)
+	SAFE_DELETE_ARRAY(m_piYieldFromConstruction);
+	SAFE_DELETE_ARRAY(m_piYieldFromUnitProduction);
+
 	SAFE_DELETE_ARRAY(m_piYieldModifierFromWonder);
-	
 	SAFE_DELETE_ARRAY(m_piDomainFreeExperiencePerGreatWorkGlobal);
 	m_piDomainFreeExperienceGlobal.clear();
 #endif
@@ -430,7 +433,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iExtraDamageHeal = kResults.GetInt("ExtraDamageHeal");
 	m_iRangedStrikeModifier = kResults.GetInt("RangedStrikeModifier");
 	m_iPopulationChange = kResults.GetInt("PopulationChange");
-
+	m_iMinorCivFriendship = kResults.GetInt("MinorCivFriendship");
 	m_iResetDamageValue = kResults.GetInt("ResetDamageValue");
 	m_iReduceDamageValue = kResults.GetInt("ReduceDamageValue");
 
@@ -695,6 +698,8 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	kUtility.SetYields(m_piYieldModifier, "Building_YieldModifiers", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldFromInternal, "Building_YieldFromInternalTR", "BuildingType", szBuildingType);
 #if defined(MOD_ROG_CORE)
+	kUtility.SetYields(m_piYieldFromConstruction, "Building_YieldFromConstruction", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldFromUnitProduction, "Building_YieldFromUnitProduction", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldModifierFromWonder, "Building_CityWithWorldWonderYieldModifierGlobal", "BuildingType", szBuildingType);
 #endif
 
@@ -1916,6 +1921,11 @@ int CvBuildingEntry::GetPopulationChange() const
 	return m_iPopulationChange;
 }
 
+int CvBuildingEntry::GetMinorCivFriendship() const
+{
+	return m_iMinorCivFriendship;
+}
+
 int CvBuildingEntry::GetResetDamageValue() const
 {
 	return m_iResetDamageValue;
@@ -2678,6 +2688,31 @@ int* CvBuildingEntry::GetYieldModifierArray() const
 
 
 #if defined(MOD_ROG_CORE)
+/// Does this  grant yields from constructing buildings?
+int CvBuildingEntry::GetYieldFromConstruction(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromConstruction[i];
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromConstructionArray() const
+{
+	return m_piYieldFromConstruction;
+}
+
+int CvBuildingEntry::GetYieldFromUnitProduction(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromUnitProduction[i];
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromUnitProductionArray() const
+{
+	return m_piYieldFromUnitProduction;
+}
+
 int CvBuildingEntry::GetYieldModifierFromWonder(int i) const
 {
 	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
