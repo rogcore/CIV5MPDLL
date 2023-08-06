@@ -21505,7 +21505,16 @@ int CvCity::CalculateCorruptionScoreModifierFromSpy() const
 	}
 
 	int rank = espionage->m_aSpyList[spyIndex].m_eRank + 1;
-	return -rank * 33;
+	if (rank == 0) {
+		return 0;
+	}
+	if (rank == 1) {
+		return -33;
+	}
+	if (rank == 2) {
+		return -67;
+	}
+	return -100;
 }
 
 bool CvCity::IsCorruptionLevelReduceByOne() const
