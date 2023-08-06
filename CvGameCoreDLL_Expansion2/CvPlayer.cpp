@@ -7989,11 +7989,9 @@ bool CvPlayer::canTrain(UnitTypes eUnit, bool bContinue, bool bTestVisible, bool
 			{
 				return false;
 			}
-
 			if (eThisPlayersUnitType != eUnit && GetPlayerTraits()->IsTrainedAll())
 			{
-				PlayerTypes eLoopPlayer = (PlayerTypes)63;
-				CvCivilizationInfo* pkInfo = GC.getCivilizationInfo(GET_PLAYER(eLoopPlayer).getCivilizationType());
+				CvCivilizationInfo* pkInfo = GC.getCivilizationInfo(GET_PLAYER(BARBARIAN_PLAYER).getCivilizationType());
 				if (pkInfo)
 				{
 					// Loop through all units
