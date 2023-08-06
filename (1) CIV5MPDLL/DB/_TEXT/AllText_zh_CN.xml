@@ -465,6 +465,24 @@
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_TRADE_VALUE">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自商路</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_PROJECTS">
+			<Text>[NEWLINE]{1_Num}{2_IconString} 来自已完成计划</Text>
+		</Row>
+
+
+		<Row Tag="TXT_KEY_VOLCAN_EVENT_TITLE">
+				<Text>火山爆发！</Text>
+			</Row>
+			<Row Tag="TXT_KEY_VOLCANO_EVENT_1">
+				<Text>一处火山发生了小规模喷发。</Text>
+			</Row>
+			<Row Tag="TXT_KEY_VOLCANO_EVENT_2">
+				<Text>一处火山发生了大规模喷发。</Text>
+			</Row>
+			<Row Tag="TXT_KEY_VOLCANO_EVENT_3">
+				<Text>一处火山发生了超大规模喷发。</Text>
+			</Row>
 	</Language_zh_CN>
 
 </GameData>

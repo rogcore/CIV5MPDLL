@@ -8652,15 +8652,17 @@ bool CvPlayer::canCreate(ProjectTypes eProject, bool bContinue, bool bTestVisibl
 		}
 	}
 
-	if(GC.getGame().isProjectMaxedOut(eProject))
+
+	if (GC.getGame().isProjectMaxedOut(eProject))
 	{
 		return false;
 	}
 
-	if(GET_TEAM(getTeam()).isProjectMaxedOut(eProject))
+	if (GET_TEAM(getTeam()).isProjectMaxedOut(eProject))
 	{
 		return false;
 	}
+	
 
 	if(!bTestVisible)
 	{
@@ -8681,15 +8683,18 @@ bool CvPlayer::canCreate(ProjectTypes eProject, bool bContinue, bool bTestVisibl
 			}
 		}
 
-		if(GC.getGame().isProjectMaxedOut(eProject, (GET_TEAM(getTeam()).getProjectMaking(eProject) + ((bContinue) ? -1 : 0))))
+
+	
+		if (GC.getGame().isProjectMaxedOut(eProject, (GET_TEAM(getTeam()).getProjectMaking(eProject) + ((bContinue) ? -1 : 0))))
 		{
 			return false;
 		}
 
-		if(GET_TEAM(getTeam()).isProjectMaxedOut(eProject, (GET_TEAM(getTeam()).getProjectMaking(eProject) + ((bContinue) ? -1 : 0))))
+		if (GET_TEAM(getTeam()).isProjectMaxedOut(eProject, (GET_TEAM(getTeam()).getProjectMaking(eProject) + ((bContinue) ? -1 : 0))))
 		{
 			return false;
 		}
+
 
 		// Nukes disabled? (by UN or something)
 		if(GC.getGame().isNoNukes())
@@ -8913,6 +8918,8 @@ bool CvPlayer::isProductionMaxedProject(ProjectTypes eProject) const
 	{
 		return false;
 	}
+
+
 
 	if(GC.getGame().isProjectMaxedOut(eProject))
 	{

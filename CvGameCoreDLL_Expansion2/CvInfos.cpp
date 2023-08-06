@@ -4997,6 +4997,7 @@ CvFeatureInfo::CvFeatureInfo() :
 	m_bRough(false),
 	m_bNaturalWonder(false),
 #if defined(MOD_MORE_NATURAL_WONDER)
+	m_bVolcano(false),
 	m_bPseudoNaturalWonder(false),
 	m_iPromotionIfOwned(NO_PROMOTION),
 #endif
@@ -5194,6 +5195,10 @@ bool CvFeatureInfo::IsNaturalWonder() const
 #endif
 }
 #if defined(MOD_MORE_NATURAL_WONDER)
+bool CvFeatureInfo::IsVolcano() const
+{
+	return m_bVolcano;
+}
 bool CvFeatureInfo::IsPseudoNaturalWonder() const
 {
 	return m_bPseudoNaturalWonder;
@@ -5360,6 +5365,7 @@ bool CvFeatureInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_bRough = kResults.GetBool("Rough");
 	m_bNaturalWonder = kResults.GetBool("NaturalWonder");
 #if defined(MOD_MORE_NATURAL_WONDER)
+	m_bVolcano = kResults.GetBool("Volcano");
 	m_bPseudoNaturalWonder = kResults.GetBool("PseudoNaturalWonder");
 
 	szTextVal = kResults.GetText("FreePromotionIfOwned");

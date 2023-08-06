@@ -775,6 +775,9 @@ public:
 	int GetBaseYieldRateFromSpecialists(YieldTypes eIndex) const;
 	void ChangeBaseYieldRateFromSpecialists(YieldTypes eIndex, int iChange);
 
+	int GetBaseYieldRateFromProjects(YieldTypes eIndex) const;
+	void ChangeBaseYieldRateFromProjects(YieldTypes eIndex, int iChange);
+
 	int GetBaseYieldRateFromMisc(YieldTypes eIndex) const;
 	void ChangeBaseYieldRateFromMisc(YieldTypes eIndex, int iChange);
 
@@ -803,7 +806,8 @@ public:
 	int GetYieldPerPopInEmpireTimes100(YieldTypes eIndex) const;
 	void ChangeYieldPerPopInEmpireTimes100(YieldTypes eIndex, int iChange);
 #endif
-
+	int GetYieldFromInternalTR(YieldTypes eIndex1) const;
+	void ChangeYieldFromInternalTR(YieldTypes eIndex, int iChange);
 	int GetYieldFromProcessModifier(YieldTypes eIndex1) const;
 	void ChangeYieldFromProcessModifier(YieldTypes eIndex, int iChange);
 
@@ -1027,6 +1031,8 @@ public:
 	int CreateUnit(UnitTypes eUnitType, UnitAITypes eAIType = NO_UNITAI, bool bUseToSatisfyOperation=true);
 	bool CreateBuilding(BuildingTypes eBuildType);
 	bool CreateProject(ProjectTypes eProjectType);
+	void changeProjectCount(ProjectTypes eProject, int iValue);
+	int getProjectCount(ProjectTypes eProject) const;
 
 	bool CanPlaceUnitHere(UnitTypes eUnitType);
 	bool IsCanPurchase(bool bTestPurchaseCost, bool bTestTrainable, UnitTypes eUnitType, BuildingTypes eBuildingType, ProjectTypes eProjectType, YieldTypes ePurchaseYield);
@@ -1384,12 +1390,13 @@ protected:
 	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromTerrain;
 	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromBuildings;
 	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromSpecialists;
+	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromProjects;
 	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromMisc;
 	std::vector<int> m_aiBaseYieldRateFromReligion;
 	FAutoVariable<std::vector<int>, CvCity> m_aiYieldRateModifier;
 	FAutoVariable<std::vector<int>, CvCity> m_aiYieldPerPop;
 
-
+	std::vector<int> m_aiNumProjects;
 
 
 #if defined(MOD_ROG_CORE)
@@ -1399,7 +1406,7 @@ protected:
 	std::vector<int> m_aiSpecialistRateModifier;
 #endif
 
-
+	std::vector<int> m_aiYieldFromInternalTR;
 	FAutoVariable<std::vector<int>, CvCity> m_aiYieldFromProcessModifier;
 
 

@@ -218,19 +218,15 @@ public:
 	int GetLandTileTurnDamage() const;
 #endif
 
-
-
 	int GetResourceQuantityFromPOP(int i) const;
 	int GetYieldChangeWorldWonder(int i) const;
 	int GetYieldChangeWorldWonderGlobal(int i) const;
-
+	int GetYieldFromInternal(int i) const;
+	int* GetYieldFromInternalArray() const;
 	int GetYieldFromProcessModifier(int i) const;
 	int* GetYieldFromProcessModifierArray() const;
-
 	int GetYieldFromProcessModifierGlobal(int i) const;
 	int* GetYieldFromProcessModifierArrayGlobal() const;
-
-
 	int GetResourceYieldChangeGlobal(int iResource, int iYieldType) const;
 	int GetImprovementYieldChange(int i, int j) const;
 	int* GetImprovementYieldChangeArray(int i) const;
@@ -317,6 +313,7 @@ public:
 #if defined(MOD_API_EXTENSIONS)
 	bool IsAddsFreshWater() const;
 	bool IsPurchaseOnly() const;
+	bool IsHumanOnly() const;
 #endif
 	bool IsMoveAfterCreated() const;
 	bool IsMountain() const;
@@ -586,7 +583,7 @@ private:
 	int** m_ppaiYieldPerXFeature;
 	int** m_ppaiSpecialistYieldChangeLocal;
 #endif
-
+	int* m_piYieldFromInternal;
 	int* m_piYieldFromProcessModifier;
 	int* m_piYieldFromProcessModifierGlobal;
 
@@ -677,6 +674,7 @@ private:
 #if defined(MOD_API_EXTENSIONS)
 	bool m_bAddsFreshWater;
 	bool m_bPurchaseOnly;
+	bool m_bHumanOnly;
 #endif
 	bool m_bMoveAfterCreated;
 	bool m_bMountain;

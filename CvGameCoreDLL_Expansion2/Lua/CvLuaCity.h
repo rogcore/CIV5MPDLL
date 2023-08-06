@@ -406,7 +406,7 @@ protected:
 
 	static int lGetBaseYieldRate(lua_State* L);
 	static int lGetYieldRateInfoTool(lua_State* L);
-
+	LUAAPIEXTN(GetBaseYieldRateFromProjects, int, iYield);
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_GLOBAL_GREATWORK_YIELDTYPES)
 	LUAAPIEXTN(GetBaseYieldRateFromGreatWorks, int, iYield);
 #endif
@@ -465,6 +465,7 @@ protected:
 	static int lGetSpecialistUpgradeThreshold(lua_State* L);
 	static int lGetNumSpecialistsAllowedByBuilding(lua_State* L);
 	static int lGetSpecialistCount(lua_State* L);
+	static int lGetProjectCount(lua_State* L);
 	static int lGetTotalSpecialistCount(lua_State* L);
 	static int lGetSpecialistCityModifier(lua_State* L);
 	static int lGetSpecialistGreatPersonProgress(lua_State* L);

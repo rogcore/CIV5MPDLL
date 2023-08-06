@@ -144,6 +144,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 #if defined(MOD_API_EXTENSIONS)
 	m_bAddsFreshWater(false),
 	m_bPurchaseOnly(false),
+	m_bHumanOnly(false),
 #endif
 
 	m_bMoveAfterCreated(false),
@@ -179,7 +180,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
 	m_bAnyWater(false),
 #endif
-
+	m_piYieldFromInternal(NULL),
 	m_piYieldFromProcessModifier(NULL),
 	m_piYieldFromProcessModifierGlobal(NULL),
 
@@ -348,7 +349,7 @@ CvBuildingEntry::~CvBuildingEntry(void)
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
 	SAFE_DELETE_ARRAY(m_piInstantYield);
 #endif
-
+	SAFE_DELETE_ARRAY(m_piYieldFromInternal);
 	SAFE_DELETE_ARRAY(m_piYieldFromProcessModifier);
 	SAFE_DELETE_ARRAY(m_piYieldFromProcessModifierGlobal);
 
@@ -419,6 +420,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	if (MOD_API_EXTENSIONS) {
 		m_bAddsFreshWater = kResults.GetBool("AddsFreshWater");
 		m_bPurchaseOnly = kResults.GetBool("PurchaseOnly");
+		m_bHumanOnly = kResults.GetBool("HumanOnly");
 	}
 #endif
 
@@ -691,7 +693,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	kUtility.SetYields(m_piYieldChangePerPop, "Building_YieldChangesPerPop", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldChangePerReligion, "Building_YieldChangesPerReligion", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldModifier, "Building_YieldModifiers", "BuildingType", szBuildingType);
-
+	kUtility.SetYields(m_piYieldFromInternal, "Building_YieldFromInternalTR", "BuildingType", szBuildingType);
 #if defined(MOD_ROG_CORE)
 	kUtility.SetYields(m_piYieldModifierFromWonder, "Building_CityWithWorldWonderYieldModifierGlobal", "BuildingType", szBuildingType);
 #endif
@@ -2303,6 +2305,11 @@ bool CvBuildingEntry::IsPurchaseOnly() const
 {
 	return m_bPurchaseOnly;
 }
+
+bool CvBuildingEntry::IsHumanOnly() const
+{
+	return m_bHumanOnly;
+}
 #endif
 
 bool CvBuildingEntry::IsMoveAfterCreated() const
@@ -2585,7 +2592,17 @@ int* CvBuildingEntry::GetYieldChangePerPopArray() const
 	return m_piYieldChangePerPop;
 }
 
-
+int CvBuildingEntry::GetYieldFromInternal(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromInternal[i];
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromInternalArray() const
+{
+	return m_piYieldFromInternal;
+}
 
 /// Does this Policy grant yields from constructing buildings?
 int CvBuildingEntry::GetYieldFromProcessModifier(int i) const
@@ -3759,6 +3776,17 @@ int CvCityBuildings::GetTotalBaseBuildingMaintenance() const
 		{
 			if(GetNumBuilding(eBuilding))
 				iTotalCost += (pkBuildingInfo->GetGoldMaintenance() * GetNumBuilding(eBuilding));
+		}
+	}
+
+	for (int iProjectLoop = 0; iProjectLoop < GC.getNumProjectInfos(); iProjectLoop++)
+	{
+		const ProjectTypes eProject = static_cast<ProjectTypes>(iProjectLoop);
+		CvProjectEntry* pkProject = GC.getProjectInfo(eProject);
+
+		if (pkProject && pkProject->GetGoldMaintenance() > 0)
+		{
+			iTotalCost += (m_pCity->getProjectCount(eProject) * pkProject->GetGoldMaintenance());
 		}
 	}
 

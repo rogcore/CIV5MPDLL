@@ -5533,7 +5533,6 @@ public:
 	}
 #endif
 
-
 	inline int getGOLDEN_AGE_GREAT_PEOPLE_MODIFIER()
 	{
 		return m_iGOLDEN_AGE_GREAT_PEOPLE_MODIFIER;
@@ -9167,8 +9166,6 @@ protected:
 #if defined(MOD_ROG_CORE)
 	int m_iORIGINAL_CAPITAL_MODMAX;
 #endif
-
-
 	int m_iGOLDEN_AGE_GREAT_PEOPLE_MODIFIER;
 	int m_iMIN_UNIT_GOLDEN_AGE_TURNS;
 	int m_iGOLDEN_AGE_CULTURE_MODIFIER;

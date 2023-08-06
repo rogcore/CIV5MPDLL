@@ -188,6 +188,8 @@ CvPlot::CvPlot() :
 	m_fPopupDelay = 0.5;
 #endif
 
+	m_iBreakTurns = 0;
+
 	m_cContinentType = 0;
 	m_cRiverCrossing = 0;
 
@@ -259,6 +261,8 @@ void CvPlot::reset(int iX, int iY, bool bConstructorCall)
 	m_cContinentType = 0;
 
 	m_uiTradeRouteBitFlags = 0;
+
+	m_iBreakTurns = 0;
 
 	m_bStartingPlot = false;
 	m_bHills = false;
@@ -440,6 +444,147 @@ void CvPlot::doTurn()
 	m_fPopupDelay = 0.5;
 #endif
 
+#if defined(MOD_MORE_NATURAL_WONDER)
+	if (MOD_VOLCANO_BREAK && IsVolcano())
+	{
+		if (GetBreakTurns() > 0)
+		{
+			ChangeBreakTurns(-1);
+		}
+
+		int iFakeRandNum=0;
+		iFakeRandNum= GC.getGame().getSmallFakeRandNum(1000, GetPlotIndex());
+
+		bool bOutBreakLv1 = false, bOutBreakLv2 = false, bOutBreakLv3 = false;
+		if (iFakeRandNum <= 100)
+		{
+			bOutBreakLv1 = true;
+		}
+		else if (iFakeRandNum <= 600 && iFakeRandNum>=550)
+		{
+			bOutBreakLv2 = true;
+		}
+		else if (iFakeRandNum >= 970)
+		{
+			bOutBreakLv3 = true;
+		}
+
+		if (GetBreakTurns() == 0)
+		{
+			if (bOutBreakLv1)
+			{
+				int iRange = 2;
+				for (int iDX = -iRange; iDX <= iRange; iDX++)
+				{
+					for (int iDY = -iRange; iDY <= iRange; iDY++)
+					{
+						CvPlot* pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, 1);
+						if (pLoopPlot != NULL)
+						{
+							GC.getGame().setPlotExtraYield(pLoopPlot->getX(), pLoopPlot->getY(), YIELD_FOOD, 1);
+
+							if (pLoopPlot->getImprovementType() != NULL && !pLoopPlot->isCity() && !pLoopPlot->IsImprovementPillaged())
+							{
+								pLoopPlot->SetImprovementPillaged(true);
+							}
+							for (int iUnitLoop = 0; iUnitLoop < pLoopPlot->getNumUnits(); iUnitLoop++)
+							{
+								CvUnit* loopUnit = pLoopPlot->getUnitByIndex(iUnitLoop);
+								if (loopUnit != NULL && !loopUnit == DOMAIN_AIR && !loopUnit == DOMAIN_HOVER)
+								{
+									loopUnit->changeDamage(50);
+								}
+							}
+						}
+					}
+				}
+				SetBreakTurns(9);
+				CvString strBuffer = GetLocalizedText("TXT_KEY_VOLCANO_EVENT_1");
+				CvString strSummary = GetLocalizedText("TXT_KEY_VOLCAN_EVENT_TITLE");
+				if (isRevealed(GC.getGame().getActiveTeam(), false))
+				{
+					GET_TEAM(GC.getGame().getActiveTeam()).AddNotification(NOTIFICATION_GENERIC, strBuffer, strSummary, getX(), getY());
+				}
+			}
+
+			else if (bOutBreakLv2)
+			{
+				int iRange = 2;
+				for (int iDX = -iRange; iDX <= iRange; iDX++)
+				{
+					for (int iDY = -iRange; iDY <= iRange; iDY++)
+					{
+						CvPlot* pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, 2);
+						if (pLoopPlot != NULL)
+						{
+							GC.getGame().setPlotExtraYield(pLoopPlot->getX(), pLoopPlot->getY(), YIELD_FOOD, 1);
+							GC.getGame().setPlotExtraYield(pLoopPlot->getX(), pLoopPlot->getY(), YIELD_PRODUCTION, 1);
+
+							if (pLoopPlot->getImprovementType() != NULL && !pLoopPlot->isCity() && !pLoopPlot->IsImprovementPillaged())
+							{
+								pLoopPlot->SetImprovementPillaged(true);
+							}
+							for (int iUnitLoop = 0; iUnitLoop < pLoopPlot->getNumUnits(); iUnitLoop++)
+							{
+								CvUnit* loopUnit = pLoopPlot->getUnitByIndex(iUnitLoop);
+								if (loopUnit != NULL && !loopUnit == DOMAIN_AIR && !loopUnit == DOMAIN_HOVER)
+								{
+									loopUnit->changeDamage(99);
+								}
+							}
+						}
+					}
+				}
+				SetBreakTurns(9);
+				CvString strBuffer = GetLocalizedText("TXT_KEY_VOLCANO_EVENT_2");
+				CvString strSummary = GetLocalizedText("TXT_KEY_VOLCAN_EVENT_TITLE");
+				if (isRevealed(GC.getGame().getActiveTeam(), false))
+				{
+					GET_TEAM(GC.getGame().getActiveTeam()).AddNotification(NOTIFICATION_GENERIC, strBuffer, strSummary, getX(), getY());
+				}
+			}
+
+			else if (bOutBreakLv3)
+			{
+				int iRange =3;
+				for (int iDX = -iRange; iDX <= iRange; iDX++)
+				{
+					for (int iDY = -iRange; iDY <= iRange; iDY++)
+					{
+						CvPlot* pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, 3);
+						if (pLoopPlot != NULL)
+						{
+							GC.getGame().setPlotExtraYield(pLoopPlot->getX(), pLoopPlot->getY(), YIELD_FOOD, 2);
+							GC.getGame().setPlotExtraYield(pLoopPlot->getX(), pLoopPlot->getY(), YIELD_PRODUCTION, 2);
+							GC.getGame().setPlotExtraYield(pLoopPlot->getX(), pLoopPlot->getY(), YIELD_GOLD, 2);
+
+							if (pLoopPlot->getImprovementType() != NULL && !pLoopPlot->isCity() && !pLoopPlot->IsImprovementPillaged())
+							{
+								pLoopPlot->SetImprovementPillaged(true);
+							}
+							for (int iUnitLoop = 0; iUnitLoop < pLoopPlot->getNumUnits(); iUnitLoop++)
+							{
+								CvUnit* loopUnit = pLoopPlot->getUnitByIndex(iUnitLoop);
+								if (loopUnit != NULL && !loopUnit == DOMAIN_AIR && !loopUnit == DOMAIN_HOVER)
+								{
+									loopUnit->changeDamage(150);
+								}
+							}
+						}
+					}
+				}
+				SetBreakTurns(9);
+				CvString strBuffer = GetLocalizedText("TXT_KEY_VOLCANO_EVENT_3");
+				CvString strSummary = GetLocalizedText("TXT_KEY_VOLCAN_EVENT_TITLE");
+				if (isRevealed(GC.getGame().getActiveTeam(), false))
+				{
+					GET_TEAM(GC.getGame().getActiveTeam()).AddNotification(NOTIFICATION_GENERIC, strBuffer, strSummary, getX(), getY());
+				}
+			}
+		}
+	}
+#endif
+
 	if(isOwned())
 	{
 		changeOwnershipDuration(1);
@@ -541,6 +686,25 @@ void CvPlot::doTurn()
 	// XXX
 }
 
+
+int CvPlot::GetBreakTurns() const
+{
+	return m_iBreakTurns;
+}
+void CvPlot::ChangeBreakTurns(int iValue) //Set in city::doturn
+{
+	if (iValue != 0)
+	{
+		m_iBreakTurns += iValue;
+	}
+}
+void CvPlot::SetBreakTurns(int iValue)
+{
+	if (iValue != m_iBreakTurns)
+	{
+		m_iBreakTurns = iValue;
+	}
+}
 
 //	--------------------------------------------------------------------------------
 void CvPlot::doImprovement()
@@ -6732,6 +6896,16 @@ bool CvPlot::IsNaturalWonder(bool orPseudoNatural) const
 #endif
 }
 
+#if defined(MOD_MORE_NATURAL_WONDER)
+bool CvPlot::IsVolcano() const
+{
+	FeatureTypes eFeature = getFeatureType();
+	if (eFeature == NO_FEATURE)
+	return false;
+	return GC.getFeatureInfo(eFeature)->IsVolcano();
+}
+#endif
+
 //	--------------------------------------------------------------------------------
 ResourceTypes CvPlot::getResourceType(TeamTypes eTeam) const
 {
@@ -11526,6 +11700,7 @@ void CvPlot::read(FDataStream& kStream)
 	kStream >> m_iImprovementDuration;
 	kStream >> m_iUpgradeProgress;
 	kStream >> m_iCulture;
+	kStream >> m_iBreakTurns;
 	kStream >> m_iNumMajorCivsRevealed;
 	kStream >> m_iCityRadiusCount;
 	kStream >> m_iReconCount;
@@ -11750,6 +11925,7 @@ void CvPlot::write(FDataStream& kStream) const
 	kStream << m_iImprovementDuration;
 	kStream << m_iUpgradeProgress;
 	kStream << m_iCulture;
+	kStream << m_iBreakTurns;
 	kStream << m_iNumMajorCivsRevealed;
 	kStream << m_iCityRadiusCount;
 	kStream << m_iReconCount;
@@ -11761,7 +11937,6 @@ void CvPlot::write(FDataStream& kStream) const
 	kStream << m_eBuilderAIScratchPadRoute;
 	kStream << m_iLandmass;
 	kStream << m_uiTradeRouteBitFlags;
-
 	kStream << m_bStartingPlot;
 	kStream << m_bHills;
 	kStream << m_bNEOfRiver;
