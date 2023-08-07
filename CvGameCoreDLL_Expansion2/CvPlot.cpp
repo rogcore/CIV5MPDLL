@@ -445,9 +445,9 @@ void CvPlot::doTurn()
 #endif
 
 #if defined(MOD_MORE_NATURAL_WONDER)
-	if (MOD_VOLCANO_BREAK && IsVolcano())
+	if (MOD_VOLCANO_BREAK && IsVolcano() && GC.getGame().getGameTurn() > 6)
 	{
-		if (GetBreakTurns() > 0)
+		if (GetBreakTurns() > 0  )
 		{
 			ChangeBreakTurns(-1);
 		}

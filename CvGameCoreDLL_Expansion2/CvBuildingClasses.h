@@ -203,7 +203,7 @@ public:
 	int GetExtraDamageHeal() const;
 	int CityRangedStrikeModifier() const;
 	int GetPopulationChange() const;
-
+	int GetMinorCivFriendship() const;
 	int GetGlobalCityStrengthMod() const;
 	int GetGlobalRangedStrikeModifier() const;
 
@@ -362,6 +362,11 @@ public:
 	int* GetYieldModifierArray() const;
 
 #if defined(MOD_ROG_CORE)
+	int GetYieldFromConstruction(int i) const;
+	int* GetYieldFromConstructionArray() const;
+	int GetYieldFromUnitProduction(int i) const;
+	int* GetYieldFromUnitProductionArray() const;
+
 	int GetYieldModifierFromWonder(int i) const;;
 	int* GetYieldModifierFromWonderArray() const;
 #endif
@@ -550,7 +555,7 @@ private:
 	int m_iExtraDamageHeal;
 	int m_iRangedStrikeModifier;
 	int m_iPopulationChange;
-
+	int m_iMinorCivFriendship;
 	int m_iResetDamageValue;
 	int m_iReduceDamageValue;
 
@@ -729,6 +734,8 @@ private:
 	int* m_piYieldModifier;
 
 #if defined(MOD_ROG_CORE)
+	int* m_piYieldFromConstruction;
+	int* m_piYieldFromUnitProduction;
 	int* m_piYieldModifierFromWonder;
 #endif
 

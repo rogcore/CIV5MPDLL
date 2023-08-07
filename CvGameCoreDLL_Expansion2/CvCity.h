@@ -850,6 +850,11 @@ public:
 	int getDomainFreeExperienceFromGreatWorks(DomainTypes eIndex) const;
 	
 #if defined(MOD_ROG_CORE)
+	int GetYieldFromConstruction(YieldTypes eIndex) const;
+	void ChangeYieldFromConstruction(YieldTypes eIndex, int iChange);
+	int GetYieldFromUnitProduction(YieldTypes eIndex) const;
+	void ChangeYieldFromUnitProduction(YieldTypes eIndex, int iChange);
+
 	int getDomainFreeExperienceFromGreatWorksGlobal(DomainTypes eIndex) const;
 #endif
 
@@ -1400,8 +1405,10 @@ protected:
 
 
 #if defined(MOD_ROG_CORE)
-	std::map<int, int> m_aiYieldPerPopInEmpire;
+	std::vector<int> m_aiYieldFromConstruction;
+	std::vector<int> m_aiYieldFromUnitProduction;
 
+	std::map<int, int> m_aiYieldPerPopInEmpire;
 	FAutoVariable<std::vector<int>, CvCity> m_aiResourceQuantityFromPOP;
 	std::vector<int> m_aiSpecialistRateModifier;
 #endif
