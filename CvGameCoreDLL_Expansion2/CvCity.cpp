@@ -13742,6 +13742,9 @@ void CvCity::updateStrengthValue()
 		m_iStrengthValue += GC.getCITY_STRENGTH_MOUNTAIN_CHANGE();
 	}
 
+	// Policies
+	m_iStrengthValue += GET_PLAYER(getOwner()).GetPlayerPolicies()->GetNumericModifier(POLICYMOD_CITY_DEFENSE_BOOST);
+
 	DLLUI->setDirty(CityInfo_DIRTY_BIT, true);
 }
 

@@ -178,6 +178,9 @@ CvPolicyEntry::CvPolicyEntry(void):
 #if defined(MOD_BUGFIX_DUMMY_POLICIES)
 	m_bDummy(false),
 #endif
+	m_iDefenseBoost(0),
+	m_iFreePopulation(0),
+	m_iFreePopulationCapital(0),
 	m_bOneShot(false),
 	m_bIncludesOneShotFreeUnits(false),
 	m_piPrereqOrPolicies(NULL),
@@ -453,6 +456,9 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 		m_bDummy = kResults.GetBool("Dummy");
 	}
 #endif
+	m_iDefenseBoost = kResults.GetInt("DefenseBoostAllCities");
+	m_iFreePopulation = kResults.GetInt("FreePopulation");
+	m_iFreePopulationCapital = kResults.GetInt("FreePopulationCapital");
 	m_bOneShot = kResults.GetBool("OneShot");
 	m_bIncludesOneShotFreeUnits = kResults.GetBool("IncludesOneShotFreeUnits");
 
@@ -2133,6 +2139,22 @@ bool CvPolicyEntry::IsDummy() const
 }
 #endif
 
+int CvPolicyEntry::GetDefenseBoost() const
+{
+	return m_iDefenseBoost;
+}
+
+/// Does this Policy grant free population?
+int CvPolicyEntry::GetFreePopulation() const
+{
+	return m_iFreePopulation;
+}
+int CvPolicyEntry::GetFreePopulationCapital() const
+{
+	return m_iFreePopulationCapital;
+}
+
+
 /// Is this a one shot policy effect
 bool CvPolicyEntry::IsOneShot() const
 {
@@ -3540,6 +3562,11 @@ int CvPlayerPolicies::GetNumericModifier(PolicyModifierType eType)
 			case POLICYMOD_POLICY_COST_MODIFIER:
 				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetPolicyCostModifier();
 				break;
+
+			case POLICYMOD_CITY_DEFENSE_BOOST:
+				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetDefenseBoost();
+				break;
+
 			case POLICYMOD_WONDER_PRODUCTION_MODIFIER:
 				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetWonderProductionModifier();
 				break;

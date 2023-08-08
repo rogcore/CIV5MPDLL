@@ -269,6 +269,9 @@ public:
 #if defined(MOD_BUGFIX_DUMMY_POLICIES)
 	bool IsDummy() const;
 #endif
+	int GetDefenseBoost() const;
+	int GetFreePopulation() const;
+	int GetFreePopulationCapital() const;
 	bool IsOneShot() const;
 	bool IncludesOneShotFreeUnits() const;
 
@@ -473,6 +476,9 @@ private:
 #if defined(MOD_BUGFIX_DUMMY_POLICIES)
 	bool m_bDummy;
 #endif
+	int m_iDefenseBoost;
+	int m_iFreePopulation;
+	int m_iFreePopulationCapital;
 	bool m_bOneShot;
 	bool m_bIncludesOneShotFreeUnits;
 
@@ -670,6 +676,7 @@ enum PolicyModifierType
     POLICYMOD_GREAT_GENERAL_RATE,
     POLICYMOD_DOMESTIC_GREAT_GENERAL_RATE,
     POLICYMOD_POLICY_COST_MODIFIER,
+	POLICYMOD_CITY_DEFENSE_BOOST,
     POLICYMOD_RELIGION_PRODUCTION_MODIFIER,
     POLICYMOD_WONDER_PRODUCTION_MODIFIER,
     POLICYMOD_BUILDING_PRODUCTION_MODIFIER,

@@ -1180,6 +1180,17 @@ void CvTeam::DoDeclareWar(TeamTypes eTeam, bool bDefensivePact, bool bMinorAllyP
 							int iNumCitiesLiberated = kDefendingPlayer.GetDiplomacyAI()->GetNumCitiesLiberated(eAttackingPlayer);
 							kDefendingPlayer.GetDiplomacyAI()->ChangeNumCitiesLiberated(eAttackingPlayer, -iNumCitiesLiberated);
 
+
+							//Do a golden age on war if we can
+							if (kAttackingPlayer.GetPlayerTraits()->IsGoldenAgeOnWar())
+							{
+								kAttackingPlayer.changeGoldenAgeTurns(kAttackingPlayer.getGoldenAgeLength());
+							}
+							if (kDefendingPlayer.GetPlayerTraits()->IsGoldenAgeOnWar())
+							{
+								kDefendingPlayer.changeGoldenAgeTurns(kDefendingPlayer.getGoldenAgeLength());
+							}
+
 #if defined(MOD_DIPLOMACY_AUTO_DENOUNCE)
 							if (MOD_DIPLOMACY_AUTO_DENOUNCE && kAttackingPlayer.isHuman() && !kDefendingPlayer.isHuman())
 							{

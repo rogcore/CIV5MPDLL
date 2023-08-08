@@ -40,6 +40,7 @@ CvTraitEntry::CvTraitEntry() :
 	m_iSeaBarbarianConversionPercent(0),
 	m_iCapitalBuildingModifier(0),
 	m_iPlotBuyCostModifier(0),
+	m_bGoldenAgeOnWar(false),
 #if defined(MOD_TRAITS_CITY_WORKING)
 	m_iCityWorkingChange(0),
 #endif
@@ -773,6 +774,12 @@ bool CvTraitEntry::IsAnyBelief() const
 }
 #endif
 
+bool CvTraitEntry::IsGoldenAgeOnWar() const
+{
+	return m_bGoldenAgeOnWar;
+}
+
+
 /// Accessor: does this civ get a bonus religious belief?
 bool CvTraitEntry::IsBonusReligiousBelief() const
 {
@@ -1379,6 +1386,7 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	m_iSeaBarbarianConversionPercent        = kResults.GetInt("SeaBarbarianConversionPercent");
 	m_iCapitalBuildingModifier				= kResults.GetInt("CapitalBuildingModifier");
 	m_iPlotBuyCostModifier					= kResults.GetInt("PlotBuyCostModifier");
+	m_bGoldenAgeOnWar                       = kResults.GetBool("GoldenAgeOnWar");
 #if defined(MOD_TRAITS_CITY_WORKING)
 	m_iCityWorkingChange					= kResults.GetInt("CityWorkingChange");
 #endif
@@ -2338,6 +2346,12 @@ void CvPlayerTraits::InitPlayerTraits()
 			{
 				m_bFaithFromUnimprovedForest = true;
 			}
+
+			if (trait->IsGoldenAgeOnWar())
+			{
+				m_bGoldenAgeOnWar = true;
+			}
+
 #if defined(MOD_TRAITS_ANY_BELIEF)
 			if(trait->IsAnyBelief())
 			{
@@ -4205,6 +4219,7 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 #if defined(MOD_TRAITS_ANY_BELIEF)
 	MOD_SERIALIZE_READ(46, kStream, m_bAnyBelief, false);
 #endif
+	kStream >> m_bGoldenAgeOnWar;
 	kStream >> m_bBonusReligiousBelief;
 
 	kStream >> m_bAbleToAnnexCityStates;
@@ -4564,6 +4579,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 #if defined(MOD_TRAITS_ANY_BELIEF)
 	MOD_SERIALIZE_WRITE(kStream, m_bAnyBelief);
 #endif
+	kStream << m_bGoldenAgeOnWar;
 	kStream << m_bBonusReligiousBelief;
 	kStream << m_bAbleToAnnexCityStates;
 	kStream << m_bCrossesMountainsAfterGreatGeneral;
