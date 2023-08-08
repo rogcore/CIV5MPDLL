@@ -278,6 +278,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_ppaiResourceYieldChange(NULL),
 	m_ppaiFeatureYieldChange(NULL),
 	m_ppaiSpecialistYieldChange(NULL),
+	m_ppaiImprovementYieldModifier(NULL),
 	m_ppaiResourceYieldModifier(NULL),
 	m_ppaiTerrainYieldChange(NULL),
 #if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
@@ -367,6 +368,7 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiResourceYieldChange);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiFeatureYieldChange);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiSpecialistYieldChange);
+	CvDatabaseUtility::SafeDelete2DArray(m_ppaiImprovementYieldModifier);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiResourceYieldModifier);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiTerrainYieldChange);
 
@@ -1227,6 +1229,30 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 			const int yield = pResults->GetInt(2);
 
 			m_ppaiSpecialistYieldChange[SpecialistID][YieldID] = yield;
+		}
+	}
+
+
+	//ResourceYieldModifiers
+	{
+		kUtility.Initialize2DArray(m_ppaiImprovementYieldModifier, "Improvements", "Yields");
+
+		std::string strKey("Building_ImprovementYieldModifiers");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Improvements.ID as ImprovementID, Yields.ID as YieldID, Yield from Building_ImprovementYieldModifiers inner join Improvements on Improvements.Type = ImprovementType inner join Yields on Yields.Type = YieldType where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType);
+
+		while (pResults->Step())
+		{
+			const int ImprovementID = pResults->GetInt(0);
+			const int YieldID = pResults->GetInt(1);
+			const int yield = pResults->GetInt(2);
+
+			m_ppaiImprovementYieldModifier[ImprovementID][YieldID] = yield;
 		}
 	}
 
@@ -3277,6 +3303,25 @@ int* CvBuildingEntry::GetSpecialistYieldChangeArray(int i) const
 	CvAssertMsg(i < GC.getNumSpecialistInfos(), "Index out of bounds");
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_ppaiSpecialistYieldChange[i];
+}
+
+
+/// Modifier to Improvement yield
+int CvBuildingEntry::GetImprovementYieldModifier(int i, int j) const
+{
+	CvAssertMsg(i < GC.getNumImprovementInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(j > -1, "Index out of bounds");
+	return m_ppaiImprovementYieldModifier ? m_ppaiImprovementYieldModifier[i][j] : -1;
+}
+
+/// Array of modifiers to Improvement yield
+int* CvBuildingEntry::GetImprovementYieldModifierArray(int i) const
+{
+	CvAssertMsg(i < GC.getNumImprovementInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_ppaiImprovementYieldModifier[i];
 }
 
 /// Modifier to resource yield
