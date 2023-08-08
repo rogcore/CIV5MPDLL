@@ -330,6 +330,7 @@ CvCity::CvCity() :
 	, m_aiYieldRateModifier("CvCity::m_aiYieldRateModifier", m_syncArchive)
 	, m_aiYieldPerPop("CvCity::m_aiYieldPerPop", m_syncArchive)
 	, m_aiPowerYieldRateModifier("CvCity::m_aiPowerYieldRateModifier", m_syncArchive)
+	, m_aiImprovementYieldRateModifier("CvCity::m_aiImprovementYieldRateModifier", m_syncArchive)
 	, m_aiResourceYieldRateModifier("CvCity::m_aiResourceYieldRateModifier", m_syncArchive)
 	, m_aiExtraSpecialistYield("CvCity::m_aiExtraSpecialistYield", m_syncArchive)
 	, m_aiProductionToYieldModifier("CvCity::m_aiProductionToYieldModifier", m_syncArchive)
@@ -386,6 +387,7 @@ CvCity::CvCity() :
 #endif
 		, m_paiNumTerrainWorked()
 		, m_paiNumFeaturelessTerrainWorked()
+		, m_paiNumImprovementWorked()
 		, m_paiNumFeatureWorked()
 		, m_iNumNearbyMountains()
 		, m_iAdditionalFood()
@@ -1141,6 +1143,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_aiYieldPerReligion.resize(NUM_YIELD_TYPES);
 	m_aiYieldRateModifier.resize(NUM_YIELD_TYPES);
 	m_aiPowerYieldRateModifier.resize(NUM_YIELD_TYPES);
+	m_aiImprovementYieldRateModifier.resize(NUM_YIELD_TYPES);
 	m_aiResourceYieldRateModifier.resize(NUM_YIELD_TYPES);
 	m_aiExtraSpecialistYield.resize(NUM_YIELD_TYPES);
 	m_aiProductionToYieldModifier.resize(NUM_YIELD_TYPES);
@@ -1160,6 +1163,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		m_aiYieldPerReligion[iI] = 0;
 		m_aiYieldRateModifier.setAt(iI, 0);
 		m_aiPowerYieldRateModifier.setAt(iI, 0);
+		m_aiImprovementYieldRateModifier.setAt(iI, 0);
 		m_aiResourceYieldRateModifier.setAt(iI, 0);
 		m_aiExtraSpecialistYield.setAt(iI, 0);
 		m_aiProductionToYieldModifier.setAt(iI, 0);
@@ -1274,6 +1278,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 
 
 		int iNumTerrainInfos = GC.getNumTerrainInfos();
+		int iNumImprovementInfos = GC.getNumImprovementInfos();
 		int iNumFeatureInfos = GC.getNumFeatureInfos();
 		int iNumResourceInfos = GC.getNumResourceInfos();
 
@@ -1285,6 +1290,13 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		{
 			m_paiNumTerrainWorked[iI] = 0;
 			m_paiNumFeaturelessTerrainWorked[iI] = 0;
+		}
+
+		m_paiNumImprovementWorked.clear();
+		m_paiNumImprovementWorked.resize(iNumImprovementInfos);
+		for (iI = 0; iI < iNumImprovementInfos; iI++)
+		{
+			m_paiNumImprovementWorked[iI] = 0;
 		}
 
 		m_paiNumFeatureWorked.clear();
@@ -1346,7 +1358,6 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 			m_paiFreeSpecialistCount.setAt(iI, 0);
 		}
 
-		int iNumImprovementInfos = GC.getNumImprovementInfos();
 		CvAssertMsg((0 < iNumImprovementInfos),  "GC.getNumImprovementInfos() is not greater than zero but an array is being allocated in CvCity::reset");
 		m_paiImprovementFreeSpecialists.clear();
 		m_paiImprovementFreeSpecialists.resize(iNumImprovementInfos);
@@ -6730,6 +6741,25 @@ void CvCity::conscript()
 }
 
 
+int CvCity::getImprovementYieldRateModifier(YieldTypes eIndex, ImprovementTypes eImprovement) const
+{
+	VALIDATE_OBJECT
+	int iModifier = 0;
+
+	for (int iI = 0; iI < GC.getNumBuildingInfos(); iI++)
+	{
+		const BuildingTypes eBuilding = static_cast<BuildingTypes>(iI);
+		CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(eBuilding);
+		if (pkBuildingInfo)
+		{
+			iModifier += m_pCityBuildings->GetNumActiveBuilding(eBuilding) * pkBuildingInfo->GetImprovementYieldModifier(eImprovement, eIndex);
+		}
+	}
+
+	return iModifier;
+}
+
+
 //	--------------------------------------------------------------------------------
 int CvCity::getResourceYieldRateModifier(YieldTypes eIndex, ResourceTypes eResource) const
 {
@@ -6747,6 +6777,20 @@ int CvCity::getResourceYieldRateModifier(YieldTypes eIndex, ResourceTypes eResou
 	}
 
 	return iModifier;
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::processImprovement(ImprovementTypes eImprovement, int iChange)
+{
+	VALIDATE_OBJECT
+
+		// Yield modifier for having a local resource
+		for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
+		{
+			const YieldTypes eYield = static_cast<YieldTypes>(iI);
+			changeImprovementYieldRateModifier(eYield, (getImprovementYieldRateModifier(eYield, eImprovement) * iChange));
+			UpdateCityYields(eYield);
+		}
 }
 
 
@@ -7199,6 +7243,8 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		{
 			eResource = (ResourceTypes) iResourceLoop;
 
+
+
 			// Does this building add resources?
 			int iNumResource = pBuildingInfo->GetResourceQuantity(iResourceLoop) * iChange;
 			if(iNumResource != 0)
@@ -7353,6 +7399,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			}
 #if defined(MOD_ROG_CORE)
 
+
 			if ((pBuildingInfo->GetYieldFromUnitProduction(eYield) > 0))
 			{
 				ChangeYieldFromUnitProduction(eYield, pBuildingInfo->GetYieldFromUnitProduction(eYield) * iChange);
@@ -7455,6 +7502,18 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			for (int iJ = 0; iJ < GC.getNumImprovementInfos(); iJ++)
 			{
 				ChangeImprovementExtraYield(((ImprovementTypes)iJ), eYield, (GC.getBuildingInfo(eBuilding)->GetImprovementYieldChange(iJ, eYield) * iChange));
+
+#if defined(MOD_IMPROVEMENT_FUNCTION)
+				if (MOD_IMPROVEMENT_FUNCTION)
+				{
+					int iYieldMod = pBuildingInfo->GetImprovementYieldModifier(((ImprovementTypes)iJ), eYield);
+					if (iYieldMod != 0)
+					{
+						iYieldMod *= GetNumImprovementWorked(((ImprovementTypes)iJ));
+						changeImprovementYieldRateModifier(eYield, iYieldMod * iChange);
+					}
+				}
+#endif
 			}
 #endif
 
@@ -11585,6 +11644,12 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 		GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD", iTempMod);
 
 
+	// Improvement Yield Rate Modifier
+	iTempMod = getImprovementYieldRateModifier(eIndex);
+	iModifier += iTempMod;
+	if (toolTipSink)
+		GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_IMPROVEMENT", iTempMod);
+
 	// project Yield Rate Modifier
 	iTempMod = getResourceYieldRateModifier(eIndex);
 	iModifier += iTempMod;
@@ -12773,6 +12838,32 @@ void CvCity::changeYieldRateModifier(YieldTypes eIndex, int iChange)
 }
 
 
+
+//	--------------------------------------------------------------------------------
+int CvCity::getImprovementYieldRateModifier(YieldTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	return m_aiImprovementYieldRateModifier[eIndex];
+}
+
+
+//	--------------------------------------------------------------------------------
+void CvCity::changeImprovementYieldRateModifier(YieldTypes eIndex, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+
+	if (iChange != 0)
+	{
+		m_aiImprovementYieldRateModifier.setAt(eIndex, m_aiImprovementYieldRateModifier[eIndex] + iChange);
+		CvAssert(getYieldRate(eIndex, false) >= 0);
+
+		GET_PLAYER(getOwner()).invalidateYieldRankCache(eIndex);
+	}
+}
 
 
 //	--------------------------------------------------------------------------------
@@ -17573,6 +17664,7 @@ void CvCity::read(FDataStream& kStream)
 	}
 	kStream >> m_aiYieldRateModifier;
 	kStream >> m_aiPowerYieldRateModifier;
+	kStream >> m_aiImprovementYieldRateModifier;
 	kStream >> m_aiResourceYieldRateModifier;
 	kStream >> m_aiExtraSpecialistYield;
 	kStream >> m_aiProductionToYieldModifier;
@@ -17780,7 +17872,8 @@ void CvCity::read(FDataStream& kStream)
 
 	kStream >> m_yieldChanges;
 	kStream >> m_paiNumTerrainWorked;
-	kStream >> m_paiNumFeaturelessTerrainWorked;
+	kStream >> m_paiNumFeaturelessTerrainWorked;	
+	kStream >> m_paiNumImprovementWorked;
 	kStream >> m_paiNumFeatureWorked;
 	kStream >> m_iNumNearbyMountains;
 	kStream >> m_iAdditionalFood;
@@ -17993,6 +18086,7 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_aiYieldPerReligion;
 	kStream << m_aiYieldRateModifier;
 	kStream << m_aiPowerYieldRateModifier;
+	kStream << m_aiImprovementYieldRateModifier;
 	kStream << m_aiResourceYieldRateModifier;
 	kStream << m_aiExtraSpecialistYield;
 	kStream << m_aiProductionToYieldModifier;
@@ -18125,6 +18219,7 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_yieldChanges;
 	kStream << m_paiNumTerrainWorked;
 	kStream << m_paiNumFeaturelessTerrainWorked;
+	kStream << m_paiNumImprovementWorked;
 	kStream << m_paiNumFeatureWorked;
 	kStream << m_iNumNearbyMountains;
 	kStream << m_iAdditionalFood;
@@ -21482,10 +21577,29 @@ void CvCity::ChangeNumFeatureWorked(FeatureTypes eFeature, int iChange)
 
 
 //	--------------------------------------------------------------------------------
+int CvCity::GetNumImprovementWorked(ImprovementTypes eImprovement)
+{
+	CvAssertMsg(eImprovement >= 0, "eImprovement is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eImprovement < GC.getNumImprovementInfos(), "eImprovement is expected to be within maximum bounds (invalid Index)");
+	return m_paiNumImprovementWorked[eImprovement];
+}
+//	--------------------------------------------------------------------------------
+void CvCity::ChangeNumImprovementWorked(ImprovementTypes eImprovement, int iChange)
+{
+	CvAssertMsg(eImprovement >= 0, "eImprovement is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eImprovement < GC.getNumImprovementInfos(), "eImprovement is expected to be within maximum bounds (invalid Index)");
+	m_paiNumImprovementWorked[eImprovement] = m_paiNumImprovementWorked[eImprovement] + iChange;
+	CvAssert(GetNumImprovementWorked(eImprovement) >= 0);
+
+	processImprovement(eImprovement, iChange);
+}
+
+
+//	--------------------------------------------------------------------------------
 void CvCity::SetYieldPerXTerrain(TerrainTypes eTerrain, YieldTypes eYield, int iValue)
 {
 	VALIDATE_OBJECT
-		CvAssertMsg(eTerrain > -1 && eTerrain < GC.getNumTerrainInfos(), "Invalid Terrain index.");
+	CvAssertMsg(eTerrain > -1 && eTerrain < GC.getNumTerrainInfos(), "Invalid Terrain index.");
 	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
 
 	SCityExtraYields& y = m_yieldChanges[eYield];
@@ -21558,7 +21672,7 @@ void CvCity::ChangeYieldPerXFeatureFromBuildingsTimes100(FeatureTypes eFeature, 
 int CvCity::GetYieldPerXFeature(FeatureTypes eFeature, YieldTypes eYield) const
 {
 	VALIDATE_OBJECT
-		CvAssertMsg(eFeature > -1 && eFeature < GC.getNumFeatureInfos(), "Invalid Terrain index.");
+    CvAssertMsg(eFeature > -1 && eFeature < GC.getNumFeatureInfos(), "Invalid Terrain index.");
 	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
 
 	return ModifierLookup(m_yieldChanges[eYield].forXFeature, eFeature);
@@ -21569,7 +21683,7 @@ int CvCity::GetYieldPerXFeature(FeatureTypes eFeature, YieldTypes eYield) const
 void CvCity::SetYieldPerXFeature(FeatureTypes eFeature, YieldTypes eYield, int iValue)
 {
 	VALIDATE_OBJECT
-		CvAssertMsg(eFeature > -1 && eFeature < GC.getNumFeatureInfos(), "Invalid Feature index.");
+	CvAssertMsg(eFeature > -1 && eFeature < GC.getNumFeatureInfos(), "Invalid Feature index.");
 	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
 
 	SCityExtraYields& y = m_yieldChanges[eYield];
@@ -21678,6 +21792,10 @@ void CvCity::UpdateYieldPerXFeature(YieldTypes eYield, FeatureTypes eFeature)
 	}
 }
 #endif
+
+
+
+
 
 
 FDataStream& operator<<(FDataStream& saveTo, const SCityExtraYields& readFrom)
