@@ -175,5 +175,9 @@ ALTER TABLE UnitPromotions ADD 'ImmuePlague' BOOLEAN DEFAULT 0;
 
 ALTER TABLE Units ADD COLUMN 'UnitTechUpgrade' BOOLEAN DEFAULT 0;
 
-
 ALTER TABLE Features ADD  'Volcano'  boolean default 0;
+
+ALTER TABLE Policies ADD COLUMN 'DefenseBoostAllCities' INTEGER DEFAULT 0;
+ALTER TABLE Policies ADD COLUMN 'FreePopulation' INTEGER DEFAULT 0;
+ALTER TABLE Policies ADD COLUMN 'FreePopulationCapital' INTEGER DEFAULT 0;
+ALTER TABLE Traits ADD COLUMN 'GoldenAgeOnWar' BOOLEAN DEFAULT 0;

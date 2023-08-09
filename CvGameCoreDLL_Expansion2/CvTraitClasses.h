@@ -162,6 +162,7 @@ public:
 #if defined(MOD_TRAITS_ANY_BELIEF)
 	bool IsAnyBelief() const;
 #endif
+	bool IsGoldenAgeOnWar() const;
 	bool IsBonusReligiousBelief() const;
 	bool IsAbleToAnnexCityStates() const;
 	bool IsCrossesMountainsAfterGreatGeneral() const;
@@ -400,6 +401,7 @@ protected:
 #if defined(MOD_TRAITS_ANY_BELIEF)
 	bool m_bAnyBelief;
 #endif
+	bool m_bGoldenAgeOnWar;
 	bool m_bBonusReligiousBelief;
 	bool m_bAbleToAnnexCityStates;
 	bool m_bCrossesMountainsAfterGreatGeneral;
@@ -927,6 +929,10 @@ public:
 		return m_bAnyBelief;
 	};
 #endif
+	bool IsGoldenAgeOnWar() const
+	{
+		return m_bGoldenAgeOnWar;
+	};
 	bool IsBonusReligiousBelief() const
 	{
 		return m_bBonusReligiousBelief;
@@ -1272,6 +1278,7 @@ private:
 #if defined(MOD_TRAITS_ANY_BELIEF)
 	bool m_bAnyBelief;
 #endif
+	bool m_bGoldenAgeOnWar;
 	bool m_bBonusReligiousBelief;
 	bool m_bAbleToAnnexCityStates;
 	bool m_bCrossesMountainsAfterGreatGeneral;

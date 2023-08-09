@@ -1312,6 +1312,9 @@ public:
 
 	int GetImprovementExtraYield(ImprovementTypes eImprovement, YieldTypes eYield) const;
 	void ChangeImprovementExtraYield(ImprovementTypes eImprovement, YieldTypes eYield, int iChange);
+
+	int GetYieldFromPillage(YieldTypes eIndex) const;
+	void ChangeYieldFromPillage(YieldTypes eIndex, int iChange);
 #endif
 
 	// Science
@@ -2484,6 +2487,7 @@ protected:
 
 #if defined(MOD_ROG_CORE)
 	std::vector< Firaxis::Array<int, NUM_YIELD_TYPES > > m_ppiImprovementYieldChange;
+	std::vector<int> m_aiYieldFromPillage;
 #endif
 
 #if defined(MOD_API_UNIFIED_YIELDS)

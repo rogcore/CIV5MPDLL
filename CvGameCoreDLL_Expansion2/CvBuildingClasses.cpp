@@ -752,7 +752,6 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	kUtility.SetYields(m_piYieldChangeWorldWonder, "Building_YieldChangeWorldWonder", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldChangeWorldWonderGlobal, "Building_YieldChangeWorldWonderGlobal", "BuildingType", szBuildingType);
 	kUtility.PopulateArrayByValue(m_piResourceQuantityFromPOP, "Resources", "Building_ResourceQuantityFromPOP", "ResourceType", "BuildingType", szBuildingType, "Modifier");
-
 #endif
 
 	//ResourceYieldChanges
@@ -3227,6 +3226,7 @@ int CvBuildingEntry::GetSpecificGreatPersonRateModifier(int i) const
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_paiSpecificGreatPersonRateModifier ? m_paiSpecificGreatPersonRateModifier[i] : -1;
 }
+
 #endif
 
 /// Can it only built if there is a building of this class in the city?

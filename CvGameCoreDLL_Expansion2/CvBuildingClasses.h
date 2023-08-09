@@ -596,10 +596,8 @@ private:
 
 #if defined(MOD_ROG_CORE)
 	int* m_paiSpecificGreatPersonRateModifier;
-
 	int* m_piYieldChangeWorldWonder;
 	int* m_piYieldChangeWorldWonderGlobal;
-
 	int* m_piResourceQuantityFromPOP;
 #endif
 

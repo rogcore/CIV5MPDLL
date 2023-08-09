@@ -360,6 +360,7 @@ CvPlayer::CvPlayer() :
 	, m_iMoveAfterCreated(0)
 
 #if defined(MOD_ROG_CORE)
+	, m_aiYieldFromPillage()
 	, m_iGlobalCityStrengthMod("CvPlayer::m_iGlobalCityStrengthMod", m_syncArchive)
 	, m_iGlobalRangedStrikeModifier("CvPlayer::m_iGlobalRangedStrikeModifier", m_syncArchive)
 #endif
@@ -1239,6 +1240,8 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 #ifdef MOD_ROG_CORE
 	m_aiWorldWonderCityYieldRateModifier.clear();
 	m_aiWorldWonderCityYieldRateModifier.resize(NUM_YIELD_TYPES, 0);
+	m_aiYieldFromPillage.clear();
+	m_aiYieldFromPillage.resize(NUM_YIELD_TYPES, 0);
 #endif
 	m_aiYieldModifierFromActiveSpies.clear();
 	m_aiYieldModifierFromActiveSpies.resize(NUM_YIELD_TYPES, 0);
@@ -9699,12 +9702,8 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	changeSpaceProductionModifier(pBuildingInfo->GetGlobalSpaceProductionModifier() * iChange);
 
 
-	
-
-
 	for(iI = 0; iI < NUM_YIELD_TYPES; iI++)
 	{
-
 		for (iJ = 0; iJ < GC.getNumFeatureInfos(); iJ++)
 		{
 			changeFeatureYieldChange(((FeatureTypes)iJ), ((YieldTypes)iI), (pBuildingInfo->GetFeatureYieldChangesGlobal(iJ, iI) * iChange));
@@ -9713,8 +9712,6 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 		{
 			changeTerrainYieldChange(((TerrainTypes)iJ), ((YieldTypes)iI), (pBuildingInfo->GetTerrainYieldChangesGlobal(iJ, iI) * iChange));
 		}
-
-
 
 		pArea->changeYieldRateModifier(GetID(), ((YieldTypes)iI), (pBuildingInfo->GetAreaYieldModifier(iI) * iChange));
 		changeYieldRateModifier(((YieldTypes)iI), (pBuildingInfo->GetGlobalYieldModifier(iI) * iChange));
@@ -19911,6 +19908,33 @@ void CvPlayer::ChangeImprovementExtraYield(ImprovementTypes eImprovement, YieldT
 		updateYield();
 	}
 }
+int CvPlayer::GetYieldFromPillage(YieldTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	return m_aiYieldFromPillage[eIndex];
+}
+
+//	--------------------------------------------------------------------------------
+/// Extra yield from building
+void CvPlayer::ChangeYieldFromPillage(YieldTypes eIndex, int iChange)
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+
+	if (iChange != 0)
+	{
+		m_aiYieldFromPillage[eIndex] = m_aiYieldFromPillage[eIndex] + iChange;
+
+		invalidateYieldRankCache(eIndex);
+
+		if (getTeam() == GC.getGame().getActiveTeam())
+		{
+			GC.GetEngineUserInterface()->setDirty(CityInfo_DIRTY_BIT, true);
+		}
+	}
+}
 #endif
 
 //	--------------------------------------------------------------------------------
@@ -25253,6 +25277,28 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	ChangeStrategicResourceMod(pPolicy->GetStrategicResourceMod() * iChange);
 	ChangeAbleToAnnexCityStatesCount((pPolicy->IsAbleToAnnexCityStates()) ? iChange : 0);
 
+
+	int iLoop = 0;
+	CvCity* pLoopCity = NULL;
+	for (pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
+	{
+		if (pPolicy->GetFreePopulation() > 0)
+		{
+			pLoopCity->changePopulation(pPolicy->GetFreePopulation(), true);
+		}
+		if (pPolicy->GetFreePopulationCapital() > 0 && pLoopCity->isCapital())
+		{
+			pLoopCity->changePopulation(pPolicy->GetFreePopulationCapital(), true);
+		}
+
+		if (pPolicy->GetDefenseBoost() != 0)
+		{
+			pLoopCity->updateStrengthValue();
+		}
+	}
+
+
+
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
 	ChangeWarCasualtiesModifier(pPolicy->GetWarCasualtiesModifier() * iChange);
 #endif
@@ -25460,9 +25506,8 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 			ChangeFreePromotionCount(ePromotion, iChange);
 	}
 
-	CvCity* pLoopCity;
-	PlayerTypes ePlayer;
 
+	PlayerTypes ePlayer;
 	// All player Capital Locations Revealed
 	if(pPolicy->IsRevealAllCapitals())
 	{
@@ -25544,7 +25589,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	bool bCulturePerGarrisonedUnit = pPolicy->GetCulturePerGarrisonedUnit();
 
 	// Loop through Cities
-	int iLoop;
+
 	for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
 	{
 		if(iNumCitiesFreeCultureBuilding > 0)
@@ -26831,6 +26876,7 @@ void CvPlayer::Read(FDataStream& kStream)
 
 #ifdef MOD_ROG_CORE
 	kStream >> m_aiWorldWonderCityYieldRateModifier;
+	kStream >> m_aiYieldFromPillage;
 #endif
 
 	kStream >> m_aiYieldModifierFromActiveSpies;
@@ -27472,6 +27518,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 
 #ifdef MOD_ROG_CORE
 	kStream << m_aiWorldWonderCityYieldRateModifier;
+	kStream << m_aiYieldFromPillage;
 #endif
 	kStream << m_aiYieldModifierFromActiveSpies;
 	kStream << m_aiCoastalCityYieldChange;
