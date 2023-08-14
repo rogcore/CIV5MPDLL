@@ -273,7 +273,8 @@ CvPlayer::CvPlayer() :
 	, m_iFreeExperienceFromMinors("CvPlayer::m_iFreeExperienceFromMinors", m_syncArchive)
 	, m_iFeatureProductionModifier("CvPlayer::m_iFeatureProductionModifier", m_syncArchive)
 	, m_iWorkerSpeedModifier("CvPlayer::m_iWorkerSpeedModifier", m_syncArchive)
-#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+#if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	, m_iNumTradeRouteBonus("CvPlayer::m_iNumTradeRouteBonus", m_syncArchive)
 	, m_iWaterBuildSpeedModifier("CvPlayer::m_iWaterBuildSpeedModifier", m_syncArchive)
 	, m_iSettlerProductionEraModifier("CvPlayer::m_iSettlerProductionEraModifier", m_syncArchive)
 	, m_iSettlerProductionStartEra("CvPlayer::m_iSettlerProductionStartEra", m_syncArchive)
@@ -1034,7 +1035,8 @@ void CvPlayer::uninit()
 	m_iFreeExperienceFromMinors = 0;
 	m_iFeatureProductionModifier = 0;
 	m_iWorkerSpeedModifier = 0;
-#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+#if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	m_iNumTradeRouteBonus = 0;
 	m_iWaterBuildSpeedModifier = 0;
 	m_iSettlerProductionEraModifier = 0;
 	m_iSettlerProductionStartEra = NO_ERA;
@@ -9701,6 +9703,8 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 
 	changeSpaceProductionModifier(pBuildingInfo->GetGlobalSpaceProductionModifier() * iChange);
 
+	changeNumTradeRouteBonus(pBuildingInfo->GetNumTradeRouteBonus() * iChange);
+
 
 	for(iI = 0; iI < NUM_YIELD_TYPES; iI++)
 	{
@@ -16224,14 +16228,22 @@ void CvPlayer::changeWorkerSpeedModifier(int iChange)
 
 
 //	--------------------------------------------------------------------------------
-#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
-int CvPlayer::getWaterBuildSpeedModifier() const
+#if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+int CvPlayer::getNumTradeRouteBonus() const
 {
-	return m_iWaterBuildSpeedModifier;
+	return m_iNumTradeRouteBonus > 0 ? m_iNumTradeRouteBonus : 0;
+}
+void CvPlayer::changeNumTradeRouteBonus(int iChange)
+{
+	m_iNumTradeRouteBonus += iChange;
 }
 
 
 //	--------------------------------------------------------------------------------
+int CvPlayer::getWaterBuildSpeedModifier() const
+{
+	return m_iWaterBuildSpeedModifier;
+}
 void CvPlayer::changeWaterBuildSpeedModifier(int iChange)
 {
 	m_iWaterBuildSpeedModifier += iChange;
@@ -21892,10 +21904,12 @@ void CvPlayer::ChangeFreePromotionCount(PromotionTypes ePromotion, int iChange)
 					pLoopUnit->setHasPromotion(ePromotion, true);
 				}
 
+#if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
 				else if (::IsPromotionValidForUnitPromotions(ePromotion, *pLoopUnit))
 				{
 					pLoopUnit->setHasPromotion(ePromotion, true);
 				}
+#endif
 			}
 		}
 	}
@@ -24732,6 +24746,15 @@ int CvPlayer::getAdvancedStartBuildingCost(BuildingTypes eBuilding, bool bAdd, C
 										return -1;
 									}
 								}
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+								if(pkBuildingLoopInfo->IsBuildingClassNeededGlobal(iBuildingClassPrereqLoop))
+								{
+									if((BuildingTypes)(getCivilizationInfo().getCivilizationBuildings(iBuildingClassPrereqLoop)) == eBuilding && getNumBuildings(eBuilding) == 1)
+									{
+										return -1;
+									}
+								}
+#endif
 							}
 						}
 					}
@@ -25204,7 +25227,8 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	ChangeGoldenAgeMeterMod(pPolicy->GetGoldenAgeMeterMod() * iChange);
 	changeGoldenAgeModifier(pPolicy->GetGoldenAgeDurationMod() * iChange);
 	changeWorkerSpeedModifier(pPolicy->GetWorkerSpeedModifier() * iChange);
-#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+#if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	changeNumTradeRouteBonus(pPolicy->GetNumTradeRouteBonus() * iChange);
 	changeWaterBuildSpeedModifier(pPolicy->GetWaterBuildSpeedModifier() * iChange);
 	setSettlerProductionEraModifier(pPolicy->GetSettlerProductionEraModifier() * iChange);
 	setSettlerProductionStartEra(pPolicy->GetSettlerProductionStartEra() * iChange);
@@ -26661,7 +26685,8 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iFreeExperienceFromMinors;
 	kStream >> m_iFeatureProductionModifier;
 	kStream >> m_iWorkerSpeedModifier;
-#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+#if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	kStream >> m_iNumTradeRouteBonus;
 	kStream >> m_iWaterBuildSpeedModifier;
 	kStream >> m_iSettlerProductionEraModifier;
 	kStream >> m_iSettlerProductionStartEra;
@@ -27349,7 +27374,8 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iFreeExperienceFromMinors;
 	kStream << m_iFeatureProductionModifier;
 	kStream << m_iWorkerSpeedModifier;
-#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+#if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	kStream << m_iNumTradeRouteBonus;
 	kStream << m_iWaterBuildSpeedModifier;
 	kStream << m_iSettlerProductionEraModifier;
 	kStream << m_iSettlerProductionStartEra;

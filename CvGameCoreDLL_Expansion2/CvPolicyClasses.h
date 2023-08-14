@@ -73,7 +73,8 @@ public:
 	int GetCapitalUnhappinessMod() const;
 	int GetFreeExperience() const;
 	int GetWorkerSpeedModifier() const;
-#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+#if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	int GetNumTradeRouteBonus() const;
 	int GetWaterBuildSpeedModifier() const;
 	int GetSettlerProductionEraModifier() const;
 	int GetSettlerProductionStartEra() const;
@@ -360,7 +361,8 @@ private:
 	int m_iCapitalUnhappinessMod;
 	int m_iFreeExperience;
 	int m_iWorkerSpeedModifier;
-#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+#if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	int m_iNumTradeRouteBonus;
 	int m_iWaterBuildSpeedModifier;
 	int m_iSettlerProductionEraModifier;
 	int m_iSettlerProductionStartEra;
