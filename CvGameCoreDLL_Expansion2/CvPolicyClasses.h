@@ -274,6 +274,9 @@ public:
 	int GetDefenseBoost() const;
 	int GetFreePopulation() const;
 	int GetFreePopulationCapital() const;
+	int GetExtraSpies() const;
+	int GetGreatScientistBeakerPolicyModifier() const;
+	int GetProductionBeakerMod() const;
 	bool IsOneShot() const;
 	bool IncludesOneShotFreeUnits() const;
 
@@ -483,6 +486,9 @@ private:
 	int m_iDefenseBoost;
 	int m_iFreePopulation;
 	int m_iFreePopulationCapital;
+	int m_iExtraSpies;
+	int m_iGreatScientistBeakerPolicyModifier;
+	int m_iProductionBeakerMod;
 	bool m_bOneShot;
 	bool m_bIncludesOneShotFreeUnits;
 

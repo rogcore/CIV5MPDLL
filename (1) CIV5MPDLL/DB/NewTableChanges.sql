@@ -180,4 +180,7 @@ ALTER TABLE Features ADD  'Volcano'  boolean default 0;
 ALTER TABLE Policies ADD COLUMN 'DefenseBoostAllCities' INTEGER DEFAULT 0;
 ALTER TABLE Policies ADD COLUMN 'FreePopulation' INTEGER DEFAULT 0;
 ALTER TABLE Policies ADD COLUMN 'FreePopulationCapital' INTEGER DEFAULT 0;
+ALTER TABLE Policies ADD COLUMN 'GreatScientistBeakerPolicyModifier' INTEGER DEFAULT 0; 
+ALTER TABLE Policies ADD COLUMN 'ProductionBeakerMod' INTEGER DEFAULT 0; 
+ALTER TABLE Policies ADD COLUMN 'ExtraSpies' INTEGER DEFAULT 0;
 ALTER TABLE Traits ADD COLUMN 'GoldenAgeOnWar' BOOLEAN DEFAULT 0;

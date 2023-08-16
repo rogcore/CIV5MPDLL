@@ -183,6 +183,9 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_iDefenseBoost(0),
 	m_iFreePopulation(0),
 	m_iFreePopulationCapital(0),
+	m_iExtraSpies(0),
+	m_iGreatScientistBeakerPolicyModifier(0),
+	m_iProductionBeakerMod(0),
 	m_bOneShot(false),
 	m_bIncludesOneShotFreeUnits(false),
 	m_piPrereqOrPolicies(NULL),
@@ -463,6 +466,9 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iDefenseBoost = kResults.GetInt("DefenseBoostAllCities");
 	m_iFreePopulation = kResults.GetInt("FreePopulation");
 	m_iFreePopulationCapital = kResults.GetInt("FreePopulationCapital");
+	m_iExtraSpies = kResults.GetInt("ExtraSpies");
+	m_iGreatScientistBeakerPolicyModifier = kResults.GetInt("GreatScientistBeakerPolicyModifier");
+	m_iProductionBeakerMod = kResults.GetInt("ProductionBeakerMod");
 	m_bOneShot = kResults.GetBool("OneShot");
 	m_bIncludesOneShotFreeUnits = kResults.GetBool("IncludesOneShotFreeUnits");
 
@@ -2167,7 +2173,22 @@ int CvPolicyEntry::GetFreePopulationCapital() const
 {
 	return m_iFreePopulationCapital;
 }
+int CvPolicyEntry::GetExtraSpies() const
+{
+	return m_iExtraSpies;
+}
 
+int CvPolicyEntry::GetGreatScientistBeakerPolicyModifier() const
+{
+	return m_iGreatScientistBeakerPolicyModifier;
+
+}
+
+int CvPolicyEntry::GetProductionBeakerMod() const
+{
+	return m_iProductionBeakerMod;
+
+}
 
 /// Is this a one shot policy effect
 bool CvPolicyEntry::IsOneShot() const

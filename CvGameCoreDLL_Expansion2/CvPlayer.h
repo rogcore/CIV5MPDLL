@@ -827,9 +827,17 @@ public:
 	void recomputeGreatPeopleModifiers();
 	int GetGreatPeopleRateModFromFriendships() const;
 
+	int GetGreatScientistBeakerPolicyMod() const;
+	void SetGreatScientistBeakerPolicyMod(int iValue);
+	void ChangeGreatScientistBeakerPolicyMod(int iChange);
+
 	int GetGreatScientistBeakerMod() const;
 	void SetGreatScientistBeakerMod(int iValue);
 	void ChangeGreatScientistBeakerMod(int iChange);
+
+	int GetProductionBeakerMod() const;
+	void SetProductionBeakerMod(int iValue);
+	void ChangeProductionBeakerMod(int iChange);
 
 	int GetGreatGeneralCombatBonus() const;
 	void SetGreatGeneralCombatBonus(int iValue);
@@ -2235,6 +2243,8 @@ protected:
 	int m_iGreatMerchantRateModifier;
 	int m_iGreatScientistRateModifier;
 	int m_iGreatScientistBeakerModifier;
+	int m_iGreatScientistBeakerPolicyModifier;
+	int m_iProductionBeakerMod;
 	int m_iGreatEngineerRateModifier;
 	int m_iGreatPersonExpendGold;
 	FAutoVariable<int, CvPlayer> m_iMaxGlobalBuildingProductionModifier;
