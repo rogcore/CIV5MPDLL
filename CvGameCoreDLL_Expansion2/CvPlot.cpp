@@ -485,12 +485,19 @@ void CvPlot::doTurn()
 
 							if (pLoopPlot->getImprovementType() != NULL && !pLoopPlot->isCity() && !pLoopPlot->IsImprovementPillaged())
 							{
+								CvImprovementEntry* pkImprovement = GC.getImprovementInfo(pLoopPlot->getImprovementType());
 								pLoopPlot->SetImprovementPillaged(true);
+
+								if (pkImprovement && pkImprovement->IsDestroyedWhenPillaged())
+								{
+									pLoopPlot->setImprovementType(NO_IMPROVEMENT);
+									pLoopPlot->SetImprovementPillaged(false);
+								}
 							}
 							for (int iUnitLoop = 0; iUnitLoop < pLoopPlot->getNumUnits(); iUnitLoop++)
 							{
 								CvUnit* loopUnit = pLoopPlot->getUnitByIndex(iUnitLoop);
-								if (loopUnit != NULL && !loopUnit == DOMAIN_AIR && !loopUnit == DOMAIN_HOVER)
+								if (loopUnit != NULL && loopUnit->getDomainType() != DOMAIN_AIR && loopUnit->getDomainType() != DOMAIN_HOVER)
 								{
 									loopUnit->changeDamage(50);
 								}
@@ -522,12 +529,25 @@ void CvPlot::doTurn()
 
 							if (pLoopPlot->getImprovementType() != NULL && !pLoopPlot->isCity() && !pLoopPlot->IsImprovementPillaged())
 							{
+								CvImprovementEntry* pkImprovement = GC.getImprovementInfo(pLoopPlot->getImprovementType());
 								pLoopPlot->SetImprovementPillaged(true);
+
+								if (pkImprovement && pkImprovement->IsDestroyedWhenPillaged())
+								{
+									pLoopPlot->setImprovementType(NO_IMPROVEMENT);
+									pLoopPlot->SetImprovementPillaged(false);
+								}
 							}
+
+							if (pLoopPlot->isCity())
+							{
+								pLoopPlot->getPlotCity()->changeDamage(0.25 * (pLoopPlot->getPlotCity()->GetMaxHitPoints()));
+							}
+
 							for (int iUnitLoop = 0; iUnitLoop < pLoopPlot->getNumUnits(); iUnitLoop++)
 							{
 								CvUnit* loopUnit = pLoopPlot->getUnitByIndex(iUnitLoop);
-								if (loopUnit != NULL && !loopUnit == DOMAIN_AIR && !loopUnit == DOMAIN_HOVER)
+								if (loopUnit != NULL && loopUnit->getDomainType() != DOMAIN_AIR && loopUnit->getDomainType() != DOMAIN_HOVER)
 								{
 									loopUnit->changeDamage(99);
 								}
@@ -560,12 +580,25 @@ void CvPlot::doTurn()
 
 							if (pLoopPlot->getImprovementType() != NULL && !pLoopPlot->isCity() && !pLoopPlot->IsImprovementPillaged())
 							{
+								CvImprovementEntry* pkImprovement = GC.getImprovementInfo(pLoopPlot->getImprovementType());
 								pLoopPlot->SetImprovementPillaged(true);
+					
+								if (pkImprovement && pkImprovement->IsDestroyedWhenPillaged() )
+								{
+									pLoopPlot->setImprovementType(NO_IMPROVEMENT);
+									pLoopPlot->SetImprovementPillaged(false);
+								}
 							}
+
+							if (pLoopPlot->isCity())
+							{
+								pLoopPlot->getPlotCity()->changeDamage(0.80 * (pLoopPlot->getPlotCity()->GetMaxHitPoints()));
+							}
+
 							for (int iUnitLoop = 0; iUnitLoop < pLoopPlot->getNumUnits(); iUnitLoop++)
 							{
 								CvUnit* loopUnit = pLoopPlot->getUnitByIndex(iUnitLoop);
-								if (loopUnit != NULL && !loopUnit == DOMAIN_AIR && !loopUnit == DOMAIN_HOVER)
+								if (loopUnit != NULL && loopUnit->getDomainType() != DOMAIN_AIR && loopUnit->getDomainType() != DOMAIN_HOVER)
 								{
 									loopUnit->changeDamage(150);
 								}
