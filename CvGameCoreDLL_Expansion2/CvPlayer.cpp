@@ -264,6 +264,8 @@ CvPlayer::CvPlayer() :
 	, m_iDomesticGreatGeneralRateModifier("CvPlayer::m_iDomesticGreatGeneralRateModifier", m_syncArchive)
 	, m_iDomesticGreatGeneralRateModFromBldgs("CvPlayer::m_iDomesticGreatGeneralRateModFromBldgs", m_syncArchive)
 	, m_iGreatScientistBeakerModifier(0)
+	, m_iGreatScientistBeakerPolicyModifier(0)
+	, m_iProductionBeakerMod(0)
 	, m_iGreatPersonExpendGold(0)
 	, m_iMaxGlobalBuildingProductionModifier("CvPlayer::m_iMaxGlobalBuildingProductionModifier", m_syncArchive)
 	, m_iMaxTeamBuildingProductionModifier("CvPlayer::m_iMaxTeamBuildingProductionModifier", m_syncArchive)
@@ -1026,6 +1028,8 @@ void CvPlayer::uninit()
 	m_iGreatMerchantRateModifier = 0;
 	m_iGreatScientistRateModifier = 0;
 	m_iGreatScientistBeakerModifier = 0;
+	m_iGreatScientistBeakerPolicyModifier = 0;
+	m_iProductionBeakerMod = 0;
 	m_iGreatEngineerRateModifier = 0;
 	m_iGreatPersonExpendGold = 0;
 	m_iMaxGlobalBuildingProductionModifier = 0;
@@ -15782,6 +15786,51 @@ void CvPlayer::ChangeGreatScientistBeakerMod(int iChange)
 	SetGreatScientistBeakerMod(GetGreatScientistBeakerMod() + iChange);
 }
 
+
+
+//	--------------------------------------------------------------------------------
+// Do we get extra beakers from using Great Scientists?
+int CvPlayer::GetGreatScientistBeakerPolicyMod() const
+{
+	return m_iGreatScientistBeakerPolicyModifier;
+}
+
+//	--------------------------------------------------------------------------------
+// Do we get extra beakers from using Great Scientists?
+void CvPlayer::SetGreatScientistBeakerPolicyMod(int iValue)
+{
+	m_iGreatScientistBeakerPolicyModifier = iValue;
+}
+
+//	--------------------------------------------------------------------------------
+// Do we get extra beakers from using Great Scientists?
+void CvPlayer::ChangeGreatScientistBeakerPolicyMod(int iChange)
+{
+	SetGreatScientistBeakerPolicyMod(GetGreatScientistBeakerPolicyMod() + iChange);
+}
+
+
+//	--------------------------------------------------------------------------------
+// Do we get extra beakers from using Great Scientists?
+int CvPlayer::GetProductionBeakerMod() const
+{
+	return m_iProductionBeakerMod;
+}
+
+//	--------------------------------------------------------------------------------
+// Do we get extra beakers from using Great Scientists?
+void CvPlayer::SetProductionBeakerMod(int iValue)
+{
+	m_iProductionBeakerMod = iValue;
+}
+
+//	--------------------------------------------------------------------------------
+// Do we get extra beakers from using Great Scientists?
+void CvPlayer::ChangeProductionBeakerMod(int iChange)
+{
+	SetProductionBeakerMod(GetProductionBeakerMod() + iChange);
+}
+
 //////////////////////////////////////////////////////////////////////////
 int CvPlayer::GetGreatGeneralCombatBonus() const
 {
@@ -25327,7 +25376,23 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	ChangeFreeFoodBox(pPolicy->GetFreeFoodBox() * iChange);
 	ChangeStrategicResourceMod(pPolicy->GetStrategicResourceMod() * iChange);
 	ChangeAbleToAnnexCityStatesCount((pPolicy->IsAbleToAnnexCityStates()) ? iChange : 0);
+	ChangeGreatScientistBeakerPolicyMod(pPolicy->GetGreatScientistBeakerPolicyModifier() * iChange);
+	ChangeProductionBeakerMod(pPolicy->GetProductionBeakerMod() * iChange);
 
+	if (pPolicy->GetExtraSpies() > 0)
+	{
+		CvPlayerEspionage* pEspionage = GetEspionage();
+		CvAssertMsg(pEspionage, "pEspionage is null! What's up with that?!");
+		if (pEspionage)
+		{
+			int iNumSpies = pPolicy->GetExtraSpies();
+
+			for (int i = 0; i < iNumSpies; i++)
+			{
+				pEspionage->CreateSpy();
+			}
+		}
+	}
 
 	int iLoop = 0;
 	CvCity* pLoopCity = NULL;
@@ -26695,6 +26760,9 @@ void CvPlayer::Read(FDataStream& kStream)
 	{
 		m_iGreatScientistBeakerModifier = 0;
 	}
+
+	kStream >> m_iGreatScientistBeakerPolicyModifier;
+	kStream >> m_iProductionBeakerMod;
 	if (uiVersion >= 13)
 	{
 		kStream >> m_iGreatEngineerRateModifier;
@@ -27392,6 +27460,8 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iGreatMerchantRateModifier;
 	kStream << m_iGreatScientistRateModifier;
 	kStream << m_iGreatScientistBeakerModifier;
+	kStream << m_iGreatScientistBeakerPolicyModifier;
+	kStream << m_iProductionBeakerMod;
 	kStream << m_iGreatEngineerRateModifier;
 	kStream << m_iGreatPersonExpendGold;
 	kStream << m_iMaxGlobalBuildingProductionModifier;

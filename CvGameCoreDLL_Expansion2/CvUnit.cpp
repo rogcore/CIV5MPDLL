@@ -10165,9 +10165,9 @@ int CvUnit::getDiscoverAmount()
 			// Beakers boost based on previous turns
 			int iPreviousTurnsToCount = m_pUnitInfo->GetBaseBeakersTurnsToCount();
 			iValue = pPlayer->GetScienceYieldFromPreviousTurns(GC.getGame().getGameTurn(), iPreviousTurnsToCount);
-			if (pPlayer->GetGreatScientistBeakerMod() != 0)
+			if (pPlayer->GetGreatScientistBeakerMod() != 0 ||  pPlayer->GetGreatScientistBeakerPolicyMod() != 0)
 			{
-				iValue += (iValue * pPlayer->GetGreatScientistBeakerMod()) / 100;
+				iValue += (iValue * (pPlayer->GetGreatScientistBeakerMod() + pPlayer->GetGreatScientistBeakerPolicyMod()) ) / 100;
 				iValue = MAX(iValue, 0); // Cannot be negative
 			}
 
@@ -10335,9 +10335,17 @@ int CvUnit::getMaxHurryProduction(CvCity* pCity) const
 
 	iProduction = (m_pUnitInfo->GetBaseHurry() + (m_pUnitInfo->GetHurryMultiplier() * pCity->getPopulation()));
 
-	iProduction *= GC.getGame().getGameSpeedInfo().getUnitHurryPercent();
-	iProduction /= 100;
-
+	CvPlayer* pPlayer = &GET_PLAYER(getOwner());
+	CvAssertMsg(pPlayer, "Owner of unit not expected to be NULL. Please send Anton your save file and version.");
+	if (pPlayer)
+	{
+		if (pPlayer->GetProductionBeakerMod() != 0)
+		{
+			iProduction += (iProduction * pPlayer->GetProductionBeakerMod()) / 100;
+		}
+		iProduction *= GC.getGame().getGameSpeedInfo().getUnitHurryPercent();
+		iProduction /= 100;
+	}
 	return std::max(0, iProduction);
 }
 
