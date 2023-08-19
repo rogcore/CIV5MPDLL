@@ -381,9 +381,11 @@ CvCity::CvCity() :
 	, m_bOwedCultureBuilding(false)
 
 	, m_yieldChanges(NUM_YIELD_TYPES)
-
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
+	   , m_ppiResourceFromImprovement()
+#endif
 #if defined(MOD_BUGFIX_FREE_FOOD_BUILDING)
-	, m_bOwedFoodBuilding(false)
+	    , m_bOwedFoodBuilding(false)
 #endif
 		, m_paiNumTerrainWorked()
 		, m_paiNumFeaturelessTerrainWorked()
@@ -972,6 +974,9 @@ void CvCity::uninit()
 #endif
 
 	m_yieldChanges.clear();
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES) 
+	m_ppiResourceFromImprovement.clear();
+#endif
 }
 
 //	--------------------------------------------------------------------------------
@@ -1403,6 +1408,10 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		}
 
 	}
+
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
+	m_ppiResourceFromImprovement.clear();
+#endif
 
 	m_yieldChanges = vector<SCityExtraYields>(NUM_YIELD_TYPES);
 
@@ -7249,6 +7258,35 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 				GET_PLAYER(ePlayer).GetEspionage()->UpdateCity(this);
 			}
 		}
+
+
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
+		if (MOD_BUILDING_IMPROVEMENT_RESOURCES)
+		{
+			std::multimap<int, std::pair<int, int>> piiResourceFromImprovement = pBuildingInfo->GetResourceFromImprovementArray();
+			if (piiResourceFromImprovement.empty() == false)
+			{
+				for (std::multimap<int, std::pair<int, int>>::const_iterator it = piiResourceFromImprovement.begin(); it != piiResourceFromImprovement.end(); ++it)
+				{
+					if (it->first >= 0 && it->first < GC.getNumResourceInfos() && it->second.first >= 0 && it->second.first < GC.getNumImprovementInfos())
+					{
+						int OldNum = GetResourceFromImprovement((ResourceTypes)it->first, (ImprovementTypes)it->second.first);
+
+						ChangeResourceFromImprovement((ResourceTypes)it->first, (ImprovementTypes)it->second.first, it->second.second * iChange);
+
+						int NewNum = GetResourceFromImprovement((ResourceTypes)it->first, (ImprovementTypes)it->second.first);
+
+						int iNumResource = (NewNum - OldNum ) * CountUnPillagedImprovement((ImprovementTypes)it->second.first);
+
+						if (iNumResource != 0)
+						{
+							owningPlayer.changeNumResourceTotal((ResourceTypes)it->first, iNumResource);
+						}
+					}
+				}
+			}
+		}
+#endif
 
 		// Resource loop
 		int iCulture, iFaith;
@@ -17992,6 +18030,9 @@ void CvCity::read(FDataStream& kStream)
 #endif
 
 	kStream >> m_yieldChanges;
+#ifdef MOD_BUILDING_IMPROVEMENT_RESOURCES
+	kStream >> m_ppiResourceFromImprovement;
+#endif
 	kStream >> m_paiNumTerrainWorked;
 	kStream >> m_paiNumFeaturelessTerrainWorked;	
 	kStream >> m_paiNumImprovementWorked;
@@ -18338,6 +18379,9 @@ void CvCity::write(FDataStream& kStream) const
 #endif
 
 	kStream << m_yieldChanges;
+#ifdef MOD_BUILDING_IMPROVEMENT_RESOURCES
+	kStream << m_ppiResourceFromImprovement;
+#endif
 	kStream << m_paiNumTerrainWorked;
 	kStream << m_paiNumFeaturelessTerrainWorked;
 	kStream << m_paiNumImprovementWorked;
@@ -20682,6 +20726,38 @@ int CvCity::CountImprovement(ImprovementTypes iImprovementType) const
 	return iCount;
 }
 
+int CvCity::CountUnPillagedImprovement(ImprovementTypes iImprovementType) const
+{
+	int iCount = 0;
+	int iX = getX(); int iY = getY(); int iOwner = getOwner();
+
+#if defined(MOD_GLOBAL_CITY_WORKING)
+	for (int iCityPlotLoop = 0; iCityPlotLoop < GetNumWorkablePlots(); iCityPlotLoop++)
+#else
+	for (int iCityPlotLoop = 0; iCityPlotLoop < NUM_CITY_PLOTS; iCityPlotLoop++)
+#endif
+	{
+		CvPlot* pLoopPlot = plotCity(iX, iY, iCityPlotLoop);
+
+		// Invalid plot or not owned by this player
+		if (pLoopPlot == NULL || pLoopPlot->getOwner() != iOwner) {
+			continue;
+		}
+
+		// Not owned by this city
+		if (pLoopPlot->getWorkingCity() != this) {
+			continue;
+		}
+
+		if (pLoopPlot->HasImprovement(iImprovementType) && !pLoopPlot->IsImprovementPillaged() ) {
+			++iCount;
+		}
+	}
+
+	return iCount;
+}
+
+
 int CvCity::CountWorkedImprovement(ImprovementTypes iImprovementType) const
 {
 	int iCount = 0;
@@ -21914,7 +21990,58 @@ void CvCity::UpdateYieldPerXFeature(YieldTypes eYield, FeatureTypes eFeature)
 }
 #endif
 
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
+//	--------------------------------------------------------------------------------
+/// Extra Resource From Improvement
+int CvCity::GetResourceFromImprovement(ResourceTypes eResource, ImprovementTypes eImprovement) const
+{
+	VALIDATE_OBJECT
 
+	CvAssertMsg(eResource >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eResource < GC.getNumResourceInfos(), "eIndex expected to be < GC.getNumResourceInfos()");
+
+	CvAssertMsg(eImprovement >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eImprovement < GC.getNumImprovementInfos(), "eIndex expected to be < GC.getNumImprovementInfos()");
+
+	if (eResource != NO_RESOURCE && eImprovement != NO_IMPROVEMENT)
+	{
+		std::map<std::pair<int, int>, short>::const_iterator it = m_ppiResourceFromImprovement.find(std::make_pair((int)eResource, (int)eImprovement));
+		if (it != m_ppiResourceFromImprovement.end()) // find returns the iterator to map::end if the key eResource is not present in the map
+		{
+			return it->second;
+		}
+	}
+
+	return 0;
+}
+
+//	--------------------------------------------------------------------------------
+/// Extra Resource From Improvement
+void CvCity::ChangeResourceFromImprovement(ResourceTypes eResource, ImprovementTypes eImprovement, int iChange)
+{
+	VALIDATE_OBJECT
+
+	CvAssertMsg(eResource >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eResource < GC.getNumResourceInfos(), "eIndex expected to be < GC.getNumResourceInfos()");
+
+	CvAssertMsg(eImprovement >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eImprovement < GC.getNumImprovementInfos(), "eIndex expected to be < GC.getNumImprovementInfos()");
+
+
+	if (eResource != NO_RESOURCE && eImprovement != NO_IMPROVEMENT && iChange != 0)
+	{
+		std::map<std::pair<int, int>, short>::iterator it = m_ppiResourceFromImprovement.find(std::make_pair((int)eResource, (int)eImprovement));
+		if (it == m_ppiResourceFromImprovement.end()) // if the key (eGreatPerson, eEra) does not exist
+		{
+			m_ppiResourceFromImprovement.insert(std::pair<std::pair<int, int>, short>(std::make_pair((int)eResource, (int)eImprovement), iChange));
+		}
+		else // if the key (eResource, eImprovement) does exist
+		{
+			it->second += iChange;
+		}
+	}
+}
+#endif
 
 
 

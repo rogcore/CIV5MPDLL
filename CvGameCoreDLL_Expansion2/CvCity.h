@@ -831,6 +831,12 @@ public:
 	void changeLocalBuildingClassYield(BuildingClassTypes eIndex1, YieldTypes eIndex2, int iChange);
 #endif
 
+
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
+	int GetResourceFromImprovement(ResourceTypes eResource, ImprovementTypes eImprovement) const;
+	void ChangeResourceFromImprovement(ResourceTypes eResource, ImprovementTypes eImprovement, int iChange);
+#endif
+
 	int getYieldRateModifier(YieldTypes eIndex) const;
 	void changeYieldRateModifier(YieldTypes eIndex, int iChange);
 
@@ -1165,6 +1171,7 @@ public:
 	int CountFeature(FeatureTypes iFeatureType) const;
 	int CountWorkedFeature(FeatureTypes iFeatureType) const;
 	int CountImprovement(ImprovementTypes iImprovementType) const;
+	int CountUnPillagedImprovement(ImprovementTypes iImprovementType) const;
 	int CountWorkedImprovement(ImprovementTypes iImprovementType) const;
 	int CountPlotType(PlotTypes iPlotType) const;
 	int CountWorkedPlotType(PlotTypes iPlotType) const;
@@ -1503,6 +1510,9 @@ protected:
 
 	vector<SCityExtraYields> m_yieldChanges; //[NUM_YIELD_TYPES]
 
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
+	std::map<std::pair<int, int>, short> m_ppiResourceFromImprovement;
+#endif
 	int m_iAdditionalFood;
 	int m_iBaseTourism;
 	int m_iBaseTourismBeforeModifiers;

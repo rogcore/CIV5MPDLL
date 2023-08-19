@@ -435,6 +435,10 @@ public:
 	int GetBuildingClassYieldChange(int i, int j) const;
 	int GetBuildingClassHappiness(int i) const;
 
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES) 
+	std::multimap<int, std::pair<int, int>> GetResourceFromImprovementArray() const;
+#endif
+
 	CvThemingBonusInfo *GetThemingBonusInfo(int i) const;
 	int GetNumThemingBonuses() const {return m_iNumThemingBonuses;};
 #ifdef MOD_API_BUILDING_ENABLE_PURCHASE_UNITS
@@ -784,6 +788,10 @@ private:
 #endif
 	int** m_ppiBuildingClassYieldChanges;
 	int* m_paiBuildingClassHappiness;
+
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
+	std::multimap<int, std::pair<int, int>> m_piiResourceFromImprovement;
+#endif
 
 	CvThemingBonusInfo* m_paThemingBonusInfo;
 	int m_iNumThemingBonuses;
