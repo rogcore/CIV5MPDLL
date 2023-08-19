@@ -150,6 +150,7 @@ public:
 
 	bool IsTrainedAll() const;
 	bool IsFightWellDamaged() const;
+	bool IsBuyOwnedTiles() const;
 	bool IsMoveFriendlyWoodsAsRoad() const;
 	bool IsFasterAlongRiver() const;
 	bool IsFasterInHills() const;
@@ -389,6 +390,7 @@ protected:
 	
 	bool m_bTrainedAll;
 	bool m_bFightWellDamaged;
+	bool m_bBuyOwnedTiles;
 	bool m_bMoveFriendlyWoodsAsRoad;
 	bool m_bFasterAlongRiver;
 	bool m_bFasterInHills;
@@ -887,6 +889,10 @@ public:
 	{
 		return m_bFightWellDamaged;
 	};
+	bool IsBuyOwnedTiles() const
+	{
+		return m_bBuyOwnedTiles;
+	};
 	bool IsMoveFriendlyWoodsAsRoad() const
 	{
 		return m_bMoveFriendlyWoodsAsRoad;
@@ -1266,6 +1272,7 @@ private:
 	// Saved
 	bool m_bTrainedAll;
 	bool m_bFightWellDamaged;
+	bool m_bBuyOwnedTiles;
 	bool m_bMoveFriendlyWoodsAsRoad;
 	bool m_bFasterAlongRiver;
 	bool m_bFasterInHills;

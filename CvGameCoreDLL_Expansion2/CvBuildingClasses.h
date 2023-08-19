@@ -363,6 +363,10 @@ public:
 	int* GetYieldFromConstructionArray() const;
 	int GetYieldFromUnitProduction(int i) const;
 	int* GetYieldFromUnitProductionArray() const;
+	int GetYieldFromBirth(int i) const;
+	int* GetYieldFromBirthArray() const;
+	int GetYieldFromBorderGrowth(int i) const;
+	int* GetYieldFromBorderGrowthArray() const;
 
 	int GetYieldModifierFromWonder(int i) const;;
 	int* GetYieldModifierFromWonderArray() const;
@@ -738,6 +742,8 @@ private:
 #if defined(MOD_ROG_CORE)
 	int* m_piYieldFromConstruction;
 	int* m_piYieldFromUnitProduction;
+	int* m_piYieldFromBirth;
+	int* m_piYieldFromBorderGrowth;
 	int* m_piYieldModifierFromWonder;
 #endif
 

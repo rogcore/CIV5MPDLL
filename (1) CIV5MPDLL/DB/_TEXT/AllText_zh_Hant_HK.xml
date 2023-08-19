@@ -2,11 +2,18 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_zh_Hant_HK>
+	
+		<Row Tag="TXT_KEY_NOTIFICATION_RESET_PLOT_COST">
+			<Text>新城市的建立重置了你所擁有的城市的地塊購買價格!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_SUMMARY_RESET_PLOT_COST">
+			<Text>昭昭天命!</Text>
+		</Row>
         <Row Tag="TXT_KEY_PRODMOD_YIELD_IMPROVEMENT">
 			<Text>[NEWLINE][ICON_BULLET]來自改良設施的城市修正值: {1_Num}%</Text>
 		</Row>
         <Row Tag="TXT_KEY_PRODMOD_SPIES">
-			<Text>[NEWLINE][ICON_BULLET]活跃间谍数的城市修正值: {1_Num}%</Text>
+			<Text>[NEWLINE][ICON_BULLET]活躍間諜數的城市修正值: {1_Num}%</Text>
 		</Row>
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_HEALTH_MOD">
 			<Text>[NEWLINE][ICON_BULLET]健康度的城市修正值: {1_Num}%</Text>
@@ -17,16 +24,16 @@
 		</Row>
 
 		<Row Tag="TXT_KEY_UNIT_PLAGUE_TRANSFER">
-			<Text>战斗期间，一种致命的病毒通过你的{1_Unit}转播给了敌方的{2_Unit}!</Text>
+			<Text>戰鬥期間，一種致命的病毒通過你的{1_Unit}傳播給了敵方的{2_Unit}!</Text>
 		</Row>
 		<Row Tag="TXT_KEY_UNIT_PLAGUE_TRANSFER_S">
-			<Text>你的{1_Unit}传播了病毒!</Text>
+			<Text>你的{1_Unit}傳播了病毒!</Text>
 		</Row>
 		<Row Tag="TXT_KEY_UNIT_PLAGUE_TRANSFER_THEM">
-			<Text>战斗期间，一种致命的病毒通过敌人的{2_Unit}传播给了你的{1_Unit}!</Text>
+			<Text>戰鬥期間，一種致命的病毒通過敵人的{2_Unit}傳播給了你的{1_Unit}!</Text>
 		</Row>
 		<Row Tag="TXT_KEY_UNIT_PLAGUE_TRANSFER_THEM_S">
-			<Text>病毒传播给了你的{1_Unit}!</Text>
+			<Text>病毒傳播給了你的{1_Unit}!</Text>
 		</Row>
 
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_POLICY_CITY_LOVE_KING">
@@ -51,10 +58,10 @@
 			<Text>忠诚度</Text>
 		</Row>
 		<Row Tag="TXT_KEY_YIELD_GREAT_GENERAL_POINTS">
-			<Text>大军事家点数</Text>
+			<Text>大軍事家點數</Text>
 		</Row>
 		<Row Tag="TXT_KEY_YIELD_GREAT_ADMIRAL_POINTS">
-			<Text>海军统帅点数</Text>
+			<Text>海軍統帥點數</Text>
 		</Row>
 
 

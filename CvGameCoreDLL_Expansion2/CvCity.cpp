@@ -227,6 +227,8 @@ CvCity::CvCity() :
 #if defined(MOD_ROG_CORE)
 	, m_aiYieldFromConstruction()
 	, m_aiYieldFromUnitProduction()
+	, m_aiYieldFromBirth()
+	, m_aiYieldFromBorderGrowth()
 	, m_aiYieldPerPopInEmpire()
 	, m_aiResourceQuantityFromPOP("CvCity::m_aiResourceQuantityFromPOP", m_syncArchive)
 #endif
@@ -1142,6 +1144,8 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 #if defined(MOD_ROG_CORE)
 	m_aiYieldFromConstruction.resize(NUM_YIELD_TYPES);
 	m_aiYieldFromUnitProduction.resize(NUM_YIELD_TYPES);
+	m_aiYieldFromBirth.resize(NUM_YIELD_TYPES);
+	m_aiYieldFromBorderGrowth.resize(NUM_YIELD_TYPES);
 	m_aiYieldPerPopInEmpire.clear();
 #endif
 
@@ -1174,7 +1178,9 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		m_aiProductionToYieldModifier.setAt(iI, 0);
 #if defined(MOD_BALANCE_CORE)
 		m_aiYieldFromConstruction[iI] = 0;	
-		m_aiYieldFromUnitProduction[iI] = 0;		
+		m_aiYieldFromUnitProduction[iI] = 0;	
+		m_aiYieldFromBirth[iI] = 0;
+		m_aiYieldFromBorderGrowth[iI] = 0;
 #endif
 	}
 
@@ -7462,6 +7468,14 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 				ChangeYieldFromConstruction(eYield, pBuildingInfo->GetYieldFromConstruction(eYield) * iChange);
 			}
 
+			if ((pBuildingInfo->GetYieldFromBirth(eYield) > 0))
+			{
+				ChangeYieldFromBirth(eYield, pBuildingInfo->GetYieldFromBirth(eYield) * iChange);
+			}
+			if ((pBuildingInfo->GetYieldFromBorderGrowth(eYield) > 0))
+			{
+				ChangeYieldFromBorderGrowth(eYield, pBuildingInfo->GetYieldFromBorderGrowth(eYield) * iChange);
+			}
 
 			ChangeYieldPerPopInEmpireTimes100(eYield, pBuildingInfo->GetYieldChangePerPopInEmpire(eYield)* iChange);
 
@@ -8770,6 +8784,27 @@ void CvCity::setPopulation(int iNewValue, bool bReassignPop /* = true */)
 		if(getPopulation() > getHighestPopulation())
 		{
 			setHighestPopulation(getPopulation());
+
+			
+#if defined(MOD_ROG_CORE)
+			if (MOD_ROG_CORE) {
+				YieldTypes eYield;
+				for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
+				{
+					eYield = (YieldTypes)iI;
+	
+					int iCost = iPopChange;
+					iCost *= GC.getGame().getGameSpeedInfo().getGrowthPercent();
+					iCost /= 100;
+					if (GetYieldFromBirth(eYield) > 0 && iCost > 0)
+					{
+						iCost *= GetYieldFromBirth(eYield);
+						doInstantYield(eYield, iCost);
+					}
+				}
+			}
+#endif
+
 		}
 
 		area()->changePopulationPerPlayer(getOwner(), (getPopulation() - iOldPopulation));
@@ -9188,6 +9223,23 @@ void CvCity::DoJONSCultureLevelIncrease()
 			}
 #endif
 #if defined(MOD_UI_CITY_EXPANSION)
+		}
+#endif
+
+#if defined(MOD_BALANCE_CORE)
+		if (MOD_ROG_CORE) {
+			YieldTypes eYield;
+			for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
+			{
+				eYield = (YieldTypes)iI;
+				int iCost = GC.getGame().getGameSpeedInfo().getCulturePercent();
+				iCost /= 100;
+				if (GetYieldFromBorderGrowth(eYield) > 0)
+				{
+					iCost *= GetYieldFromBorderGrowth(eYield);
+					doInstantYield(eYield, iCost);
+				}
+			}
 		}
 #endif
 
@@ -12897,6 +12949,55 @@ void CvCity::ChangeYieldFromUnitProduction(YieldTypes eIndex, int iChange)
 		CvAssert(GetYieldFromUnitProduction(eIndex) >= 0);
 	}
 }
+
+//	--------------------------------------------------------------------------------
+/// Extra yield from building
+int CvCity::GetYieldFromBirth(YieldTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	return m_aiYieldFromBirth[eIndex];
+}
+
+//	--------------------------------------------------------------------------------
+/// Extra yield from building
+void CvCity::ChangeYieldFromBirth(YieldTypes eIndex, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+
+	if (iChange != 0)
+	{
+		m_aiYieldFromBirth[eIndex] = m_aiYieldFromBirth[eIndex] + iChange;
+		CvAssert(GetYieldFromBirth(eIndex) >= 0);
+	}
+}
+//	--------------------------------------------------------------------------------
+/// Extra yield from building
+int CvCity::GetYieldFromBorderGrowth(YieldTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	return m_aiYieldFromBorderGrowth[eIndex];
+}
+
+//	--------------------------------------------------------------------------------
+/// Extra yield from building
+void CvCity::ChangeYieldFromBorderGrowth(YieldTypes eIndex, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+
+	if (iChange != 0)
+	{
+		m_aiYieldFromBorderGrowth[eIndex] = m_aiYieldFromBorderGrowth[eIndex] + iChange;
+		CvAssert(GetYieldFromBorderGrowth(eIndex) >= 0);
+	}
+}
 //	--------------------------------------------------------------------------------
 /// Extra yield for each pop point in empire
 int CvCity::GetYieldPerPopInEmpireTimes100(YieldTypes eIndex) const
@@ -14057,10 +14158,27 @@ bool CvCity::CanBuyPlot(int iPlotX, int iPlotY, bool bIgnoreCost)
 	}
 
 	// if this plot belongs to someone, bail!
-	if(pTargetPlot->getOwner() != NO_PLAYER)
+	if (pTargetPlot->getOwner() != NO_PLAYER)
 	{
-		return false;
+		if (GET_PLAYER(getOwner()).GetPlayerTraits()->IsBuyOwnedTiles())
+		{
+			if (pTargetPlot->getOwner() == getOwner() || pTargetPlot->isCity())
+				return false;
+
+			// Bad idea for AI to steal?
+			if (!GET_PLAYER(getOwner()).isHuman() && GET_PLAYER(getOwner()).isMajorCiv() && GET_PLAYER(getOwner()).GetDiplomacyAI()->IsPlayerBadTheftTarget(pTargetPlot->getOwner(), pTargetPlot))
+				return false;
+		}
+		else
+		{
+			return false;
+		}
 	}
+
+	//: can't buy plot with enemy combat units 
+	if (MOD_ROG_CORE && pTargetPlot->IsActualEnemyUnit(getOwner(), true))
+		return false;
+
 
 	// Must be adjacent to a plot owned by this city
 	CvPlot* pAdjacentPlot;
@@ -14265,7 +14383,21 @@ void CvCity::GetBuyablePlotList(std::vector<int>& aiPlotList)
 			{
 				if (pLoopPlot->getOwner() != NO_PLAYER)
 				{
-					continue;
+#if defined(MOD_ROG_CORE)
+					if (MOD_ROG_CORE && GET_PLAYER(getOwner()).GetPlayerTraits()->IsBuyOwnedTiles())
+					{
+						if (pLoopPlot->getOwner() == getOwner() || pLoopPlot->isCity())
+						{
+							continue;
+						}
+					}
+					else
+					{
+#endif
+						continue;
+#if defined(MOD_ROG_CORE)
+					}
+#endif
 				}
 
 #if defined(MOD_EVENTS_CITY_BORDERS)
@@ -14530,6 +14662,18 @@ int CvCity::GetBuyPlotCost(int iPlotX, int iPlotY) const
 		// If we have a culture surplus, we get a discount on the tile
 		if (GetJONSCultureStored() >= GetJONSCultureThreshold()) {
 			iCost -= GET_PLAYER(getOwner()).GetBuyPlotCost();
+		}
+	}
+#endif
+
+#if defined(MOD_ROG_CORE)
+	//Owned by someone? Much more expensive!
+	if (MOD_ROG_CORE && GET_PLAYER(getOwner()).GetPlayerTraits()->IsBuyOwnedTiles())
+	{
+		if ((pPlot->getOwner() != NO_PLAYER) && (pPlot->getOwner() != getOwner()))
+		{
+			iCost *= 3;
+			iCost /= 2;
 		}
 	}
 #endif
@@ -14815,6 +14959,9 @@ int CvCity::GetIndividualPlotScore(const CvPlot* pPlot) const
 	// For each player not on our team, check how close their nearest city is to this plot
 	CvPlayer& owningPlayer = GET_PLAYER(m_eOwner);
 	CvDiplomacyAI* owningPlayerDiploAI = owningPlayer.GetDiplomacyAI();
+
+	bool bAmerica = GET_PLAYER(getOwner()).GetPlayerTraits()->IsBuyOwnedTiles() && iRtnValue > 0;
+
 	for(iI = 0; iI < MAX_MAJOR_CIVS; iI++)
 	{
 		CvPlayer& loopPlayer = GET_PLAYER((PlayerTypes)iI);
@@ -14835,16 +14982,30 @@ int CvCity::GetIndividualPlotScore(const CvPlot* pPlot) const
 						// Only want to account for civs with a city within 10 tiles
 						if(iDistance < 10)
 						{
+							bool bManifestDestiny = bAmerica && pPlot->getOwner() == loopPlayer.GetID();
+
 							switch(eLandDisputeLevel)
 							{
 							case DISPUTE_LEVEL_FIERCE:
 								iRtnValue += (10 - iDistance) * /* 6 */ GC.getAI_PLOT_VALUE_FIERCE_DISPUTE();
+
+								if (bManifestDestiny)
+									iRtnValue *= 8;
+
 								break;
 							case DISPUTE_LEVEL_STRONG:
 								iRtnValue += (10 - iDistance) * /* 4 */GC.getAI_PLOT_VALUE_STRONG_DISPUTE();
+
+								if (bManifestDestiny)
+									iRtnValue *= 4;
+
 								break;
 							case DISPUTE_LEVEL_WEAK:
 								iRtnValue += (10 - iDistance) * /* 2 */ GC.getAI_PLOT_VALUE_WEAK_DISPUTE();
+
+								if (bManifestDestiny)
+									iRtnValue *= 2;
+
 								break;
 							}
 						}
@@ -17808,6 +17969,8 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_aiSpecialistRateModifier;
 	kStream >> m_aiYieldFromConstruction;
 	kStream >> m_aiYieldFromUnitProduction;
+	kStream >> m_aiYieldFromBirth;
+	kStream >> m_aiYieldFromBorderGrowth;
 #endif
 
 	if (uiVersion >= 4)
@@ -18244,6 +18407,8 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_aiSpecialistRateModifier;
 	kStream << m_aiYieldFromConstruction;
 	kStream << m_aiYieldFromUnitProduction;
+	kStream << m_aiYieldFromBirth;
+	kStream << m_aiYieldFromBorderGrowth;
 #endif
 	kStream << m_aiYieldPerReligion;
 	kStream << m_aiYieldRateModifier;

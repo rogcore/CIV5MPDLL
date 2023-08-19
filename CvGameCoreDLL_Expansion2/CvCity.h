@@ -873,6 +873,10 @@ public:
 	void ChangeYieldFromConstruction(YieldTypes eIndex, int iChange);
 	int GetYieldFromUnitProduction(YieldTypes eIndex) const;
 	void ChangeYieldFromUnitProduction(YieldTypes eIndex, int iChange);
+	int GetYieldFromBirth(YieldTypes eIndex) const;
+	void ChangeYieldFromBirth(YieldTypes eIndex, int iChange);
+	int GetYieldFromBorderGrowth(YieldTypes eIndex) const;
+	void ChangeYieldFromBorderGrowth(YieldTypes eIndex, int iChange);
 
 	int getDomainFreeExperienceFromGreatWorksGlobal(DomainTypes eIndex) const;
 #endif
@@ -1427,6 +1431,8 @@ protected:
 #if defined(MOD_ROG_CORE)
 	std::vector<int> m_aiYieldFromConstruction;
 	std::vector<int> m_aiYieldFromUnitProduction;
+	std::vector<int> m_aiYieldFromBirth;
+	std::vector<int> m_aiYieldFromBorderGrowth;
 
 	std::map<int, int> m_aiYieldPerPopInEmpire;
 	FAutoVariable<std::vector<int>, CvCity> m_aiResourceQuantityFromPOP;

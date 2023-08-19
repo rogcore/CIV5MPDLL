@@ -254,6 +254,8 @@ CvBuildingEntry::CvBuildingEntry(void):
 #if defined(MOD_ROG_CORE)
 	m_piYieldFromConstruction(NULL),
 	m_piYieldFromUnitProduction(NULL),
+	m_piYieldFromBirth(NULL),
+	m_piYieldFromBorderGrowth(NULL),
 
 	m_piYieldModifierFromWonder(NULL),
 	m_piDomainFreeExperiencePerGreatWorkGlobal(NULL),
@@ -339,6 +341,8 @@ CvBuildingEntry::~CvBuildingEntry(void)
 #if defined(MOD_ROG_CORE)
 	SAFE_DELETE_ARRAY(m_piYieldFromConstruction);
 	SAFE_DELETE_ARRAY(m_piYieldFromUnitProduction);
+	SAFE_DELETE_ARRAY(m_piYieldFromBirth);
+	SAFE_DELETE_ARRAY(m_piYieldFromBorderGrowth);
 
 	SAFE_DELETE_ARRAY(m_piYieldModifierFromWonder);
 	SAFE_DELETE_ARRAY(m_piDomainFreeExperiencePerGreatWorkGlobal);
@@ -714,6 +718,9 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 #if defined(MOD_ROG_CORE)
 	kUtility.SetYields(m_piYieldFromConstruction, "Building_YieldFromConstruction", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldFromUnitProduction, "Building_YieldFromUnitProduction", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldFromBirth, "Building_YieldFromBirth", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldFromBorderGrowth, "Building_YieldFromBorderGrowth", "BuildingType", szBuildingType);
+
 	kUtility.SetYields(m_piYieldModifierFromWonder, "Building_CityWithWorldWonderYieldModifierGlobal", "BuildingType", szBuildingType);
 #endif
 
@@ -2779,6 +2786,30 @@ int CvBuildingEntry::GetYieldFromUnitProduction(int i) const
 int* CvBuildingEntry::GetYieldFromUnitProductionArray() const
 {
 	return m_piYieldFromUnitProduction;
+}
+
+int CvBuildingEntry::GetYieldFromBirth(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromBirth[i];
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromBirthArray() const
+{
+	return m_piYieldFromBirth;
+}
+
+int CvBuildingEntry::GetYieldFromBorderGrowth(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromBorderGrowth[i];
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromBorderGrowthArray() const
+{
+	return m_piYieldFromBorderGrowth;
 }
 
 int CvBuildingEntry::GetYieldModifierFromWonder(int i) const
