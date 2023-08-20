@@ -129,6 +129,7 @@ CvTraitEntry::CvTraitEntry() :
 	m_eFreeBuildingOnConquest(NO_BUILDING),
 	m_bTrainedAll(false),
 	m_bFightWellDamaged(false),
+	m_bBuyOwnedTiles(false),
 	m_bMoveFriendlyWoodsAsRoad(false),
 	m_bFasterAlongRiver(false),
 	m_bFasterInHills(false),
@@ -714,6 +715,11 @@ BuildingTypes CvTraitEntry::GetFreeBuildingOnConquest() const
 bool CvTraitEntry::IsFightWellDamaged() const
 {
 	return m_bFightWellDamaged;
+}
+
+bool CvTraitEntry::IsBuyOwnedTiles() const
+{
+	return m_bBuyOwnedTiles;
 }
 
 /// Accessor:: does this civ get combat bonuses when damaged?
@@ -1547,6 +1553,7 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	}
 	m_bTrainedAll = kResults.GetBool("TrainedAll");
 	m_bFightWellDamaged = kResults.GetBool("FightWellDamaged");
+	m_bBuyOwnedTiles = kResults.GetBool("BuyOwnedTiles");
 	m_bMoveFriendlyWoodsAsRoad = kResults.GetBool("MoveFriendlyWoodsAsRoad");
 	m_bFasterAlongRiver = kResults.GetBool("FasterAlongRiver");
 	m_bFasterInHills = kResults.GetBool("FasterInHills");
@@ -2324,6 +2331,11 @@ void CvPlayerTraits::InitPlayerTraits()
 				//m_pPlayer->ChangeWoundedUnitDamageMod(iWoundedUnitDamageMod);
 			}
 
+			if (trait->IsBuyOwnedTiles())
+			{
+				m_bBuyOwnedTiles = true;
+			}
+
 			if(trait->IsMoveFriendlyWoodsAsRoad())
 			{
 				m_bMoveFriendlyWoodsAsRoad = true;
@@ -2784,6 +2796,7 @@ void CvPlayerTraits::Reset()
 #endif
 	m_bTrainedAll = false;
 	m_bFightWellDamaged = false;
+	m_bBuyOwnedTiles = false;
 	m_bMoveFriendlyWoodsAsRoad = false;
 	m_bFasterAlongRiver = false;
 	m_bFasterInHills = false;
@@ -4218,6 +4231,7 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 #endif
 	kStream >> m_bTrainedAll;
 	kStream >> m_bFightWellDamaged;
+	kStream >> m_bBuyOwnedTiles;
 	kStream >> m_bMoveFriendlyWoodsAsRoad;
 	kStream >> m_bFasterAlongRiver;
 
@@ -4587,6 +4601,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 #endif
 	kStream << m_bTrainedAll;
 	kStream << m_bFightWellDamaged;
+	kStream << m_bBuyOwnedTiles;
 	kStream << m_bMoveFriendlyWoodsAsRoad;
 	kStream << m_bFasterAlongRiver;
 	kStream << m_bFasterInHills;

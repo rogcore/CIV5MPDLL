@@ -2,6 +2,12 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_en_US>
+	<Row Tag="TXT_KEY_NOTIFICATION_RESET_PLOT_COST">
+			<Text>Founding a new City has reset the cost increase of Tile purchases in all owned cities!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_SUMMARY_RESET_PLOT_COST">
+			<Text>Manifest Destiny!</Text>
+		</Row>
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_IMPROVEMENT">
 			<Text>[NEWLINE][ICON_BULLET]City correction from improved facilities: {1_Num}%</Text>
 		</Row>

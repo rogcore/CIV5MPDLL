@@ -254,6 +254,8 @@ CvBuildingEntry::CvBuildingEntry(void):
 #if defined(MOD_ROG_CORE)
 	m_piYieldFromConstruction(NULL),
 	m_piYieldFromUnitProduction(NULL),
+	m_piYieldFromBirth(NULL),
+	m_piYieldFromBorderGrowth(NULL),
 
 	m_piYieldModifierFromWonder(NULL),
 	m_piDomainFreeExperiencePerGreatWorkGlobal(NULL),
@@ -288,6 +290,10 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_ppiBuildingClassYieldChanges(NULL),
 	m_paiBuildingClassHappiness(NULL),
 	m_paThemingBonusInfo(NULL),
+
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
+	m_piiResourceFromImprovement(),
+#endif
 
 	m_iNumThemingBonuses(0),
 #ifdef MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD
@@ -335,6 +341,8 @@ CvBuildingEntry::~CvBuildingEntry(void)
 #if defined(MOD_ROG_CORE)
 	SAFE_DELETE_ARRAY(m_piYieldFromConstruction);
 	SAFE_DELETE_ARRAY(m_piYieldFromUnitProduction);
+	SAFE_DELETE_ARRAY(m_piYieldFromBirth);
+	SAFE_DELETE_ARRAY(m_piYieldFromBorderGrowth);
 
 	SAFE_DELETE_ARRAY(m_piYieldModifierFromWonder);
 	SAFE_DELETE_ARRAY(m_piDomainFreeExperiencePerGreatWorkGlobal);
@@ -367,6 +375,10 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	SAFE_DELETE_ARRAY(m_piYieldChangeWorldWonder);
 	SAFE_DELETE_ARRAY(m_piYieldChangeWorldWonderGlobal);
 	SAFE_DELETE_ARRAY(m_paiSpecificGreatPersonRateModifier);
+#endif
+
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
+	m_piiResourceFromImprovement.clear();
 #endif
 
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiResourceYieldChange);
@@ -706,6 +718,9 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 #if defined(MOD_ROG_CORE)
 	kUtility.SetYields(m_piYieldFromConstruction, "Building_YieldFromConstruction", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldFromUnitProduction, "Building_YieldFromUnitProduction", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldFromBirth, "Building_YieldFromBirth", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldFromBorderGrowth, "Building_YieldFromBorderGrowth", "BuildingType", szBuildingType);
+
 	kUtility.SetYields(m_piYieldModifierFromWonder, "Building_CityWithWorldWonderYieldModifierGlobal", "BuildingType", szBuildingType);
 #endif
 
@@ -1355,6 +1370,34 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 			m_ppiBuildingClassLocalYieldChanges[BuildingClassID][iYieldID] = iYieldChange;
 		}
+	}
+#endif
+
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
+	//Building_ResourceFromImprovement
+	{
+		std::string strKey("Building_ResourceFromImprovement");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Resources.ID as ResourcesID, Improvements.ID as ImprovementsID, Value from Building_ResourceFromImprovement inner join Resources on Resources.Type = ResourceType inner join Improvements on ImprovementType = Improvements.Type where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType);
+
+		while (pResults->Step())
+		{
+			const int iResource = pResults->GetInt(0);
+			const int iImprovement = pResults->GetInt(1);
+			const int iValue = pResults->GetInt(2);
+
+			m_piiResourceFromImprovement.insert(std::make_pair(iResource, std::make_pair(iImprovement, iValue)));
+		}
+
+		pResults->Reset();
+
+		//Trim extra memory off container since this is mostly read-only.
+		std::multimap<int, std::pair<int, int>>(m_piiResourceFromImprovement).swap(m_piiResourceFromImprovement);
 	}
 #endif
 
@@ -2745,6 +2788,30 @@ int* CvBuildingEntry::GetYieldFromUnitProductionArray() const
 	return m_piYieldFromUnitProduction;
 }
 
+int CvBuildingEntry::GetYieldFromBirth(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromBirth[i];
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromBirthArray() const
+{
+	return m_piYieldFromBirth;
+}
+
+int CvBuildingEntry::GetYieldFromBorderGrowth(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromBorderGrowth[i];
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromBorderGrowthArray() const
+{
+	return m_piYieldFromBorderGrowth;
+}
+
 int CvBuildingEntry::GetYieldModifierFromWonder(int i) const
 {
 	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
@@ -3416,6 +3483,13 @@ int CvBuildingEntry::GetBuildingClassHappiness(int i) const
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_paiBuildingClassHappiness ? m_paiBuildingClassHappiness[i] : -1;
 }
+
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
+std::multimap<int, std::pair<int, int>> CvBuildingEntry::GetResourceFromImprovementArray() const
+{
+	return m_piiResourceFromImprovement;
+}
+#endif
 
 CvThemingBonusInfo *CvBuildingEntry::GetThemingBonusInfo(int i) const
 {

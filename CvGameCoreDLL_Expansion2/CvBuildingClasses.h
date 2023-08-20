@@ -363,6 +363,10 @@ public:
 	int* GetYieldFromConstructionArray() const;
 	int GetYieldFromUnitProduction(int i) const;
 	int* GetYieldFromUnitProductionArray() const;
+	int GetYieldFromBirth(int i) const;
+	int* GetYieldFromBirthArray() const;
+	int GetYieldFromBorderGrowth(int i) const;
+	int* GetYieldFromBorderGrowthArray() const;
 
 	int GetYieldModifierFromWonder(int i) const;;
 	int* GetYieldModifierFromWonderArray() const;
@@ -434,6 +438,10 @@ public:
 #endif
 	int GetBuildingClassYieldChange(int i, int j) const;
 	int GetBuildingClassHappiness(int i) const;
+
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES) 
+	std::multimap<int, std::pair<int, int>> GetResourceFromImprovementArray() const;
+#endif
 
 	CvThemingBonusInfo *GetThemingBonusInfo(int i) const;
 	int GetNumThemingBonuses() const {return m_iNumThemingBonuses;};
@@ -734,6 +742,8 @@ private:
 #if defined(MOD_ROG_CORE)
 	int* m_piYieldFromConstruction;
 	int* m_piYieldFromUnitProduction;
+	int* m_piYieldFromBirth;
+	int* m_piYieldFromBorderGrowth;
 	int* m_piYieldModifierFromWonder;
 #endif
 
@@ -784,6 +794,10 @@ private:
 #endif
 	int** m_ppiBuildingClassYieldChanges;
 	int* m_paiBuildingClassHappiness;
+
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
+	std::multimap<int, std::pair<int, int>> m_piiResourceFromImprovement;
+#endif
 
 	CvThemingBonusInfo* m_paThemingBonusInfo;
 	int m_iNumThemingBonuses;

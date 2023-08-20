@@ -2,6 +2,13 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_zh_CN>
+	
+		<Row Tag="TXT_KEY_NOTIFICATION_RESET_PLOT_COST">
+			<Text>新城市的建立重置了你所拥有的城市的地块购买价格!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_SUMMARY_RESET_PLOT_COST">
+			<Text>昭昭天命!</Text>
+		</Row>
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_IMPROVEMENT">
 			<Text>[NEWLINE][ICON_BULLET]来自改良设施的城市修正值: {1_Num}%</Text>
 		</Row>

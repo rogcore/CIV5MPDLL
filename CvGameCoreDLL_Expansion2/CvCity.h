@@ -831,6 +831,12 @@ public:
 	void changeLocalBuildingClassYield(BuildingClassTypes eIndex1, YieldTypes eIndex2, int iChange);
 #endif
 
+
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
+	int GetResourceFromImprovement(ResourceTypes eResource, ImprovementTypes eImprovement) const;
+	void ChangeResourceFromImprovement(ResourceTypes eResource, ImprovementTypes eImprovement, int iChange);
+#endif
+
 	int getYieldRateModifier(YieldTypes eIndex) const;
 	void changeYieldRateModifier(YieldTypes eIndex, int iChange);
 
@@ -867,6 +873,10 @@ public:
 	void ChangeYieldFromConstruction(YieldTypes eIndex, int iChange);
 	int GetYieldFromUnitProduction(YieldTypes eIndex) const;
 	void ChangeYieldFromUnitProduction(YieldTypes eIndex, int iChange);
+	int GetYieldFromBirth(YieldTypes eIndex) const;
+	void ChangeYieldFromBirth(YieldTypes eIndex, int iChange);
+	int GetYieldFromBorderGrowth(YieldTypes eIndex) const;
+	void ChangeYieldFromBorderGrowth(YieldTypes eIndex, int iChange);
 
 	int getDomainFreeExperienceFromGreatWorksGlobal(DomainTypes eIndex) const;
 #endif
@@ -1171,6 +1181,7 @@ public:
 	int CountFeature(FeatureTypes iFeatureType) const;
 	int CountWorkedFeature(FeatureTypes iFeatureType) const;
 	int CountImprovement(ImprovementTypes iImprovementType) const;
+	int CountUnPillagedImprovement(ImprovementTypes iImprovementType) const;
 	int CountWorkedImprovement(ImprovementTypes iImprovementType) const;
 	int CountPlotType(PlotTypes iPlotType) const;
 	int CountWorkedPlotType(PlotTypes iPlotType) const;
@@ -1426,6 +1437,8 @@ protected:
 #if defined(MOD_ROG_CORE)
 	std::vector<int> m_aiYieldFromConstruction;
 	std::vector<int> m_aiYieldFromUnitProduction;
+	std::vector<int> m_aiYieldFromBirth;
+	std::vector<int> m_aiYieldFromBorderGrowth;
 
 	std::map<int, int> m_aiYieldPerPopInEmpire;
 	FAutoVariable<std::vector<int>, CvCity> m_aiResourceQuantityFromPOP;
@@ -1511,6 +1524,9 @@ protected:
 
 	vector<SCityExtraYields> m_yieldChanges; //[NUM_YIELD_TYPES]
 
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
+	std::map<std::pair<int, int>, short> m_ppiResourceFromImprovement;
+#endif
 	int m_iAdditionalFood;
 	int m_iBaseTourism;
 	int m_iBaseTourismBeforeModifiers;
