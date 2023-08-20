@@ -120,6 +120,8 @@ CvTraitEntry::CvTraitEntry() :
 #endif
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
 	m_iCiviliansFreePromotion(NO_PROMOTION),
+	m_iTradeRouteLandGoldBonus(0),
+	m_iTradeRouteSeaGoldBonus(0),
 #endif
 
 	m_eFreeUnitPrereqTech(NO_TECH),
@@ -674,6 +676,14 @@ int CvTraitEntry::GetTradeBuildingModifier() const
 int CvTraitEntry::GetCiviliansFreePromotion() const
 {
 	return m_iCiviliansFreePromotion;
+}
+int CvTraitEntry::GetTradeRouteLandGoldBonus() const
+{
+	return m_iTradeRouteLandGoldBonus;
+}
+int CvTraitEntry::GetTradeRouteSeaGoldBonus() const
+{
+	return m_iTradeRouteSeaGoldBonus;
 }
 #endif
 
@@ -1498,6 +1508,8 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	{
 		m_iCiviliansFreePromotion = GC.getInfoTypeForString(szTextVal, true);
 	}
+	m_iTradeRouteLandGoldBonus = kResults.GetInt("TradeRouteLandGoldBonus");
+	m_iTradeRouteSeaGoldBonus = kResults.GetInt("TradeRouteSeaGoldBonus");
 #endif
 
 #if defined(MOD_TRAITS_OTHER_PREREQS)
@@ -2293,6 +2305,8 @@ void CvPlayerTraits::InitPlayerTraits()
 			{
 				m_iCiviliansFreePromotion = trait->GetCiviliansFreePromotion();
 			}
+			m_iTradeRouteLandGoldBonus += trait->GetTradeRouteLandGoldBonus();
+			m_iTradeRouteSeaGoldBonus += trait->GetTradeRouteSeaGoldBonus();
 #endif
 
 #ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
@@ -2777,6 +2791,8 @@ void CvPlayerTraits::Reset()
 	m_iTradeBuildingModifier = 0;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
 	m_iCiviliansFreePromotion = NO_PROMOTION;
+	m_iTradeRouteLandGoldBonus = 0;
+	m_iTradeRouteSeaGoldBonus = 0;
 #endif
 	m_bTrainedAll = false;
 	m_bFightWellDamaged = false;
@@ -4206,6 +4222,8 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	}
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
 	kStream >> m_iCiviliansFreePromotion;
+	kStream >> m_iTradeRouteLandGoldBonus;
+	kStream >> m_iTradeRouteSeaGoldBonus;
 #endif
 
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
@@ -4575,6 +4593,8 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
 	kStream << m_iCiviliansFreePromotion;
+	kStream << m_iTradeRouteLandGoldBonus;
+	kStream << m_iTradeRouteSeaGoldBonus;
 #endif
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	MOD_SERIALIZE_WRITE(kStream, m_iSeaTradeRouteRangeBonus);

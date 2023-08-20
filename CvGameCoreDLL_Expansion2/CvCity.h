@@ -941,6 +941,12 @@ public:
 	bool isFreePromotion(PromotionTypes eIndex) const;
 	void changeFreePromotionCount(PromotionTypes eIndex, int iChange);
 
+	int getTradeRouteDomainRangeModifier(DomainTypes eIndex) const;
+	void changeTradeRouteDomainRangeModifier(DomainTypes eIndex, int iChange);
+
+	int getTradeRouteDomainGoldBonus(DomainTypes eIndex) const;
+	void changeTradeRouteDomainGoldBonus(DomainTypes eIndex, int iChange);
+
 	int getSpecialistFreeExperience() const;
 	void changeSpecialistFreeExperience(int iChange);
 
@@ -1472,6 +1478,8 @@ protected:
 	FAutoVariable<std::vector<int>, CvCity> m_paiUnitCombatFreeExperience;
 	FAutoVariable<std::vector<int>, CvCity> m_paiUnitCombatProductionModifier;
 	FAutoVariable<std::vector<int>, CvCity> m_paiFreePromotionCount;
+	FAutoVariable<std::vector<int>, CvCity> m_viTradeRouteDomainRangeModifier;
+	FAutoVariable<std::vector<int>, CvCity> m_viTradeRouteDomainGoldBonus;
 
 	int m_iBaseHappinessFromBuildings;
 	int m_iUnmoddedHappinessFromBuildings;

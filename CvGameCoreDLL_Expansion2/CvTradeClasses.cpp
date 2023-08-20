@@ -2284,41 +2284,10 @@ int CvPlayerTrade::GetTradeConnectionYourBuildingValueTimes100(const TradeConnec
 	}
 
 	int iBonus = 0;
+
 	if (bAsOriginPlayer)
 	{
-		CvCity* pOriginCity = CvGameTrade::GetOriginCity(kTradeConnection);
-		for (int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
-		{
-			BuildingTypes eBuilding = (BuildingTypes)GET_PLAYER(pOriginCity->getOwner()).getCivilizationInfo().getCivilizationBuildings(iI);
-			if(eBuilding != NO_BUILDING)
-			{
-				CvBuildingEntry* pBuildingEntry = GC.GetGameBuildings()->GetEntry(eBuilding);
-				if (!pBuildingEntry)
-				{
-					continue;
-				}
-
-				if (pBuildingEntry && pOriginCity->GetCityBuildings()->GetNumBuilding((BuildingTypes)pBuildingEntry->GetID()))
-				{
-					if (pBuildingEntry->GetTradeRouteSeaGoldBonus() > 0 && kTradeConnection.m_eDomain == DOMAIN_SEA)
-					{
-#if defined(MOD_BUGFIX_MINOR)
-						iBonus += pBuildingEntry->GetTradeRouteSeaGoldBonus() * pOriginCity->GetCityBuildings()->GetNumBuilding((BuildingTypes)pBuildingEntry->GetID());
-#else
-						iBonus += pBuildingEntry->GetTradeRouteSeaGoldBonus();
-#endif
-					}
-					else if (pBuildingEntry->GetTradeRouteLandGoldBonus() > 0 && kTradeConnection.m_eDomain == DOMAIN_LAND)
-					{
-#if defined(MOD_BUGFIX_MINOR)
-						iBonus += pBuildingEntry->GetTradeRouteLandGoldBonus() * pOriginCity->GetCityBuildings()->GetNumBuilding((BuildingTypes)pBuildingEntry->GetID());
-#else
-						iBonus += pBuildingEntry->GetTradeRouteLandGoldBonus();
-#endif
-					}
-				}
-			}
-		}
+		iBonus += CvGameTrade::GetOriginCity(kTradeConnection)->getTradeRouteDomainGoldBonus(kTradeConnection.m_eDomain);
 	}
 
 	if (bAsOriginPlayer)
@@ -2528,6 +2497,31 @@ int CvPlayerTrade::GetTradeConnectionOtherTraitValueTimes100(const TradeConnecti
 }
 
 //	--------------------------------------------------------------------------------
+int CvPlayerTrade::GetTradeConnectionTraitValueTimes100(const TradeConnection& kTradeConnection, YieldTypes eYield, bool bAsOriginPlayer)
+{
+	int iValue = 0;
+	if (kTradeConnection.m_eConnectionType == TRADE_CONNECTION_INTERNATIONAL)
+	{
+		if (bAsOriginPlayer && eYield == YIELD_GOLD)
+		{
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+			switch (kTradeConnection.m_eDomain)
+			{
+			case DOMAIN_SEA:
+				iValue += GET_PLAYER(kTradeConnection.m_eOriginOwner).GetPlayerTraits()->GetTradeRouteSeaGoldBonus();
+				break;
+			case DOMAIN_LAND:
+				iValue += GET_PLAYER(kTradeConnection.m_eOriginOwner).GetPlayerTraits()->GetTradeRouteLandGoldBonus();
+				break;
+			}
+#endif
+		}
+	}
+
+	return iValue;
+}
+
+//	--------------------------------------------------------------------------------
 int CvPlayerTrade::GetTradeConnectionDomainValueModifierTimes100(const TradeConnection& kTradeConnection, YieldTypes eYield)
 {
 	// unnecessary code to make it compile for now
@@ -2646,6 +2640,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 					int iYourBuildingBonus = GetTradeConnectionYourBuildingValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
 					int iTheirBuildingBonus = GetTradeConnectionTheirBuildingValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
 					int iTraitBonus = GetTradeConnectionOtherTraitValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
+					iTraitBonus += GetTradeConnectionTraitValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
 
 					int iModifier = 100;
 					int iDomainModifier = GetTradeConnectionDomainValueModifierTimes100(kTradeConnection, eYield);
@@ -2691,6 +2686,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 #if defined(MOD_API_UNIFIED_YIELDS)
 					int iPolicyBonus = GetTradeConnectionPolicyValueTimes100(kTradeConnection, eYield);
 					int iTraitBonus = GetTradeConnectionOtherTraitValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
+					iTraitBonus += GetTradeConnectionTraitValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
 #endif
 
 					iValue = iBaseValue;
@@ -2728,6 +2724,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 						int iDomainModifier = GetTradeConnectionDomainValueModifierTimes100(kTradeConnection, eYield);
 						int iDestRiverModifier = GetTradeConnectionRiverValueModifierTimes100(kTradeConnection, eYield, false);
 						int iTraitBonus = GetTradeConnectionOtherTraitValueTimes100(kTradeConnection, eYield, false);
+						iTraitBonus += GetTradeConnectionTraitValueTimes100(kTradeConnection, eYield, false);
 
 						iValue = iBaseValue;
 						iValue += iYourBuildingBonus;
@@ -2756,6 +2753,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 						int iBaseValue = GetTradeConnectionBaseValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
 #if defined(MOD_API_UNIFIED_YIELDS)
 						int iTraitBonus = GetTradeConnectionOtherTraitValueTimes100(kTradeConnection, eYield, false);
+						iTraitBonus += GetTradeConnectionTraitValueTimes100(kTradeConnection, eYield, false);
 #endif
 
 						int iModifier = 100;
@@ -2787,6 +2785,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 #if defined(MOD_API_UNIFIED_YIELDS)
 					iValue += GetTradeConnectionPolicyValueTimes100(kTradeConnection, eYield);
 					iValue += GetTradeConnectionOtherTraitValueTimes100(kTradeConnection, eYield, false);
+					iValue += GetTradeConnectionTraitValueTimes100(kTradeConnection, eYield, false);
 #endif
 #if defined(MOD_GLOBAL_INTERNAL_TRADE_ROUTE_BONUS_FROM_ORIGIN_CITY)
 					CvCity* pOriginCity = CvGameTrade::GetOriginCity(kTradeConnection);
@@ -2838,6 +2837,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 #if defined(MOD_API_UNIFIED_YIELDS)
 					iValue += GetTradeConnectionPolicyValueTimes100(kTradeConnection, eYield);
 					iValue += GetTradeConnectionOtherTraitValueTimes100(kTradeConnection, eYield, false);
+					iValue += GetTradeConnectionTraitValueTimes100(kTradeConnection, eYield, false);
 #endif
 #if defined(MOD_GLOBAL_INTERNAL_TRADE_ROUTE_BONUS_FROM_ORIGIN_CITY)
 					if (MOD_GLOBAL_INTERNAL_TRADE_ROUTE_BONUS_FROM_ORIGIN_CITY) {
@@ -3823,60 +3823,9 @@ int CvPlayerTrade::GetTradeRouteRange (DomainTypes eDomain, CvCity* pOriginCity)
 		break;
 	}
 
-	CvPlayerTechs* pMyPlayerTechs = m_pPlayer->GetPlayerTechs();
-	CvTeamTechs* pMyTeamTechs = GET_TEAM(GET_PLAYER(m_pPlayer->GetID()).getTeam()).GetTeamTechs();
-	CvTechEntry* pTechInfo = NULL; 
+	int iExtendedRange = GET_PLAYER(m_pPlayer->GetID()).getTradeRouteDomainExtraRange(eDomain);
 
-	int iExtendedRange = 0;
-	for(int iTechLoop = 0; iTechLoop < pMyPlayerTechs->GetTechs()->GetNumTechs(); iTechLoop++)
-	{
-		TechTypes eTech = (TechTypes)iTechLoop;
-		if (!pMyTeamTechs->HasTech(eTech))
-		{
-			continue;
-		}
-
-		pTechInfo = pMyPlayerTechs->GetTechs()->GetEntry(eTech);
-		CvAssertMsg(pTechInfo, "null tech entry");
-		if (pTechInfo)
-		{
-			iExtendedRange += pTechInfo->GetTradeRouteDomainExtraRange(eDomain);
-		}
-	}
-	
-	int iRangeModifier = 0;
-	for (int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
-	{
-		BuildingTypes eBuilding = (BuildingTypes)GET_PLAYER(pOriginCity->getOwner()).getCivilizationInfo().getCivilizationBuildings(iI);
-		if(eBuilding != NO_BUILDING)
-		{
-			CvBuildingEntry* pBuildingEntry = GC.GetGameBuildings()->GetEntry(eBuilding);
-			if (!pBuildingEntry)
-			{
-				continue;
-			}
-
-			if (pBuildingEntry && pOriginCity->GetCityBuildings()->GetNumBuilding((BuildingTypes)pBuildingEntry->GetID()))
-			{
-				if (pBuildingEntry->GetTradeRouteSeaDistanceModifier() > 0 && eDomain == DOMAIN_SEA)
-				{
-#if defined(MOD_BUGFIX_MINOR)
-					iRangeModifier += pBuildingEntry->GetTradeRouteSeaDistanceModifier() * pOriginCity->GetCityBuildings()->GetNumBuilding((BuildingTypes)pBuildingEntry->GetID());
-#else
-					iRangeModifier += pBuildingEntry->GetTradeRouteSeaDistanceModifier();
-#endif
-				}
-				else if (pBuildingEntry->GetTradeRouteLandDistanceModifier() > 0 && eDomain == DOMAIN_LAND)
-				{
-#if defined(MOD_BUGFIX_MINOR)
-					iRangeModifier += pBuildingEntry->GetTradeRouteLandDistanceModifier() * pOriginCity->GetCityBuildings()->GetNumBuilding((BuildingTypes)pBuildingEntry->GetID());
-#else
-					iRangeModifier += pBuildingEntry->GetTradeRouteLandDistanceModifier();
-#endif
-				}
-			}
-		}
-	}
+	int iRangeModifier = pOriginCity->getTradeRouteDomainRangeModifier(eDomain);
 
 	iRange = iBaseRange;
 	iRange += iTraitRange;
