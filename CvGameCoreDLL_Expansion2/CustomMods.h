@@ -857,6 +857,10 @@
 //   GameEvents.CityPuppeted.Add(function(playerID, cityID) end) 
 #define MOD_EVENTS_CITY_PUPPETED                      gCustomMods.isEVENTS_CITY_PUPPETED()
 
+
+//   GameEvents.DoDenounce.Add(function(PlayerID, OtherPlayerID) end) 
+#define MOD_EVENTS_DO_DENOUNCE                      gCustomMods.isEVENTS_DO_DENOUNCE ()
+
 //  GameEvents.TileSetOwnership.Add(iPlotX, iPlotY, iOldOwner,iNewOwner) end)
 #define MOD_EVENTS_TILE_SET_OWNER                gCustomMods.isEVENTS_TILE_SET_OWNER()
 
@@ -1272,6 +1276,7 @@ enum BattleTypeTypes
 #define GAMEEVENT_CultureBombDiscover			"CultureBombDiscover",		    "iiiib"
 #define GAMEEVENT_FaithDiscover			        "FaithDiscover",		        "iiiib"
 #define GAMEEVENT_CityPuppeted					"CityPuppeted",					"ii"
+#define GAMEEVENT_DoDenounce					"DoDenounce",					"ii"
 #define GAMEEVENT_CityBeginsWLTKD			    "CityBeginsWLTKD",              "iiii"
 #define GAMEEVENT_CityEndsWLTKD				    "CityEndsWLTKD",                "iiii"
 #define GAMEEVENT_CityRangedStrike				"CityRangedStrike",			    "iiiiii"
@@ -1629,6 +1634,7 @@ public:
 	MOD_OPT_DECL(EVENTS_GREAT_WORK_CREATED);
 	MOD_OPT_DECL(EVENTS_GREAT_PEOPLE_BOOST);
 	MOD_OPT_DECL(EVENTS_CITY_PUPPETED);
+	MOD_OPT_DECL(EVENTS_DO_DENOUNCE);
 	MOD_OPT_DECL(EVENTS_WLKD_DAY);
 	MOD_OPT_DECL(EVENTS_CITY_RANGE_STRIKE);
 	MOD_OPT_DECL(EVENTS_UNIT_CAN_RANGEATTACK);

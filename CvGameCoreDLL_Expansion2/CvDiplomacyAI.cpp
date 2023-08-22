@@ -21417,6 +21417,14 @@ void CvDiplomacyAI::DoDenouncePlayer(PlayerTypes ePlayer)
 
 	SetDenouncedPlayerCounter(ePlayer, 0);
 
+
+#if defined(MOD_EVENTS_DO_DENOUNCE)
+	if (MOD_EVENTS_DO_DENOUNCE && eMyPlayer !=NULL) 
+	{
+		GAMEEVENTINVOKE_HOOK(GAMEEVENT_DoDenounce, eMyPlayer, ePlayer);
+	}
+#endif
+
 	// close both embassies
 	GET_TEAM(eMyTeam).CloseEmbassyAtTeam(eTheirTeam);
 	GET_TEAM(eTheirTeam).CloseEmbassyAtTeam(eMyTeam);
