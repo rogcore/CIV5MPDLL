@@ -254,6 +254,7 @@ CvPlayer::CvPlayer() :
 	, m_iGreatPeopleThresholdModifier("CvPlayer::m_iGreatPeopleThresholdModifier", m_syncArchive)
 	, m_iGreatGeneralsThresholdModifier("CvPlayer::m_iGreatGeneralsThresholdModifier", m_syncArchive)
 	, m_iGreatAdmiralsThresholdModifier(0)
+	, m_iNoResistance()
 	, m_iGreatGeneralCombatBonus(0)
 	, m_iAnarchyNumTurns("CvPlayer::m_iAnarchyNumTurns", m_syncArchive)
 	, m_iPolicyCostModifier("CvPlayer::m_iPolicyCostModifier", m_syncArchive)
@@ -1013,6 +1014,7 @@ void CvPlayer::uninit()
 	m_iGreatPeopleThresholdModifier = 0;
 	m_iGreatGeneralsThresholdModifier = 0;
 	m_iGreatAdmiralsThresholdModifier = 0;
+	m_iNoResistance = 0;
 	m_iGreatGeneralCombatBonus = 0;
 	m_iAnarchyNumTurns = 0;
 	m_iPolicyCostModifier = 0;
@@ -3176,13 +3178,16 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 		{
 			pNewCity->SetOccupied(true);
 
-			int iInfluenceReduction = GetCulture()->GetInfluenceCityConquestReduction(eOldOwner);
-			int iOriginalResistanceTurns = pNewCity->getPopulation() * (100 - iInfluenceReduction) / 100;
-			int iTurnChange = GetCaptureCityResistanceTurnsChange(pNewCity, iOriginalResistanceTurns, GET_PLAYER(eOldOwner).IsHasLostCapital());
-
-			if (iTurnChange + iOriginalResistanceTurns > 0)
+			if (!GET_PLAYER(GetID()).CanNoResistance())
 			{
-				pNewCity->ChangeResistanceTurns(iTurnChange + iOriginalResistanceTurns);
+				int iInfluenceReduction = GetCulture()->GetInfluenceCityConquestReduction(eOldOwner);
+				int iOriginalResistanceTurns = pNewCity->getPopulation() * (100 - iInfluenceReduction) / 100;
+				int iTurnChange = GetCaptureCityResistanceTurnsChange(pNewCity, iOriginalResistanceTurns, GET_PLAYER(eOldOwner).IsHasLostCapital());
+
+				if (iTurnChange + iOriginalResistanceTurns > 0)
+				{
+					pNewCity->ChangeResistanceTurns(iTurnChange + iOriginalResistanceTurns);
+				}
 			}
 		}
 
@@ -15834,6 +15839,28 @@ void CvPlayer::ChangeProductionBeakerMod(int iChange)
 	SetProductionBeakerMod(GetProductionBeakerMod() + iChange);
 }
 
+
+//	--------------------------------------------------------------------------------
+bool CvPlayer::CanNoResistance() const
+{
+	if (GetNoResistance() > 0)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetNoResistance() const
+{
+	return m_iNoResistance;
+}
+//	--------------------------------------------------------------------------------
+void CvPlayer::ChangeNoResistance(int iChange)
+{
+	m_iNoResistance += iChange;
+}
 //////////////////////////////////////////////////////////////////////////
 int CvPlayer::GetGreatGeneralCombatBonus() const
 {
@@ -25399,6 +25426,12 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	ChangeGreatScientistBeakerPolicyMod(pPolicy->GetGreatScientistBeakerPolicyModifier() * iChange);
 	ChangeProductionBeakerMod(pPolicy->GetProductionBeakerMod() * iChange);
 
+
+	if (pPolicy->IsNoResistance())
+	{
+		ChangeNoResistance(pPolicy->IsNoResistance() * iChange);
+	}
+
 	if (pPolicy->GetExtraSpies() > 0)
 	{
 		CvPlayerEspionage* pEspionage = GetEspionage();
@@ -26757,6 +26790,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iGreatPeopleThresholdModifier;
 	kStream >> m_iGreatGeneralsThresholdModifier;
 	kStream >> m_iGreatAdmiralsThresholdModifier;
+	kStream >> m_iNoResistance;
 	kStream >> m_iGreatGeneralCombatBonus;
 	kStream >> m_iAnarchyNumTurns;
 	kStream >> m_iPolicyCostModifier;
@@ -27465,6 +27499,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iGreatPeopleThresholdModifier;
 	kStream << m_iGreatGeneralsThresholdModifier;
 	kStream << m_iGreatAdmiralsThresholdModifier;
+	kStream << m_iNoResistance;
 	kStream << m_iGreatGeneralCombatBonus;
 	kStream << m_iAnarchyNumTurns;
 	kStream << m_iPolicyCostModifier;

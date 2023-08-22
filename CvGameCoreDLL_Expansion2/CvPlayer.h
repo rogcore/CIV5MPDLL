@@ -839,6 +839,10 @@ public:
 	void SetProductionBeakerMod(int iValue);
 	void ChangeProductionBeakerMod(int iChange);
 
+	bool CanNoResistance() const;
+	int GetNoResistance() const;
+	void ChangeNoResistance(int iValue);
+
 	int GetGreatGeneralCombatBonus() const;
 	void SetGreatGeneralCombatBonus(int iValue);
 
@@ -2229,6 +2233,7 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iGreatPeopleThresholdModifier;
 	FAutoVariable<int, CvPlayer> m_iGreatGeneralsThresholdModifier;
 	int m_iGreatAdmiralsThresholdModifier;
+	int m_iNoResistance;
 	int m_iGreatGeneralCombatBonus;
 	FAutoVariable<int, CvPlayer> m_iAnarchyNumTurns;
 	FAutoVariable<int, CvPlayer> m_iPolicyCostModifier;

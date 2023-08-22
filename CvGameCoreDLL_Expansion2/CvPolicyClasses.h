@@ -271,6 +271,7 @@ public:
 #if defined(MOD_BUGFIX_DUMMY_POLICIES)
 	bool IsDummy() const;
 #endif
+	bool IsNoResistance() const;
 	int GetDefenseBoost() const;
 	int GetFreePopulation() const;
 	int GetFreePopulationCapital() const;
@@ -483,6 +484,7 @@ private:
 #if defined(MOD_BUGFIX_DUMMY_POLICIES)
 	bool m_bDummy;
 #endif
+	bool m_bNoResistance;
 	int m_iDefenseBoost;
 	int m_iFreePopulation;
 	int m_iFreePopulationCapital;

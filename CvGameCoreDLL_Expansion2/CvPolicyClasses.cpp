@@ -180,6 +180,7 @@ CvPolicyEntry::CvPolicyEntry(void):
 #if defined(MOD_BUGFIX_DUMMY_POLICIES)
 	m_bDummy(false),
 #endif
+	m_bNoResistance(false),
 	m_iDefenseBoost(0),
 	m_iFreePopulation(0),
 	m_iFreePopulationCapital(0),
@@ -463,6 +464,7 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 		m_bDummy = kResults.GetBool("Dummy");
 	}
 #endif
+	m_bNoResistance = kResults.GetInt("NoResistance");
 	m_iDefenseBoost = kResults.GetInt("DefenseBoostAllCities");
 	m_iFreePopulation = kResults.GetInt("FreePopulation");
 	m_iFreePopulationCapital = kResults.GetInt("FreePopulationCapital");
@@ -2159,10 +2161,17 @@ bool CvPolicyEntry::IsDummy() const
 }
 #endif
 
+bool CvPolicyEntry::IsNoResistance() const
+{
+	return m_bNoResistance;
+}
+
+
 int CvPolicyEntry::GetDefenseBoost() const
 {
 	return m_iDefenseBoost;
 }
+
 
 /// Does this Policy grant free population?
 int CvPolicyEntry::GetFreePopulation() const
