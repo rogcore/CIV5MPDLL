@@ -181,7 +181,12 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_bDummy(false),
 #endif
 	m_bNoResistance(false),
+	m_bUpgradeAllTerritory(false),
 	m_iDefenseBoost(0),
+	m_iCityCaptureHealGlobal(0),
+	m_iOriginalCapitalCaptureTech(0),
+	m_iOriginalCapitalCapturePolicy(0),
+	m_iOriginalCapitalCaptureGreatPerson(0),
 	m_iFreePopulation(0),
 	m_iFreePopulationCapital(0),
 	m_iExtraSpies(0),
@@ -465,7 +470,12 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	}
 #endif
 	m_bNoResistance = kResults.GetInt("NoResistance");
+	m_bUpgradeAllTerritory = kResults.GetInt("UpgradeAllTerritory");
 	m_iDefenseBoost = kResults.GetInt("DefenseBoostAllCities");
+	m_iCityCaptureHealGlobal = kResults.GetInt("CityCaptureHealGlobal");
+	m_iOriginalCapitalCaptureTech = kResults.GetInt("OriginalCapitalCaptureTech");
+	m_iOriginalCapitalCapturePolicy = kResults.GetInt("OriginalCapitalCapturePolicy");
+	m_iOriginalCapitalCaptureGreatPerson = kResults.GetInt("OriginalCapitalCaptureGreatPerson");
 	m_iFreePopulation = kResults.GetInt("FreePopulation");
 	m_iFreePopulationCapital = kResults.GetInt("FreePopulationCapital");
 	m_iExtraSpies = kResults.GetInt("ExtraSpies");
@@ -2166,10 +2176,37 @@ bool CvPolicyEntry::IsNoResistance() const
 	return m_bNoResistance;
 }
 
+bool CvPolicyEntry::IsUpgradeAllTerritory() const
+{
+	return m_bUpgradeAllTerritory;
+}
 
 int CvPolicyEntry::GetDefenseBoost() const
 {
 	return m_iDefenseBoost;
+}
+
+/// All units heal X whenever you conquer a city
+int CvPolicyEntry::GetCityCaptureHealGlobal() const
+{
+	return m_iCityCaptureHealGlobal;
+}
+
+int CvPolicyEntry::GetOriginalCapitalCaptureTech() const
+{
+	return m_iOriginalCapitalCaptureTech;
+}
+
+
+int CvPolicyEntry::GetOriginalCapitalCapturePolicy() const
+{
+	return m_iOriginalCapitalCapturePolicy;
+}
+
+
+int CvPolicyEntry::GetOriginalCapitalCaptureGreatPerson() const
+{
+	return m_iOriginalCapitalCaptureGreatPerson;
 }
 
 

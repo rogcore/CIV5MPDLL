@@ -12262,11 +12262,11 @@ bool CvUnit::CanUpgradeTo(UnitTypes eUpgradeUnitType, bool bOnlyTestVisible) con
 		}
 
 #if defined(MOD_GLOBAL_CS_UPGRADES)
-		if (!CanUpgradeInTerritory(bOnlyTestVisible))
+		if (!CanUpgradeInTerritory(bOnlyTestVisible) && !GET_PLAYER(getOwner()).CanUpgradeAllTerritory())
 			return false;
 #else
 		// Must be in territory owned by the player
-		if(pPlot->getOwner() != getOwner())
+		if(pPlot->getOwner() != getOwner() && ! GET_PLAYER(getOwner()).CanUpgradeAllTerritory() )
 			return false;
 #endif
 
@@ -12345,25 +12345,29 @@ bool CvUnit::CanUpgradeInTerritory(bool bOnlyTestVisible) const
 	VALIDATE_OBJECT
 
 	// Show the upgrade, but don't actually allow it
-	if(!bOnlyTestVisible)
-	{
-		CvPlot* pPlot = plot();
-		const PlayerTypes kPlotOwner = pPlot->getOwner();
+		if (!bOnlyTestVisible)
+		{
+			CvPlot* pPlot = plot();
+			const PlayerTypes kPlotOwner = pPlot->getOwner();
 
-		// Must be in territory owned by the player or by an allied militaristic City State
-		if (kPlotOwner != getOwner()) {
-			if (MOD_GLOBAL_CS_UPGRADES && kPlotOwner != NO_PLAYER) {
-				const CvPlayer& pPlotOwner = GET_PLAYER(kPlotOwner);
-				if (!(pPlotOwner.isMinorCiv() && 
-					  pPlotOwner.GetMinorCivAI()->GetTrait() == MINOR_CIV_TRAIT_MILITARISTIC && 
-					  pPlotOwner.GetMinorCivAI()->GetAlly() == getOwner())) {
+			// Must be in territory owned by the player or by an allied militaristic City State
+			if (kPlotOwner != getOwner())
+			{
+				if (MOD_GLOBAL_CS_UPGRADES && kPlotOwner != NO_PLAYER)
+				{
+					const CvPlayer& pPlotOwner = GET_PLAYER(kPlotOwner);
+					if (!(pPlotOwner.isMinorCiv() &&
+						pPlotOwner.GetMinorCivAI()->GetTrait() == MINOR_CIV_TRAIT_MILITARISTIC &&
+						pPlotOwner.GetMinorCivAI()->GetAlly() == getOwner())) {
+						return false;
+					}
+				}
+				else
+				{
 					return false;
 				}
-			} else {
-				return false;
 			}
 		}
-	}
 
 	return true;
 }

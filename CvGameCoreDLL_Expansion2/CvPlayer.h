@@ -843,6 +843,20 @@ public:
 	int GetNoResistance() const;
 	void ChangeNoResistance(int iValue);
 
+	bool CanUpgradeAllTerritory() const;
+	int GetUpgradeAllTerritory() const;
+	void ChangeUpgradeAllTerritory(int iValue);
+
+	int getCityCaptureHealGlobal() const;
+	void changeCityCaptureHealGlobal(int iChange);
+
+	int getOriginalCapitalCaptureTech() const;
+	void changeOriginalCapitalCaptureTech(int iChange);
+	int getOriginalCapitalCapturePolicy() const;
+	void changeOriginalCapitalCapturePolicy(int iChange);
+	int getOriginalCapitalCaptureGreatPerson() const;
+	void changeOriginalCapitalCaptureGreatPerson(int iChange);
+
 	int GetGreatGeneralCombatBonus() const;
 	void SetGreatGeneralCombatBonus(int iValue);
 
@@ -2234,6 +2248,11 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iGreatGeneralsThresholdModifier;
 	int m_iGreatAdmiralsThresholdModifier;
 	int m_iNoResistance;
+	int m_iUpgradeAllTerritory;
+	int m_iCityCaptureHealGlobal;
+	int m_iOriginalCapitalCaptureTech;
+	int m_iOriginalCapitalCapturePolicy;
+	int m_iOriginalCapitalCaptureGreatPerson;
 	int m_iGreatGeneralCombatBonus;
 	FAutoVariable<int, CvPlayer> m_iAnarchyNumTurns;
 	FAutoVariable<int, CvPlayer> m_iPolicyCostModifier;

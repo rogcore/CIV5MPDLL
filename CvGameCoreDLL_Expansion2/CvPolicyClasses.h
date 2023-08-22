@@ -272,7 +272,12 @@ public:
 	bool IsDummy() const;
 #endif
 	bool IsNoResistance() const;
+	bool IsUpgradeAllTerritory() const;
 	int GetDefenseBoost() const;
+	int GetCityCaptureHealGlobal() const;
+	int GetOriginalCapitalCaptureTech() const;
+	int GetOriginalCapitalCapturePolicy() const;
+	int GetOriginalCapitalCaptureGreatPerson() const;
 	int GetFreePopulation() const;
 	int GetFreePopulationCapital() const;
 	int GetExtraSpies() const;
@@ -485,7 +490,12 @@ private:
 	bool m_bDummy;
 #endif
 	bool m_bNoResistance;
+	bool m_bUpgradeAllTerritory;
 	int m_iDefenseBoost;
+	int m_iCityCaptureHealGlobal;
+	int m_iOriginalCapitalCaptureTech;
+	int m_iOriginalCapitalCapturePolicy;
+	int m_iOriginalCapitalCaptureGreatPerson;
 	int m_iFreePopulation;
 	int m_iFreePopulationCapital;
 	int m_iExtraSpies;
