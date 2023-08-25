@@ -456,15 +456,15 @@ void CvPlot::doTurn()
 		iFakeRandNum= GC.getGame().getSmallFakeRandNum(1000, GetPlotIndex());
 
 		bool bOutBreakLv1 = false, bOutBreakLv2 = false, bOutBreakLv3 = false;
-		if (iFakeRandNum <= 100)
+		if (iFakeRandNum <= 50)
 		{
 			bOutBreakLv1 = true;
 		}
-		else if (iFakeRandNum <= 600 && iFakeRandNum>=550)
+		else if (iFakeRandNum <= 600 && iFakeRandNum>=580)
 		{
 			bOutBreakLv2 = true;
 		}
-		else if (iFakeRandNum >= 970)
+		else if (iFakeRandNum >= 990)
 		{
 			bOutBreakLv3 = true;
 		}

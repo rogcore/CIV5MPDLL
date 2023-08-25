@@ -254,6 +254,7 @@ CvPlayer::CvPlayer() :
 	, m_iGreatPeopleThresholdModifier("CvPlayer::m_iGreatPeopleThresholdModifier", m_syncArchive)
 	, m_iGreatGeneralsThresholdModifier("CvPlayer::m_iGreatGeneralsThresholdModifier", m_syncArchive)
 	, m_iGreatAdmiralsThresholdModifier(0)
+	, m_iAlwaysWeLoveKindDayInGoldenAge()
 	, m_iNoResistance()
 	, m_iUpgradeAllTerritory()
 	, m_iCityCaptureHealGlobal(0)
@@ -1019,6 +1020,7 @@ void CvPlayer::uninit()
 	m_iGreatPeopleThresholdModifier = 0;
 	m_iGreatGeneralsThresholdModifier = 0;
 	m_iGreatAdmiralsThresholdModifier = 0;
+	m_iAlwaysWeLoveKindDayInGoldenAge = 0;
 	m_iNoResistance = 0;
 	m_iUpgradeAllTerritory = 0;
 	m_iCityCaptureHealGlobal = 0;
@@ -15886,6 +15888,30 @@ void CvPlayer::ChangeProductionBeakerMod(int iChange)
 
 
 //	--------------------------------------------------------------------------------
+bool CvPlayer::CanAlwaysWeLoveKindDayInGoldenAge() const
+{
+	if (GetAlwaysWeLoveKindDayInGoldenAge() > 0)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetAlwaysWeLoveKindDayInGoldenAge() const
+{
+	return m_iAlwaysWeLoveKindDayInGoldenAge;
+}
+//	--------------------------------------------------------------------------------
+void CvPlayer::ChangeAlwaysWeLoveKindDayInGoldenAge(int iChange)
+{
+	m_iAlwaysWeLoveKindDayInGoldenAge += iChange;
+}
+
+
+
+//	--------------------------------------------------------------------------------
 bool CvPlayer::CanNoResistance() const
 {
 	if (GetNoResistance() > 0)
@@ -25552,6 +25578,10 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 		ChangeNoResistance(pPolicy->IsNoResistance() * iChange);
 	}
 
+	if (pPolicy->IsAlwaysWeLoveKindDayInGoldenAge())
+	{
+		ChangeAlwaysWeLoveKindDayInGoldenAge(pPolicy->IsAlwaysWeLoveKindDayInGoldenAge() * iChange);
+	}
 
 	if (pPolicy->IsUpgradeAllTerritory())
 	{
@@ -26916,6 +26946,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iGreatPeopleThresholdModifier;
 	kStream >> m_iGreatGeneralsThresholdModifier;
 	kStream >> m_iGreatAdmiralsThresholdModifier;
+	kStream >> m_iAlwaysWeLoveKindDayInGoldenAge;
 	kStream >> m_iNoResistance;
 	kStream >> m_iUpgradeAllTerritory;
 	kStream >> m_iCityCaptureHealGlobal;
@@ -27630,6 +27661,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iGreatPeopleThresholdModifier;
 	kStream << m_iGreatGeneralsThresholdModifier;
 	kStream << m_iGreatAdmiralsThresholdModifier;
+	kStream << m_iAlwaysWeLoveKindDayInGoldenAge;
 	kStream << m_iNoResistance;
 	kStream << m_iUpgradeAllTerritory;
 	kStream << m_iCityCaptureHealGlobal;

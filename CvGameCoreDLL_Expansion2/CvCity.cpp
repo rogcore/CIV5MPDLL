@@ -4108,9 +4108,12 @@ void CvCity::DoTestResourceDemanded()
 	VALIDATE_OBJECT
 	ResourceTypes eResource = GetResourceDemanded();
 
-	if(GetWeLoveTheKingDayCounter() > 0)
+	if(GetWeLoveTheKingDayCounter() > 0 )
 	{
-		ChangeWeLoveTheKingDayCounter(-1);
+		if (!GET_PLAYER(getOwner()).isGoldenAge() || !GET_PLAYER(getOwner()).CanAlwaysWeLoveKindDayInGoldenAge())
+		{
+			ChangeWeLoveTheKingDayCounter(-1);
+		}
 
 		// WLTKD over!
 		if(GetWeLoveTheKingDayCounter() == 0)

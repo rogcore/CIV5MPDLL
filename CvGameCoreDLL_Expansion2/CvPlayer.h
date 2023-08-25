@@ -839,6 +839,10 @@ public:
 	void SetProductionBeakerMod(int iValue);
 	void ChangeProductionBeakerMod(int iChange);
 
+	bool CanAlwaysWeLoveKindDayInGoldenAge() const;
+	int GetAlwaysWeLoveKindDayInGoldenAge() const;
+	void ChangeAlwaysWeLoveKindDayInGoldenAge(int iValue);
+
 	bool CanNoResistance() const;
 	int GetNoResistance() const;
 	void ChangeNoResistance(int iValue);
@@ -849,7 +853,6 @@ public:
 
 	int getCityCaptureHealGlobal() const;
 	void changeCityCaptureHealGlobal(int iChange);
-
 	int getOriginalCapitalCaptureTech() const;
 	void changeOriginalCapitalCaptureTech(int iChange);
 	int getOriginalCapitalCapturePolicy() const;
@@ -2247,6 +2250,7 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iGreatPeopleThresholdModifier;
 	FAutoVariable<int, CvPlayer> m_iGreatGeneralsThresholdModifier;
 	int m_iGreatAdmiralsThresholdModifier;
+	int m_iAlwaysWeLoveKindDayInGoldenAge;
 	int m_iNoResistance;
 	int m_iUpgradeAllTerritory;
 	int m_iCityCaptureHealGlobal;
