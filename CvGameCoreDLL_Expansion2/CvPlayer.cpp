@@ -254,6 +254,12 @@ CvPlayer::CvPlayer() :
 	, m_iGreatPeopleThresholdModifier("CvPlayer::m_iGreatPeopleThresholdModifier", m_syncArchive)
 	, m_iGreatGeneralsThresholdModifier("CvPlayer::m_iGreatGeneralsThresholdModifier", m_syncArchive)
 	, m_iGreatAdmiralsThresholdModifier(0)
+	, m_iNoResistance()
+	, m_iUpgradeAllTerritory()
+	, m_iCityCaptureHealGlobal(0)
+	, m_iOriginalCapitalCaptureTech(0)
+	, m_iOriginalCapitalCapturePolicy(0)
+	, m_iOriginalCapitalCaptureGreatPerson(0)
 	, m_iGreatGeneralCombatBonus(0)
 	, m_iAnarchyNumTurns("CvPlayer::m_iAnarchyNumTurns", m_syncArchive)
 	, m_iPolicyCostModifier("CvPlayer::m_iPolicyCostModifier", m_syncArchive)
@@ -1013,6 +1019,12 @@ void CvPlayer::uninit()
 	m_iGreatPeopleThresholdModifier = 0;
 	m_iGreatGeneralsThresholdModifier = 0;
 	m_iGreatAdmiralsThresholdModifier = 0;
+	m_iNoResistance = 0;
+	m_iUpgradeAllTerritory = 0;
+	m_iCityCaptureHealGlobal = 0;
+	m_iOriginalCapitalCaptureTech = 0;
+	m_iOriginalCapitalCapturePolicy = 0;
+	m_iOriginalCapitalCaptureGreatPerson = 0;
 	m_iGreatGeneralCombatBonus = 0;
 	m_iAnarchyNumTurns = 0;
 	m_iPolicyCostModifier = 0;
@@ -2343,6 +2355,38 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 		}
 	}
 
+	
+	if (bConquest)
+	{
+		// All units heal from conquering a city?
+		if (getCityCaptureHealGlobal() > 0)
+		{
+			DoHealGlobal(getCityCaptureHealGlobal());
+		}
+
+		// Trigger most "first conquest" bonuses now.
+		if (!pOldCity->isEverOwned(GetID()))
+		{
+			if (pOldCity->IsOriginalMajorCapital() && getOriginalCapitalCaptureTech() > 0)
+			{
+				int iNumTechs = GetNumFreeTechs();
+				SetNumFreeTechs(getOriginalCapitalCaptureTech()+ iNumTechs);
+			}
+
+			if (pOldCity->IsOriginalMajorCapital() && getOriginalCapitalCapturePolicy() > 0)
+			{
+				ChangeNumFreePolicies(getOriginalCapitalCapturePolicy());
+			}
+
+			if (pOldCity->IsOriginalMajorCapital() && getOriginalCapitalCaptureGreatPerson() > 0)
+			{
+				ChangeNumGreatPeople(getOriginalCapitalCaptureGreatPerson());
+			}
+
+		}
+	}
+
+
 	// slewis - warmonger calculations
 	if (bConquest)
 	{
@@ -2714,6 +2758,9 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 	}
 
 	CvCivilizationInfo& playerCivilizationInfo = getCivilizationInfo();
+
+
+
 
 #if !defined(NO_ACHIEVEMENTS)
 	if(bConquest && !GC.getGame().isGameMultiPlayer() && isHuman())
@@ -3176,13 +3223,16 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 		{
 			pNewCity->SetOccupied(true);
 
-			int iInfluenceReduction = GetCulture()->GetInfluenceCityConquestReduction(eOldOwner);
-			int iOriginalResistanceTurns = pNewCity->getPopulation() * (100 - iInfluenceReduction) / 100;
-			int iTurnChange = GetCaptureCityResistanceTurnsChange(pNewCity, iOriginalResistanceTurns, GET_PLAYER(eOldOwner).IsHasLostCapital());
-
-			if (iTurnChange + iOriginalResistanceTurns > 0)
+			if ( (!GET_PLAYER(GetID()).CanNoResistance()) && !GET_PLAYER(GetID()).GetPlayerTraits()->IsNoResistance() )
 			{
-				pNewCity->ChangeResistanceTurns(iTurnChange + iOriginalResistanceTurns);
+				int iInfluenceReduction = GetCulture()->GetInfluenceCityConquestReduction(eOldOwner);
+				int iOriginalResistanceTurns = pNewCity->getPopulation() * (100 - iInfluenceReduction) / 100;
+				int iTurnChange = GetCaptureCityResistanceTurnsChange(pNewCity, iOriginalResistanceTurns, GET_PLAYER(eOldOwner).IsHasLostCapital());
+
+				if (iTurnChange + iOriginalResistanceTurns > 0)
+				{
+					pNewCity->ChangeResistanceTurns(iTurnChange + iOriginalResistanceTurns);
+				}
 			}
 		}
 
@@ -15834,6 +15884,100 @@ void CvPlayer::ChangeProductionBeakerMod(int iChange)
 	SetProductionBeakerMod(GetProductionBeakerMod() + iChange);
 }
 
+
+//	--------------------------------------------------------------------------------
+bool CvPlayer::CanNoResistance() const
+{
+	if (GetNoResistance() > 0)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetNoResistance() const
+{
+	return m_iNoResistance;
+}
+//	--------------------------------------------------------------------------------
+void CvPlayer::ChangeNoResistance(int iChange)
+{
+	m_iNoResistance += iChange;
+}
+
+
+
+//	--------------------------------------------------------------------------------
+bool CvPlayer::CanUpgradeAllTerritory() const
+{
+	if (GetUpgradeAllTerritory() > 0)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetUpgradeAllTerritory() const
+{
+	return m_iUpgradeAllTerritory;
+}
+//	--------------------------------------------------------------------------------
+void CvPlayer::ChangeUpgradeAllTerritory(int iChange)
+{
+	m_iUpgradeAllTerritory += iChange;
+}
+
+
+
+int CvPlayer::getCityCaptureHealGlobal() const
+{
+	return m_iCityCaptureHealGlobal;
+}
+
+void CvPlayer::changeCityCaptureHealGlobal(int iChange)
+{
+	m_iCityCaptureHealGlobal += iChange;
+}
+
+
+int CvPlayer::getOriginalCapitalCaptureTech() const
+{
+	return m_iOriginalCapitalCaptureTech;
+}
+
+void CvPlayer::changeOriginalCapitalCaptureTech(int iChange)
+{
+	m_iOriginalCapitalCaptureTech += iChange;
+}
+
+
+int CvPlayer::getOriginalCapitalCapturePolicy() const
+{
+	return m_iOriginalCapitalCapturePolicy;
+}
+
+void CvPlayer::changeOriginalCapitalCapturePolicy(int iChange)
+{
+	m_iOriginalCapitalCapturePolicy += iChange;
+}
+
+
+
+int CvPlayer::getOriginalCapitalCaptureGreatPerson() const
+{
+	return m_iOriginalCapitalCaptureGreatPerson;
+}
+
+void CvPlayer::changeOriginalCapitalCaptureGreatPerson(int iChange)
+{
+	m_iOriginalCapitalCaptureGreatPerson += iChange;
+}
+
+
 //////////////////////////////////////////////////////////////////////////
 int CvPlayer::GetGreatGeneralCombatBonus() const
 {
@@ -25398,6 +25542,21 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	ChangeAbleToAnnexCityStatesCount((pPolicy->IsAbleToAnnexCityStates()) ? iChange : 0);
 	ChangeGreatScientistBeakerPolicyMod(pPolicy->GetGreatScientistBeakerPolicyModifier() * iChange);
 	ChangeProductionBeakerMod(pPolicy->GetProductionBeakerMod() * iChange);
+	changeCityCaptureHealGlobal(pPolicy->GetCityCaptureHealGlobal() * iChange);
+	changeOriginalCapitalCaptureTech(pPolicy->GetOriginalCapitalCaptureTech() * iChange);
+	changeOriginalCapitalCapturePolicy(pPolicy->GetOriginalCapitalCapturePolicy() * iChange);
+	changeOriginalCapitalCaptureGreatPerson(pPolicy->GetOriginalCapitalCaptureGreatPerson() * iChange);
+
+	if (pPolicy->IsNoResistance())
+	{
+		ChangeNoResistance(pPolicy->IsNoResistance() * iChange);
+	}
+
+
+	if (pPolicy->IsUpgradeAllTerritory())
+	{
+		ChangeUpgradeAllTerritory(pPolicy->IsUpgradeAllTerritory() * iChange);
+	}
 
 	if (pPolicy->GetExtraSpies() > 0)
 	{
@@ -26757,6 +26916,12 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iGreatPeopleThresholdModifier;
 	kStream >> m_iGreatGeneralsThresholdModifier;
 	kStream >> m_iGreatAdmiralsThresholdModifier;
+	kStream >> m_iNoResistance;
+	kStream >> m_iUpgradeAllTerritory;
+	kStream >> m_iCityCaptureHealGlobal;
+	kStream >> m_iOriginalCapitalCaptureTech;
+	kStream >> m_iOriginalCapitalCapturePolicy;
+	kStream >> m_iOriginalCapitalCaptureGreatPerson;
 	kStream >> m_iGreatGeneralCombatBonus;
 	kStream >> m_iAnarchyNumTurns;
 	kStream >> m_iPolicyCostModifier;
@@ -27465,6 +27630,12 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iGreatPeopleThresholdModifier;
 	kStream << m_iGreatGeneralsThresholdModifier;
 	kStream << m_iGreatAdmiralsThresholdModifier;
+	kStream << m_iNoResistance;
+	kStream << m_iUpgradeAllTerritory;
+	kStream << m_iCityCaptureHealGlobal;
+	kStream << m_iOriginalCapitalCaptureTech;
+	kStream << m_iOriginalCapitalCapturePolicy;
+	kStream << m_iOriginalCapitalCaptureGreatPerson;
 	kStream << m_iGreatGeneralCombatBonus;
 	kStream << m_iAnarchyNumTurns;
 	kStream << m_iPolicyCostModifier;

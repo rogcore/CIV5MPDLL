@@ -166,6 +166,7 @@ public:
 	bool IsAnyBelief() const;
 #endif
 	bool IsGoldenAgeOnWar() const;
+	bool IsNoResistance() const;
 	bool IsBonusReligiousBelief() const;
 	bool IsAbleToAnnexCityStates() const;
 	bool IsCrossesMountainsAfterGreatGeneral() const;
@@ -408,6 +409,7 @@ protected:
 	bool m_bAnyBelief;
 #endif
 	bool m_bGoldenAgeOnWar;
+	bool m_bNoResistance;
 	bool m_bBonusReligiousBelief;
 	bool m_bAbleToAnnexCityStates;
 	bool m_bCrossesMountainsAfterGreatGeneral;
@@ -952,6 +954,10 @@ public:
 	{
 		return m_bGoldenAgeOnWar;
 	};
+	bool IsNoResistance() const
+	{
+		return m_bNoResistance;
+	};
 	bool IsBonusReligiousBelief() const
 	{
 		return m_bBonusReligiousBelief;
@@ -1301,6 +1307,7 @@ private:
 	bool m_bAnyBelief;
 #endif
 	bool m_bGoldenAgeOnWar;
+	bool m_bNoResistance;
 	bool m_bBonusReligiousBelief;
 	bool m_bAbleToAnnexCityStates;
 	bool m_bCrossesMountainsAfterGreatGeneral;

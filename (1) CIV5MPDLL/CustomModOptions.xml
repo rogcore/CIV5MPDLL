@@ -1009,6 +1009,8 @@
     <!--GameEvents.FaithDiscover.Add(function(iPlayer, iUnit, iX, iY, bIsGreatPerson) end)-->  
     <Row Class="3" Name="EVENTS_CITY_PUPPETED" Value="0"/>
     <!--GameEvents.CityPuppeted.Add(function(playerID, cityID) end)--> 
+    <Row Class="3" Name="EVENTS_DO_DENOUNCE" Value="0"/>
+    <!--GameEvents.DoDenounce.Add(function(PlayerID, OtherPlayerID) end)--> 
     <Row Class="3" Name="EVENTS_CITY_RANGE_STRIKE" Value="0"/>
     <!--GameEvents.CityRangedStrike.Add(function(iPlayer,iAttCity,idefPlayer,idefUnit,iX, iY) end)--> 
     <Row Class="3" Name="EVENTS_TILE_SET_OWNER" Value="0"/>
