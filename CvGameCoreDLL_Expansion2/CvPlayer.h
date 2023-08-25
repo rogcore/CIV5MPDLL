@@ -689,6 +689,11 @@ public:
 	int GetGoldenAgePointPerTurnFromCitys() const;
 #endif	
 
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	void DoChangeGreatGeneralRate();
+	void DoChangeGreatAdmiralRate();
+#endif
+
 	// Golden Age Stuff
 
 	void DoProcessGoldenAge();
