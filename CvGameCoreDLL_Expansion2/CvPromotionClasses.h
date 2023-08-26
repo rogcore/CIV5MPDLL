@@ -183,10 +183,10 @@ public:
 	int GetOutsideCapitalLandAttackMod() const;
 	int GetOnCapitalLandDefenseMod() const;
 	int GetOutsideCapitalLandDefenseMod() const;
-
 	int GetBarbarianCombatBonus() const;
 	int GetAOEDamageOnKill() const;
 	int GetDamageAoEFortified() const;
+	int GetMoraleBreakChance() const;
 	int GetWorkRateMod() const;
 #endif
 
@@ -653,8 +653,8 @@ protected:
 	int m_iNearbyUnitClassBonusRange;
 	UnitClassTypes m_iCombatBonusFromNearbyUnitClass;
 
-
 	int m_iAOEDamageOnKill;
+	int m_iMoraleBreakChance;
 	int m_iDamageAoEFortified;
 	int m_iWorkRateMod;
 	int m_iBarbarianCombatBonus;

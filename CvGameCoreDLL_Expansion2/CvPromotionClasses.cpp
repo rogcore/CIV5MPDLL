@@ -128,8 +128,8 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iNearbyUnitClassBonus(0),
 	m_iNearbyUnitClassBonusRange(0),
 	m_iCombatBonusFromNearbyUnitClass(NO_UNITCLASS),
-
 	m_iAOEDamageOnKill(0),
+	m_iMoraleBreakChance(0),
 	m_iDamageAoEFortified(0),
 	m_iWorkRateMod(0),
 	m_iBarbarianCombatBonus(0),
@@ -518,8 +518,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 		m_iOutsideCapitalLandAttackMod = kResults.GetInt("OutsideCapitalLandAttackMod");
 		m_iOnCapitalLandDefenseMod = kResults.GetInt("OnCapitalLandDefenseMod");
 		m_iOutsideCapitalLandDefenseMod = kResults.GetInt("OutsideCapitalLandDefenseMod");
-
-
+		m_iMoraleBreakChance = kResults.GetInt("MoraleBreakChance");
 		m_iDamageAoEFortified = kResults.GetInt("AoEWhileFortified");
 		m_iWorkRateMod = kResults.GetInt("WorkRateMod");
 		m_iAOEDamageOnKill = kResults.GetInt("AOEDamageOnKill");
@@ -1909,6 +1908,11 @@ int CvPromotionEntry::GetBarbarianCombatBonus() const
 int CvPromotionEntry::GetAOEDamageOnKill() const
 {
 	return m_iAOEDamageOnKill;
+}
+
+int CvPromotionEntry::GetMoraleBreakChance() const
+{
+	return m_iMoraleBreakChance;
 }
 
 int CvPromotionEntry::GetDamageAoEFortified() const

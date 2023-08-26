@@ -3,6 +3,18 @@
 	<!-- Espionage.xml -->
 	<Language_zh_CN>
 	
+<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK">
+			<Text>我们的{2_Unit}被敌人的{1_Unit}击退了！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK_S">
+			<Text>{1_Unit}被击退了！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK_THEM">
+			<Text>我们的{1_Unit}迫使敌人的{2_Unit}撤退了！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK_THEM_S">
+			<Text>敌人的{1_Unit}被击退了！</Text>
+		</Row>
 		<Row Tag="TXT_KEY_NOTIFICATION_RESET_PLOT_COST">
 			<Text>新城市的建立重置了你所拥有的城市的地块购买价格!</Text>
 		</Row>

@@ -478,6 +478,10 @@ public:
 	UnitCombatTypes getUnitPromotionType() const;
 #endif
 	DomainTypes getDomainType() const;
+#if defined(MOD_ROG_CORE)
+	//check if plot type matches the (primary) domain type
+	bool isNativeDomain(const CvPlot* pPlot) const;
+#endif
 
 	int flavorValue(FlavorTypes eFlavor) const;
 
@@ -1692,7 +1696,8 @@ public:
 	void ChangeRangedSupportFireMod(int iValue);
 	int GetRangedSupportFireMod() const;
 
-
+	int GetMoraleBreakChance() const;
+	void ChangeMoraleBreakChance(int iChange);
 	int GetDamageAoEFortified() const;
 	void ChangeDamageAoEFortified(int iChange);
 
@@ -2307,8 +2312,8 @@ protected:
 	int m_iMoveUsedAttackMod;
 	int m_iGoldenAgeMod;
 	int m_iRangedSupportFireMod;
-
 	int m_iBarbCombatBonus;
+	int m_iCanMoraleBreak;
 	int m_iDamageAoEFortified;
 	int m_iWorkRateMod;
 	int m_iAOEDamageOnKill;
@@ -2411,16 +2416,15 @@ protected:
 
 	CvUnit* airStrikeTarget(CvPlot& pPlot, bool bNoncombatAllowed) const;
 
-	bool CanWithdrawFromMelee(CvUnit& pAttacker);
-	bool DoWithdrawFromMelee(CvUnit& pAttacker);
-
-	// these are do to a unit using Heavy Charge against you
-	bool CanFallBackFromMelee(CvUnit& pAttacker);
-	bool DoFallBackFromMelee(CvUnit& pAttacker);
 
  #ifdef MOD_GLOBAL_WAR_CASUALTIES
 	int m_iWarCasualtiesModifier = 0;
  #endif
+
+	bool CanFallBack(const CvUnit& pAttacker, bool bCheckChances) const;
+	int  GetWithdrawChance(const CvUnit& pAttacker, const bool bCheckChances) const;
+	bool DoFallBack(const CvUnit& pAttacker);
+
 
 private:
 

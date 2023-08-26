@@ -2,6 +2,19 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_en_US>
+			<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK">
+			<Text>Our {2_Unit} was knocked back by the enemy's {1_Unit}!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK_S">
+			<Text>{1_Unit}was repelled！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK_THEM">
+			<Text>Our {1_Unit} forced the enemy's {2_Unit} to retreat!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK_THEM_S">
+			<Text>Enemy {1_Unit} has been knocked back!</Text>
+		</Row>
+
 	<Row Tag="TXT_KEY_NOTIFICATION_RESET_PLOT_COST">
 			<Text>Founding a new City has reset the cost increase of Tile purchases in all owned cities!</Text>
 		</Row>
