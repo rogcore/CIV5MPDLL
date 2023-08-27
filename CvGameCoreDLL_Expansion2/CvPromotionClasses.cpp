@@ -137,37 +137,28 @@ CvPromotionEntry::CvPromotionEntry():
 
 	m_iCaptureDefeatedEnemyChance(0),
 	m_bCannotBeCaptured(false),
-
 #if defined(MOD_ROG_CORE)
 	m_iHPHealedIfDefeatEnemyGlobal(0),
 	m_iNumOriginalCapitalAttackMod(0),
 	m_iNumOriginalCapitalDefenseMod(0),
-#endif
 
-#if defined(MOD_ROG_CORE)
+	m_iPillageReplenishMoves(0),
+	m_iPillageReplenishAttck(false),
+	m_iPillageReplenishHealth(0),
 	m_iOnCapitalLandAttackMod(0),
 	m_iOutsideCapitalLandAttackMod(0),
 	m_iOnCapitalLandDefenseMod(0),
 	m_iOutsideCapitalLandDefenseMod(0),
-#endif
 
-
-#if defined(MOD_ROG_CORE)
 	m_iNumSpyDefenseMod(0),
 	m_iNumSpyAttackMod(0),
-
 	m_iNumWonderDefenseMod(0),
 	m_iNumWonderAttackMod(0), 
-
 	m_iNumWorkDefenseMod(0),
 	m_iNumWorkAttackMod(0),
-
 	m_iNumSpyStayDefenseMod(0),
 	m_iNumSpyStayAttackMod(0),
-
 	m_bNoResourcePunishment(false),
-
-
 	m_iCurrentHitPointAttackMod(0),
 	m_iCurrentHitPointDefenseMod(0),
 #endif
@@ -495,62 +486,45 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iAttackBelowHealthMod = kResults.GetInt("AttackBelowEqual50HealthMod");
 	m_bStrongerDamaged = kResults.GetBool("StrongerDamaged");
 	m_bFightWellDamaged = kResults.GetBool("FightWellDamaged");
-
 	m_iMeleeDefenseMod = kResults.GetInt("MeleeDefenseMod");
+	m_iMoveLfetAttackMod = kResults.GetInt("MoveLfetAttackMod");
+	m_iMoveUsedAttackMod = kResults.GetInt("MoveUsedAttackMod");
+	m_iGoldenAgeMod = kResults.GetInt("GoldenAgeMod");
+	m_iRangedSupportFireMod = kResults.GetInt("RangedSupportFireMod");
+	m_iHPHealedIfDefeatEnemyGlobal = kResults.GetInt("HPHealedIfDestroyEnemyGlobal");
+	m_iNumOriginalCapitalAttackMod = kResults.GetInt("NumOriginalCapitalAttackMod");
+	m_iNumOriginalCapitalDefenseMod = kResults.GetInt("NumOriginalCapitalDefenseMod");
+	m_iOnCapitalLandAttackMod = kResults.GetInt("OnCapitalLandAttackMod");
+	m_iOutsideCapitalLandAttackMod = kResults.GetInt("OutsideCapitalLandAttackMod");
+	m_iOnCapitalLandDefenseMod = kResults.GetInt("OnCapitalLandDefenseMod");
+	m_iOutsideCapitalLandDefenseMod = kResults.GetInt("OutsideCapitalLandDefenseMod");
+	m_iMoraleBreakChance = kResults.GetInt("MoraleBreakChance");
+	m_iDamageAoEFortified = kResults.GetInt("AoEWhileFortified");
+	m_iWorkRateMod = kResults.GetInt("WorkRateMod");
+	m_iAOEDamageOnKill = kResults.GetInt("AOEDamageOnKill");
+	m_iBarbarianCombatBonus = kResults.GetInt("BarbarianCombatBonus");
+	m_iPillageReplenishMoves = kResults.GetInt("PillageReplenishMoves");
+	m_iPillageReplenishAttck = kResults.GetInt("PillageReplenishAttck");
+	m_iPillageReplenishHealth = kResults.GetInt("PillageReplenishHealth");
 #endif
 
-#if defined(MOD_ROG_CORE)
-	if (MOD_ROG_CORE) {
-		m_iMoveLfetAttackMod = kResults.GetInt("MoveLfetAttackMod");
-		m_iMoveUsedAttackMod = kResults.GetInt("MoveUsedAttackMod");
-		m_iGoldenAgeMod = kResults.GetInt("GoldenAgeMod");
-		m_iRangedSupportFireMod = kResults.GetInt("RangedSupportFireMod");
-	}
-#endif
+	m_iCaptureDefeatedEnemyChance = kResults.GetInt("CaptureDefeatedEnemyChance");
+	m_bCannotBeCaptured = kResults.GetBool("CannotBeCaptured");
 
 #if defined(MOD_ROG_CORE)
-     	m_iHPHealedIfDefeatEnemyGlobal = kResults.GetInt("HPHealedIfDestroyEnemyGlobal");
-		m_iNumOriginalCapitalAttackMod = kResults.GetInt("NumOriginalCapitalAttackMod");
-		m_iNumOriginalCapitalDefenseMod = kResults.GetInt("NumOriginalCapitalDefenseMod");
-#endif
-
-
-#if defined(MOD_ROG_CORE)
-		m_iOnCapitalLandAttackMod = kResults.GetInt("OnCapitalLandAttackMod");
-		m_iOutsideCapitalLandAttackMod = kResults.GetInt("OutsideCapitalLandAttackMod");
-		m_iOnCapitalLandDefenseMod = kResults.GetInt("OnCapitalLandDefenseMod");
-		m_iOutsideCapitalLandDefenseMod = kResults.GetInt("OutsideCapitalLandDefenseMod");
-		m_iMoraleBreakChance = kResults.GetInt("MoraleBreakChance");
-		m_iDamageAoEFortified = kResults.GetInt("AoEWhileFortified");
-		m_iWorkRateMod = kResults.GetInt("WorkRateMod");
-		m_iAOEDamageOnKill = kResults.GetInt("AOEDamageOnKill");
-
-		m_iBarbarianCombatBonus = kResults.GetInt("BarbarianCombatBonus");
-#endif
-
-		m_iCaptureDefeatedEnemyChance = kResults.GetInt("CaptureDefeatedEnemyChance");
-		m_bCannotBeCaptured = kResults.GetBool("CannotBeCaptured");
-
-#if defined(MOD_ROG_CORE)
-			m_iNumSpyDefenseMod = kResults.GetInt("NumSpyDefenseMod");
-			m_iNumSpyAttackMod = kResults.GetInt("NumSpyAttackMod");
-
-			m_iNumWonderDefenseMod = kResults.GetInt("NumWonderDefenseMod");
-			m_iNumWonderAttackMod = kResults.GetInt("NumWonderAttackMod");
-
-			m_iNumWorkDefenseMod = kResults.GetInt("NumWorkDefenseMod");
-			m_iNumWorkAttackMod = kResults.GetInt("NumWorkAttackMod");
-
-			m_iNumSpyStayDefenseMod = kResults.GetInt("NumSpyStayDefenseMod");
-			m_iNumSpyStayAttackMod = kResults.GetInt("NumSpyStayAttackMod");
-
-			m_bNoResourcePunishment = kResults.GetBool("NoResourcePunishment");
-
-			m_iCurrentHitPointAttackMod = kResults.GetInt("CurrentHitPointAttackMod");
-			m_iCurrentHitPointDefenseMod = kResults.GetInt("CurrentHitPointDefenseMod");
-
-			m_iNearNumEnemyAttackMod = kResults.GetInt("NearNumEnemyAttackMod");
-			m_iNearNumEnemyDefenseMod = kResults.GetInt("NearNumEnemyDefenseMod");
+	m_iNumSpyDefenseMod = kResults.GetInt("NumSpyDefenseMod");
+	m_iNumSpyAttackMod = kResults.GetInt("NumSpyAttackMod");
+	m_iNumWonderDefenseMod = kResults.GetInt("NumWonderDefenseMod");
+	m_iNumWonderAttackMod = kResults.GetInt("NumWonderAttackMod");
+	m_iNumWorkDefenseMod = kResults.GetInt("NumWorkDefenseMod");
+	m_iNumWorkAttackMod = kResults.GetInt("NumWorkAttackMod");
+	m_iNumSpyStayDefenseMod = kResults.GetInt("NumSpyStayDefenseMod");
+	m_iNumSpyStayAttackMod = kResults.GetInt("NumSpyStayAttackMod");
+	m_bNoResourcePunishment = kResults.GetBool("NoResourcePunishment");
+	m_iCurrentHitPointAttackMod = kResults.GetInt("CurrentHitPointAttackMod");
+	m_iCurrentHitPointDefenseMod = kResults.GetInt("CurrentHitPointDefenseMod");
+	m_iNearNumEnemyAttackMod = kResults.GetInt("NearNumEnemyAttackMod");
+	m_iNearNumEnemyDefenseMod = kResults.GetInt("NearNumEnemyDefenseMod");
 #endif
 
 	m_bRoughTerrainEndsTurn = kResults.GetBool("RoughTerrainEndsTurn");
@@ -1926,6 +1900,20 @@ int CvPromotionEntry::GetDamageAoEFortified() const
 int CvPromotionEntry::GetWorkRateMod() const
 {
 	return m_iWorkRateMod;
+}
+
+
+int CvPromotionEntry::GetPillageReplenishMoves() const
+{
+	return m_iPillageReplenishMoves;
+}
+bool CvPromotionEntry::PillageReplenishAttck() const
+{
+	return m_iPillageReplenishAttck;
+}
+int CvPromotionEntry::GetPillageReplenishHealth() const
+{
+	return m_iPillageReplenishHealth;
 }
 #endif
 

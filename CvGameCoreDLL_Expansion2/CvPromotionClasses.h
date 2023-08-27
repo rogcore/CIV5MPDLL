@@ -195,6 +195,10 @@ public:
 
 
 #if defined(MOD_ROG_CORE)
+	int GetPillageReplenishMoves() const;
+	bool PillageReplenishAttck() const;
+	int GetPillageReplenishHealth() const;
+
 	int GetNumSpyDefenseMod() const;
 	int GetNumSpyAttackMod() const;
 
@@ -665,7 +669,10 @@ protected:
 	int m_iCaptureDefeatedEnemyChance;
 	bool m_bCannotBeCaptured;
 
-#if defined(MOD_ROG_CORE)	
+#if defined(MOD_ROG_CORE)
+	int m_iPillageReplenishMoves;
+	int m_iPillageReplenishAttck;
+	int m_iPillageReplenishHealth;
 	int m_iAoEDamageOnMove;
 	int m_iForcedDamageValue;
 	int m_iChangeDamageValue;

@@ -443,6 +443,8 @@ CvUnit::CvUnit() :
 		, m_iDamageAoEFortified(0)
 		, m_iCanMoraleBreak(0)
 		, m_iWorkRateMod(0)
+		, m_iPillageReplenishMoves(0)
+		, m_iPillageReplenishHealth(0)
 		, m_iAOEDamageOnKill(0)
 #endif
 
@@ -1281,6 +1283,8 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iDamageAoEFortified = 0;
 	m_iCanMoraleBreak = 0;
 	m_iWorkRateMod = 0;
+	m_iPillageReplenishMoves = 0;
+	m_iPillageReplenishHealth = 0;
 	m_iAOEDamageOnKill = 0;
 #endif
 	m_iImmueMeleeAttack = 0;
@@ -1371,6 +1375,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iGreatGeneralCombatModifier = 0;
 	m_iIgnoreGreatGeneralBenefit = 0;
 	m_iIgnoreZOC = 0;
+	m_iPillageReplenishAttck = 0;
 	m_iCanDoFallBackDamage = 0;
 	m_iCanParadropAnyWhere = 0;
 #if defined(MOD_UNITS_NO_SUPPLY)
@@ -6259,7 +6264,35 @@ void CvUnit::ChangeWorkRateMod(int iChange)
 }
 
 
+int CvUnit::GetPillageReplenishMoves() const
+{
+	return m_iPillageReplenishMoves;
+}
+void CvUnit::ChangePillageReplenishMoves(int iValue)
+{
+	m_iPillageReplenishMoves += iValue;
+}
 
+//	--------------------------------------------------------------------------------
+bool CvUnit::IsPillageReplenishAttck() const
+{
+	return m_iPillageReplenishAttck > 0;
+}
+
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangePillageReplenishAttckount(int iChange)
+{
+	m_iPillageReplenishAttck += iChange;
+}
+
+int CvUnit::GetPillageReplenishHealth() const
+{
+	return m_iPillageReplenishHealth;
+}
+void CvUnit::ChangePillageReplenishHealth(int iValue)
+{
+	m_iPillageReplenishHealth += iValue;
+}
 #endif
 
 void CvUnit::ChangeCannotBeCapturedCount(int iChange)
@@ -9122,6 +9155,23 @@ bool CvUnit::pillage()
 	{
 		changeMoves(-GC.getMOVE_DENOMINATOR());
 	}
+#if defined(MOD_ROG_CORE)
+	if (IsPillageReplenishAttck())
+	{
+		setMadeAttack(false);	
+	}
+	int iHealMoves = GetPillageReplenishMoves();
+	int iHealExtra = GetPillageReplenishHealth();
+	if (iHealMoves !=0)
+	{
+		iHealMoves= iHealMoves *GC.getMOVE_DENOMINATOR();
+		changeMoves(iHealMoves);
+	}
+	if (iHealExtra != 0)
+	{
+		changeDamage(-iHealExtra);
+	}
+#endif
 
 	if(bSuccessfulNonRoadPillage)
 	{
@@ -24657,11 +24707,14 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 			}
 		}
 #endif
-
 		ChangeCaptureDefeatedEnemyChance((thisPromotion.GetCaptureDefeatedEnemyChance()) * iChange);
 		ChangeCannotBeCapturedCount((thisPromotion.CannotBeCaptured()) ? iChange : 0);
 
 #if defined(MOD_ROG_CORE)
+		ChangePillageReplenishMoves((thisPromotion.GetPillageReplenishMoves()) * iChange);
+		ChangePillageReplenishAttckount(thisPromotion.PillageReplenishAttck() ? iChange : 0);
+		ChangePillageReplenishHealth((thisPromotion.GetPillageReplenishHealth())* iChange);
+
 		ChangeMoveLfetAttackMod(thisPromotion.GetMoveLfetAttackMod() * iChange);
 		ChangeMoveUsedAttackMod(thisPromotion.GetMoveUsedAttackMod() * iChange);
 		ChangeGoldenAgeMod(thisPromotion.GetGoldenAgeMod() * iChange);
@@ -25368,6 +25421,7 @@ void CvUnit::read(FDataStream& kStream)
 	{
 		m_iIgnoreZOC = 0;
 	}
+	kStream >> m_iPillageReplenishAttck;
 	kStream >> m_iCanDoFallBackDamage;
 	kStream >> m_iCaptureDefeatedEnemyChance;
 	kStream >> m_iCanParadropAnyWhere;
@@ -25388,6 +25442,8 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iDamageAoEFortified;
 	kStream >> m_iCanMoraleBreak;
 	kStream >> m_iWorkRateMod;
+	kStream >> m_iPillageReplenishMoves;
+	kStream >> m_iPillageReplenishHealth;
 	kStream >> m_iAOEDamageOnKill;
 #endif
 
@@ -25718,6 +25774,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iGreatGeneralCombatModifier;
 	kStream << m_iIgnoreGreatGeneralBenefit;
 	kStream << m_iIgnoreZOC;
+	kStream << m_iPillageReplenishAttck;
 	kStream << m_iCanDoFallBackDamage;
 	kStream << m_iCanParadropAnyWhere;
 	kStream << m_iCaptureDefeatedEnemyChance;
@@ -25738,6 +25795,8 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iDamageAoEFortified;
 	kStream << m_iCanMoraleBreak;
 	kStream << m_iWorkRateMod;
+	kStream << m_iPillageReplenishMoves;
+	kStream << m_iPillageReplenishHealth;
 	kStream << m_iAOEDamageOnKill;
 #endif
 

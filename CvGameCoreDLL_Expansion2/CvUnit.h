@@ -1712,6 +1712,13 @@ public:
 	int GetWorkRateMod() const;
 	void ChangeWorkRateMod(int iChange);
 
+	int GetPillageReplenishMoves() const;
+	void ChangePillageReplenishMoves(int iChange);
+	bool IsPillageReplenishAttck() const;
+	void ChangePillageReplenishAttckount(int iChange);
+	int GetPillageReplenishHealth() const;
+	void ChangePillageReplenishHealth(int iChange);
+
 	int getAOEDamageOnKill() const;
 	void changeAOEDamageOnKill(int iChange);
 
@@ -2327,6 +2334,9 @@ protected:
 	int m_iCanMoraleBreak;
 	int m_iDamageAoEFortified;
 	int m_iWorkRateMod;
+	int m_iPillageReplenishMoves;
+	int m_iPillageReplenishAttck;
+	int m_iPillageReplenishHealth;
 	int m_iAOEDamageOnKill;
 #endif
 
