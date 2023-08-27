@@ -28850,36 +28850,36 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 		{
 			iTemp = 0;
 
-			for(iI = 0; iI < NUM_DOMAIN_TYPES; iI++)
-			{
-				iTemp += pkPromotionInfo->GetDomainModifierPercent(iI);
-			}
-
-			iValue = GetPromotionValue(iTemp, getDomainType() == DOMAIN_SEA ? 1 : 0, iFlavorOffDef, lowPriority);
-		}
-
-		if (iValue == 0)
-		{
-			iTemp = 0;
-
 			for (iI = 0; iI < NUM_DOMAIN_TYPES; iI++)
 			{
+				iTemp = pkPromotionInfo->GetDomainModifierPercent(iI) * 2;
 				iTemp += pkPromotionInfo->GetDomainAttackPercent(iI);
-			}
-
-			iValue = GetPromotionValue(iTemp, getDomainType() == DOMAIN_SEA ? 1 : 0, iFlavorOffDef, lowPriority);
-		}
-
-		if (iValue == 0)
-		{
-			iTemp = 0;
-
-			for (iI = 0; iI < NUM_DOMAIN_TYPES; iI++)
-			{
 				iTemp += pkPromotionInfo->GetDomainDefensePercent(iI);
+
+				if (iTemp <= 0)
+					continue;
+
+				if (DomainTypes(iI) == DOMAIN_SEA)
+				{
+					iExtra = iTemp * (iFlavorDefense + 2 * iFlavorNaval);
+					iExtra *= 0.5;
+					iValue += iExtra;
+				}
+				else if (DomainTypes(iI) == DOMAIN_LAND)
+				{
+					iExtra = iTemp * (iFlavorDefense + iFlavorOffense + iFlavorCityDefense);
+					iExtra *= 0.5;
+					iValue += iExtra;
+				}
+				else if (DomainTypes(iI) == DOMAIN_AIR)
+				{
+					iExtra = iTemp * (3 * iFlavorAntiAir);
+					iExtra *= 0.5;
+					iValue += iExtra;
+				}
+
 			}
 
-			iValue = GetPromotionValue(iTemp, getDomainType() == DOMAIN_SEA ? 1 : 0, iFlavorOffDef, lowPriority);
 		}
 
 		// Unknown promotion? Always give at least a random priority with some flavor
