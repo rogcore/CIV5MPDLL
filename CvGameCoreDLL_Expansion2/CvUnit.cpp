@@ -8973,8 +8973,9 @@ bool CvUnit::pillage()
 		{
 			if(pPlot->getTeam() != getTeam())
 			{
-
 #if defined(MOD_ROG_CORE)
+            if (MOD_ROG_CORE)
+			{
 				if (pPlot->getOwner() != NO_PLAYER)
 				{
 					for (int iYieldLoop = 0; iYieldLoop < NUM_YIELD_TYPES; iYieldLoop++)
@@ -9021,7 +9022,8 @@ bool CvUnit::pillage()
 							}
 						}
 					}
-				}			
+				}
+			}
 #endif
 				int iPillageGold = 0;
 
@@ -25366,7 +25368,7 @@ void CvUnit::read(FDataStream& kStream)
 	{
 		m_iIgnoreZOC = 0;
 	}
-
+	kStream >> m_iCanDoFallBackDamage;
 	kStream >> m_iCaptureDefeatedEnemyChance;
 	kStream >> m_iCanParadropAnyWhere;
 	kStream >> m_iCannotBeCapturedCount;
