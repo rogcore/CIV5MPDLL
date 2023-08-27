@@ -1564,17 +1564,17 @@ void CvUnitEntry::DoUpdatePower()
 				}
 			}
 
-			for(iLoop = 0; iLoop < GC.getNumFeatureInfos(); iLoop++)
+			for (iLoop = 0; iLoop < GC.getNumFeatureInfos(); iLoop++)
 			{
 				// Feature Attack - add one quarter of the bonus
-				if(kPromotion->GetFeatureAttackPercent(iLoop) > 0)
+				if (kPromotion->GetFeatureAttackPercent(iLoop) > 0)
 				{
 					iTemp = (iBasePower * kPromotion->GetFeatureAttackPercent(iLoop) / 4);
 					iTemp /= 100;
 					iBonusPower += iTemp;
 				}
 				// Feature Defense - add one quarter of the bonus
-				if(kPromotion->GetFeatureDefensePercent(iLoop) > 0)
+				if (kPromotion->GetFeatureDefensePercent(iLoop) > 0)
 				{
 					iTemp = (iBasePower * kPromotion->GetFeatureDefensePercent(iLoop) / 4);
 					iTemp /= 100;
@@ -1582,54 +1582,17 @@ void CvUnitEntry::DoUpdatePower()
 				}
 			}
 
-#if defined(MOD_BUGFIX_UNITCOMBAT_BONUS_VS_DOMAIN_ONLY)
-			if (MOD_BUGFIX_UNITCOMBAT_BONUS_VS_DOMAIN_ONLY) {
-				// Only add UNITCOMBAT bonuses against the same domain, so we need to know the domain of combat classes
-				//   DOMAIN_SEA is UNITCOMBAT_NAVALRANGED and UNITCOMBAT_NAVALMELEE
-				//   DOMAIN_AIR is UNITCOMBAT_HELICOPTER, UNITCOMBAT_FIGHTER and UNITCOMBAT_BOMBER
-				//   DOMAIN_LAND is everything else
-				int iMyDomain = GetDomainType();
-				for(iLoop = 0; iLoop < GC.getNumUnitCombatClassInfos(); iLoop++)
+			for (iLoop = 0; iLoop < GC.getNumUnitCombatClassInfos(); iLoop++)
+			{
+				// Unit Combat Class (e.g. Pikemen) - add one quarter of the bonus
+				if (kPromotion->GetUnitCombatModifierPercent(iLoop) > 0)
 				{
-					int iTheirDomain = NO_DOMAIN;
-					CvBaseInfo* pkUnitCombatInfo = GC.getUnitCombatClassInfo((UnitCombatTypes)iLoop);
-					if (pkUnitCombatInfo) {
-						int iTheirUnitCombat = pkUnitCombatInfo->GetID();
-					
-						if (iTheirUnitCombat == GC.getInfoTypeForString("UNITCOMBAT_NAVALRANGED", true) || iTheirUnitCombat == GC.getInfoTypeForString("UNITCOMBAT_NAVALMELEE", true)) {
-							iTheirDomain = DOMAIN_SEA;
-						} else if (iTheirUnitCombat == GC.getInfoTypeForString("UNITCOMBAT_HELICOPTER", true) || iTheirUnitCombat == GC.getInfoTypeForString("UNITCOMBAT_FIGHTER", true) || iTheirUnitCombat == GC.getInfoTypeForString("UNITCOMBAT_BOMBER", true)) {
-							iTheirDomain = DOMAIN_AIR;
-						} else {
-							iTheirDomain = DOMAIN_LAND;
-						}
-					}
-
-					if (iMyDomain == iTheirDomain) {
-						// Unit Combat Class (e.g. Pikemen) - add one quarter of the bonus
-						if(kPromotion->GetUnitCombatModifierPercent(iLoop) > 0)
-						{
-							iTemp = (iBasePower * kPromotion->GetUnitCombatModifierPercent(iLoop) / 4);
-							iTemp /= 100;
-							iBonusPower += iTemp;
-						}
-					}
+					iTemp = (iBasePower * kPromotion->GetUnitCombatModifierPercent(iLoop) / 4);
+					iTemp /= 100;
+					iBonusPower += iTemp;
 				}
-			} else {
-#endif
-				for(iLoop = 0; iLoop < GC.getNumUnitCombatClassInfos(); iLoop++)
-				{
-					// Unit Combat Class (e.g. Pikemen) - add one quarter of the bonus
-					if(kPromotion->GetUnitCombatModifierPercent(iLoop) > 0)
-					{
-						iTemp = (iBasePower * kPromotion->GetUnitCombatModifierPercent(iLoop) / 4);
-						iTemp /= 100;
-						iBonusPower += iTemp;
-					}
-				}
-#if defined(MOD_BUGFIX_UNITCOMBAT_BONUS_VS_DOMAIN_ONLY)
 			}
-#endif
+		   
 
 			for(iLoop = 0; iLoop < GC.getNumUnitClassInfos(); iLoop++)
 			{
@@ -1663,6 +1626,21 @@ void CvUnitEntry::DoUpdatePower()
 				if(kPromotion->GetDomainModifierPercent(iLoop) > 0)
 				{
 					iTemp = (iBasePower * kPromotion->GetDomainModifierPercent(iLoop) / 4);
+					iTemp /= 100;
+					iBonusPower += iTemp;
+				}
+
+				// Domain Attack - add one sixth of the bonus
+				if (kPromotion->GetDomainAttackPercent(iLoop) > 0)
+				{
+					iTemp = (iBasePower * kPromotion->GetDomainAttackPercent(iLoop) / 6);
+					iTemp /= 100;
+					iBonusPower += iTemp;
+				}
+				// Domain Defense - add one sixth of the bonus
+				if (kPromotion->GetDomainDefensePercent(iLoop) > 0)
+				{
+					iTemp = (iBasePower * kPromotion->GetDomainDefensePercent(iLoop) / 6);
 					iTemp /= 100;
 					iBonusPower += iTemp;
 				}
