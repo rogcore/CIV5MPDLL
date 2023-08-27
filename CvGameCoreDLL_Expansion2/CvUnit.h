@@ -850,7 +850,10 @@ public:
 	int getArea() const;
 	CvArea* area() const;
 	bool onMap() const;
-
+#if defined(MOD_ROG_CORE)
+	void setOriginCity(int ID);
+	CvCity* getOriginCity() const;
+#endif
 	int getLastMoveTurn() const;
 	void setLastMoveTurn(int iNewValue);
 
@@ -1507,6 +1510,8 @@ public:
 
 	bool canAcquirePromotion(PromotionTypes ePromotion) const;
 	bool canAcquirePromotionAny() const;
+
+
 	bool isPromotionValid(PromotionTypes ePromotion) const;
 	bool isHasPromotion(PromotionTypes eIndex) const;
 	void setHasPromotion(PromotionTypes eIndex, bool bNewValue);
@@ -2286,6 +2291,7 @@ protected:
 #endif
 	FAutoVariable<std::vector<int>, CvUnit> m_extraUnitCombatModifier;
 	FAutoVariable<std::vector<int>, CvUnit> m_unitClassModifier;
+
 	int m_iMissionTimer;
 	FAutoVariable<int, CvUnit> m_iMissionAIX;
 	FAutoVariable<int, CvUnit> m_iMissionAIY;
@@ -2312,6 +2318,7 @@ protected:
 #endif
 
 #if defined(MOD_ROG_CORE)
+	int m_iOriginCity;
 	int m_iMoveLfetAttackMod;
 	int m_iMoveUsedAttackMod;
 	int m_iGoldenAgeMod;

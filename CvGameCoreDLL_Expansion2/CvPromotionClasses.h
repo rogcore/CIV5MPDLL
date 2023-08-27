@@ -817,11 +817,7 @@ protected:
 #if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
 	std::vector<int> m_vPrePromotions;
 #endif	
-
-
 	bool* m_pbUnitType;
-
-
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 	bool* m_pbUnitName;
 #endif

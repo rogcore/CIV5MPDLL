@@ -257,6 +257,10 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piYieldFromBirth(NULL),
 	m_piYieldFromBorderGrowth(NULL),
 
+	m_piYieldFromPillage(NULL),
+	m_piYieldFromPillageGlobal(NULL),
+	m_piYieldFromPillageGlobalPlayer(NULL),
+
 	m_piYieldModifierFromWonder(NULL),
 	m_piDomainFreeExperiencePerGreatWorkGlobal(NULL),
 	m_piDomainFreeExperienceGlobal(),
@@ -343,7 +347,9 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	SAFE_DELETE_ARRAY(m_piYieldFromUnitProduction);
 	SAFE_DELETE_ARRAY(m_piYieldFromBirth);
 	SAFE_DELETE_ARRAY(m_piYieldFromBorderGrowth);
-
+	SAFE_DELETE_ARRAY(m_piYieldFromPillage);
+	SAFE_DELETE_ARRAY(m_piYieldFromPillageGlobal);
+	SAFE_DELETE_ARRAY(m_piYieldFromPillageGlobalPlayer);
 	SAFE_DELETE_ARRAY(m_piYieldModifierFromWonder);
 	SAFE_DELETE_ARRAY(m_piDomainFreeExperiencePerGreatWorkGlobal);
 	m_piDomainFreeExperienceGlobal.clear();
@@ -720,7 +726,9 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	kUtility.SetYields(m_piYieldFromUnitProduction, "Building_YieldFromUnitProduction", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldFromBirth, "Building_YieldFromBirth", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldFromBorderGrowth, "Building_YieldFromBorderGrowth", "BuildingType", szBuildingType);
-
+	kUtility.SetYields(m_piYieldFromPillage, "Building_YieldFromPillage", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldFromPillageGlobal, "Building_YieldFromPillageGlobal", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldFromPillageGlobalPlayer, "Building_YieldFromPillageGlobalPlayer", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldModifierFromWonder, "Building_CityWithWorldWonderYieldModifierGlobal", "BuildingType", szBuildingType);
 #endif
 
@@ -2810,6 +2818,45 @@ int CvBuildingEntry::GetYieldFromBorderGrowth(int i) const
 int* CvBuildingEntry::GetYieldFromBorderGrowthArray() const
 {
 	return m_piYieldFromBorderGrowth;
+}
+
+/// Change to yield if pillaging
+int CvBuildingEntry::GetYieldFromPillage(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromPillage ? m_piYieldFromPillage[i] : -1;
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromPillageArray() const
+{
+	return m_piYieldFromPillage;
+}
+
+/// Change to yield if pillaging
+int CvBuildingEntry::GetYieldFromPillageGlobal(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromPillageGlobal ? m_piYieldFromPillageGlobal[i] : -1;
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromPillageGlobalArray() const
+{
+	return m_piYieldFromPillageGlobal;
+}
+
+/// Change to yield if pillaging
+int CvBuildingEntry::GetYieldFromPillageGlobalPlayer(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromPillageGlobalPlayer ? m_piYieldFromPillageGlobalPlayer[i] : -1;
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromPillageGlobalPlayerArray() const
+{
+	return m_piYieldFromPillageGlobalPlayer;
 }
 
 int CvBuildingEntry::GetYieldModifierFromWonder(int i) const

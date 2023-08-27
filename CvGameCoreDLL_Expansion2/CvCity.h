@@ -877,7 +877,8 @@ public:
 	void ChangeYieldFromBirth(YieldTypes eIndex, int iChange);
 	int GetYieldFromBorderGrowth(YieldTypes eIndex) const;
 	void ChangeYieldFromBorderGrowth(YieldTypes eIndex, int iChange);
-
+	int GetYieldFromPillage(YieldTypes eIndex) const;
+	void ChangeYieldFromPillage(YieldTypes eIndex, int iChange);
 	int getDomainFreeExperienceFromGreatWorksGlobal(DomainTypes eIndex) const;
 #endif
 
@@ -1439,6 +1440,8 @@ protected:
 	std::vector<int> m_aiYieldFromUnitProduction;
 	std::vector<int> m_aiYieldFromBirth;
 	std::vector<int> m_aiYieldFromBorderGrowth;
+
+	std::vector<int> m_aiYieldFromPillage;
 
 	std::map<int, int> m_aiYieldPerPopInEmpire;
 	FAutoVariable<std::vector<int>, CvCity> m_aiResourceQuantityFromPOP;

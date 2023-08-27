@@ -372,6 +372,7 @@ CvPlayer::CvPlayer() :
 	, m_iMoveAfterCreated(0)
 
 #if defined(MOD_ROG_CORE)
+	, m_aiYieldFromPillageGlobal()
 	, m_aiYieldFromPillage()
 	, m_iGlobalCityStrengthMod("CvPlayer::m_iGlobalCityStrengthMod", m_syncArchive)
 	, m_iGlobalRangedStrikeModifier("CvPlayer::m_iGlobalRangedStrikeModifier", m_syncArchive)
@@ -1265,6 +1266,8 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 #ifdef MOD_ROG_CORE
 	m_aiWorldWonderCityYieldRateModifier.clear();
 	m_aiWorldWonderCityYieldRateModifier.resize(NUM_YIELD_TYPES, 0);
+	m_aiYieldFromPillageGlobal.clear();
+	m_aiYieldFromPillageGlobal.resize(NUM_YIELD_TYPES, 0);
 	m_aiYieldFromPillage.clear();
 	m_aiYieldFromPillage.resize(NUM_YIELD_TYPES, 0);
 #endif
@@ -9797,9 +9800,10 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 
 
 #if defined(MOD_ROG_CORE)
+		ChangeYieldFromPillage(((YieldTypes)iI), (pBuildingInfo->GetYieldFromPillageGlobal(iI) * iChange));
+		ChangeYieldFromPillagePlayer(((YieldTypes)iI), (pBuildingInfo->GetYieldFromPillageGlobalPlayer(iI) * iChange));
 
 		changeWorldWonderCityYieldRateModifier(((YieldTypes)iI), (pBuildingInfo->GetYieldModifierFromWonder(iI) * iChange));
-
 
 		int iMod = pBuildingInfo->GetGreatWorkYieldChange(iI) * iChange;
 		if (iMod != 0)
@@ -20328,7 +20332,37 @@ void CvPlayer::ChangeImprovementExtraYield(ImprovementTypes eImprovement, YieldT
 		updateYield();
 	}
 }
+
 int CvPlayer::GetYieldFromPillage(YieldTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	return m_aiYieldFromPillageGlobal[eIndex];
+}
+
+//	--------------------------------------------------------------------------------
+/// Extra yield from building
+void CvPlayer::ChangeYieldFromPillage(YieldTypes eIndex, int iChange)
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+
+	if (iChange != 0)
+	{
+		m_aiYieldFromPillageGlobal[eIndex] = m_aiYieldFromPillageGlobal[eIndex] + iChange;
+
+		invalidateYieldRankCache(eIndex);
+
+		if (getTeam() == GC.getGame().getActiveTeam())
+		{
+			GC.GetEngineUserInterface()->setDirty(CityInfo_DIRTY_BIT, true);
+		}
+	}
+}
+
+
+int CvPlayer::GetYieldFromPillagePlayer(YieldTypes eIndex) const
 {
 	VALIDATE_OBJECT
 	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
@@ -20338,7 +20372,7 @@ int CvPlayer::GetYieldFromPillage(YieldTypes eIndex) const
 
 //	--------------------------------------------------------------------------------
 /// Extra yield from building
-void CvPlayer::ChangeYieldFromPillage(YieldTypes eIndex, int iChange)
+void CvPlayer::ChangeYieldFromPillagePlayer(YieldTypes eIndex, int iChange)
 {
 	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
 	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
@@ -21500,16 +21534,17 @@ void CvPlayer::AddIncomingUnit(PlayerTypes eFromPlayer, CvUnit* pUnit)
 			CvUnit* pNewUnit = initUnit(eType, iX, iY);
 			CvAssert(pNewUnit);
 			if (pNewUnit)
-#if defined(MOD_BUGFIX_MOVE_AFTER_PURCHASE)
 			{
 				if (!pUnit->getUnitInfo().CanMoveAfterPurchase())
 				{
-#endif
 					pNewUnit->finishMoves();
-#if defined(MOD_BUGFIX_MOVE_AFTER_PURCHASE)
+				}
+
+				if (getCapitalCity() != NULL)
+				{
+					pNewUnit->setOriginCity(getCapitalCity()->GetID());
 				}
 			}
-#endif
 		}
 	}
 	else
@@ -23223,6 +23258,7 @@ void CvPlayer::changeYieldFromBarbarianKills(YieldTypes eYield, int iChange)
 		m_piYieldFromBarbarianKills[eYield] += iChange;
 	}
 }
+
 
 //	--------------------------------------------------------------------------------
 int CvPlayer::GetYieldChangeTradeRoute(YieldTypes eYield) const
@@ -27357,6 +27393,7 @@ void CvPlayer::Read(FDataStream& kStream)
 
 #ifdef MOD_ROG_CORE
 	kStream >> m_aiWorldWonderCityYieldRateModifier;
+	kStream >> m_aiYieldFromPillageGlobal;
 	kStream >> m_aiYieldFromPillage;
 #endif
 
@@ -28011,6 +28048,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 
 #ifdef MOD_ROG_CORE
 	kStream << m_aiWorldWonderCityYieldRateModifier;
+	kStream << m_aiYieldFromPillageGlobal;
 	kStream << m_aiYieldFromPillage;
 #endif
 	kStream << m_aiYieldModifierFromActiveSpies;
@@ -28300,6 +28338,13 @@ void CvPlayer::createGreatGeneral(UnitTypes eGreatPersonUnit, int iX, int iY)
 		CvAssert(false);
 		return;
 	}
+#if defined(MOD_ROG_CORE)
+	if (pGreatPeopleUnit->IsCombatUnit() && getCapitalCity() != NULL)
+	{
+		getCapitalCity()->addProductionExperience(pGreatPeopleUnit);
+		pGreatPeopleUnit->setOriginCity(getCapitalCity()->GetID());
+	}
+#endif
 
 	ChangeNumGreatPeople(1);
 

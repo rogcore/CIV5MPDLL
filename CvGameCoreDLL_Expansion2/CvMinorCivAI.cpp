@@ -8633,10 +8633,12 @@ void CvMinorCivAI::DoSpawnUnit(PlayerTypes eMajor)
 
 #if defined(MOD_GLOBAL_CS_GIFTS)
 				pSpawnUnit = pNewUnit;
+				pSpawnUnit->setOriginCity(pSpawnCity ? pSpawnCity->GetID() : -1);
 #endif
 			}
 			else
 				pNewUnit->kill(false);	// Could not find a spot!
+			    pNewUnit->setOriginCity(pSpawnCity ? pSpawnCity->GetID() : -1);
 		}
 	}
 

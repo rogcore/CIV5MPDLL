@@ -3085,6 +3085,8 @@ bool CvPromotionEntry::GetCivilianUnitType(int i) const
 	return false;
 }
 
+
+
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 /// If this a promotion that names a unit
 bool CvPromotionEntry::IsUnitNaming(int i) const

@@ -229,6 +229,7 @@ CvCity::CvCity() :
 	, m_aiYieldFromUnitProduction()
 	, m_aiYieldFromBirth()
 	, m_aiYieldFromBorderGrowth()
+	, m_aiYieldFromPillage()
 	, m_aiYieldPerPopInEmpire()
 	, m_aiResourceQuantityFromPOP("CvCity::m_aiResourceQuantityFromPOP", m_syncArchive)
 #endif
@@ -1149,6 +1150,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_aiYieldFromUnitProduction.resize(NUM_YIELD_TYPES);
 	m_aiYieldFromBirth.resize(NUM_YIELD_TYPES);
 	m_aiYieldFromBorderGrowth.resize(NUM_YIELD_TYPES);
+	m_aiYieldFromPillage.resize(NUM_YIELD_TYPES);
 	m_aiYieldPerPopInEmpire.clear();
 #endif
 
@@ -1184,6 +1186,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		m_aiYieldFromUnitProduction[iI] = 0;	
 		m_aiYieldFromBirth[iI] = 0;
 		m_aiYieldFromBorderGrowth[iI] = 0;
+		m_aiYieldFromPillage[iI] = 0;
 #endif
 	}
 
@@ -7497,6 +7500,11 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 				ChangeYieldFromBorderGrowth(eYield, pBuildingInfo->GetYieldFromBorderGrowth(eYield) * iChange);
 			}
 
+			if ((pBuildingInfo->GetYieldFromPillage(eYield) > 0))
+			{
+				ChangeYieldFromPillage(eYield, pBuildingInfo->GetYieldFromPillage(eYield) * iChange);
+			}
+
 			ChangeYieldPerPopInEmpireTimes100(eYield, pBuildingInfo->GetYieldChangePerPopInEmpire(eYield)* iChange);
 
 			if ((pBuildingInfo->GetYieldFromProcessModifier(eYield) > 0))
@@ -13046,6 +13054,30 @@ void CvCity::ChangeYieldPerPopInEmpireTimes100(YieldTypes eIndex, int iChange)
 	if (iChange != 0)
 		m_aiYieldPerPopInEmpire[(int)eIndex] += iChange;
 }
+
+
+int CvCity::GetYieldFromPillage(YieldTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	return m_aiYieldFromPillage[eIndex];
+}
+
+//	--------------------------------------------------------------------------------
+/// Extra yield from building
+void CvCity::ChangeYieldFromPillage(YieldTypes eIndex, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+
+	if (iChange != 0)
+	{
+		m_aiYieldFromPillage[eIndex] = m_aiYieldFromPillage[eIndex] + iChange;
+		CvAssert(GetYieldFromPillage(eIndex) >= 0);
+	}
+}
 #endif
 
 //	--------------------------------------------------------------------------------
@@ -18025,6 +18057,7 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_aiYieldFromUnitProduction;
 	kStream >> m_aiYieldFromBirth;
 	kStream >> m_aiYieldFromBorderGrowth;
+	kStream >> m_aiYieldFromPillage;
 #endif
 
 	if (uiVersion >= 4)
@@ -18465,6 +18498,7 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_aiYieldFromUnitProduction;
 	kStream << m_aiYieldFromBirth;
 	kStream << m_aiYieldFromBorderGrowth;
+	kStream << m_aiYieldFromPillage;
 #endif
 	kStream << m_aiYieldPerReligion;
 	kStream << m_aiYieldRateModifier;

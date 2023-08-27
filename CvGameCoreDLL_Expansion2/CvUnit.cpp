@@ -434,6 +434,7 @@ CvUnit::CvUnit() :
 #endif
 
 #if defined(MOD_ROG_CORE)
+		, m_iOriginCity()
 		, m_iMoveLfetAttackMod(0)
 		, m_iMoveUsedAttackMod(0)
 		, m_iGoldenAgeMod(0)
@@ -624,6 +625,10 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 	// Init pre-setup() data
 	setXY(iX, iY, false, false, false, false, bNoMove);
 
+#if defined(MOD_ROG_CORE)
+	if (plot() && plot()->getWorkingCity() && plot()->getOwner() == getOwner())
+		setOriginCity(plot()->getWorkingCity()->GetID());
+#endif
 	//--------------------------------
 	// Init non-saved data
 
@@ -1267,6 +1272,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iCannotBeCapturedCount = 0;
 
 #if defined(MOD_ROG_CORE)
+	m_iOriginCity = -1;
 	m_iMoveLfetAttackMod = 0;
 	m_iMoveUsedAttackMod = 0;
 	m_iGoldenAgeMod = 0;
@@ -1881,6 +1887,20 @@ void CvUnit::convert(CvUnit* pUnit, bool bIsUpgrade)
 	setFacingDirection(pUnit->getFacingDirection(false));
 	SetBeenPromotedFromGoody(pUnit->IsHasBeenPromotedFromGoody());
 	SetTourismBlastStrength(pUnit->GetTourismBlastStrength());
+
+#if defined(MOD_ROG_CORE)
+	if (pUnit->getOriginCity() == NULL)
+	{
+		if (plot() && plot()->getWorkingCity() && plot()->getOwner() == getOwner())
+		{
+			setOriginCity(plot()->getWorkingCity()->GetID());
+		}
+	}
+	else
+	{
+		setOriginCity(pUnit->getOriginCity()->GetID());
+	}
+#endif
 
 	if (pUnit->getUnitInfo().GetNumExoticGoods() > 0)
 	{
@@ -8953,6 +8973,56 @@ bool CvUnit::pillage()
 		{
 			if(pPlot->getTeam() != getTeam())
 			{
+
+#if defined(MOD_ROG_CORE)
+				if (pPlot->getOwner() != NO_PLAYER)
+				{
+					for (int iYieldLoop = 0; iYieldLoop < NUM_YIELD_TYPES; iYieldLoop++)
+					{
+						YieldTypes iYieldType = (YieldTypes)iYieldLoop;
+
+						CvCity* pOriginCity = getOriginCity();
+
+						if (pOriginCity != NULL)
+						{
+							int iValue = pOriginCity->GetYieldFromPillage(iYieldType) + GET_PLAYER(getOwner()).GetYieldFromPillage(iYieldType) + GET_PLAYER(getOwner()).GetYieldFromPillagePlayer(iYieldType);
+							if (iValue > 0)
+							{
+								pOriginCity->doInstantYield((YieldTypes)iYieldLoop, iValue);
+
+								int iLoop = 0;
+								for (CvCity* pLoopCity = GET_PLAYER(getOwner()).firstCity(&iLoop); pLoopCity != NULL; pLoopCity = GET_PLAYER(getOwner()).nextCity(&iLoop))
+								{
+									//If we passed in a city, only check that city.
+									if (pLoopCity != pOriginCity)
+									{
+										pLoopCity->doInstantYield((YieldTypes)iYieldLoop, GET_PLAYER(getOwner()).GetYieldFromPillagePlayer(iYieldType));
+									}
+								}
+							}
+						}
+						if (pOriginCity == NULL)
+						{
+							pOriginCity = GET_PLAYER(getOwner()).getCapitalCity();
+							int iValue = GET_PLAYER(getOwner()).GetYieldFromPillage(iYieldType) + GET_PLAYER(getOwner()).GetYieldFromPillagePlayer(iYieldType);
+							if (iValue > 0)
+							{
+								pOriginCity->doInstantYield((YieldTypes)iYieldLoop, iValue);
+
+								int iLoop = 0;
+								for (CvCity* pLoopCity = GET_PLAYER(getOwner()).firstCity(&iLoop); pLoopCity != NULL; pLoopCity = GET_PLAYER(getOwner()).nextCity(&iLoop))
+								{
+									//If we passed in a city, only check that city.
+									if (pLoopCity != pOriginCity)
+									{
+										pLoopCity->doInstantYield((YieldTypes)iYieldLoop, GET_PLAYER(getOwner()).GetYieldFromPillagePlayer(iYieldType));
+									}
+								}
+							}
+						}
+					}
+				}			
+#endif
 				int iPillageGold = 0;
 
 				// TODO: add scripting support for "doPillageGold"
@@ -19536,6 +19606,31 @@ bool CvUnit::onMap() const
 	return (plot() != NULL);
 }
 
+#if defined(MOD_ROG_CORE)
+//	--------------------------------------------------------------------------------
+CvCity* CvUnit::getOriginCity() const
+{
+	VALIDATE_OBJECT
+		if (getOwner() == NO_PLAYER)
+			return NULL;
+
+	if (m_iOriginCity == -1 && GET_PLAYER(getOwner()).getCapitalCity() != NULL)
+		return GET_PLAYER(getOwner()).getCapitalCity();
+
+	if (m_iOriginCity == -1)
+		return NULL;
+
+	return GET_PLAYER(getOwner()).getCity(m_iOriginCity);
+}
+
+
+//	--------------------------------------------------------------------------------
+void CvUnit::setOriginCity(int iNewValue)
+{
+	VALIDATE_OBJECT
+	m_iOriginCity = iNewValue;
+}
+#endif
 
 //	--------------------------------------------------------------------------------
 int CvUnit::getLastMoveTurn() const
@@ -24103,6 +24198,8 @@ void CvUnit::changeUnitClassModifier(UnitClassTypes eIndex, int iChange)
 }
 
 
+
+
 //	--------------------------------------------------------------------------------
 bool CvUnit::canAcquirePromotion(PromotionTypes ePromotion) const
 {
@@ -25280,6 +25377,7 @@ void CvUnit::read(FDataStream& kStream)
 #endif
 
 #if defined(MOD_ROG_CORE)
+	kStream >> m_iOriginCity;
 	kStream >> m_iMoveLfetAttackMod;
 	kStream >> m_iMoveUsedAttackMod;
 	kStream >> m_iGoldenAgeMod;
@@ -25629,6 +25727,7 @@ void CvUnit::write(FDataStream& kStream) const
 #endif
 
 #if defined(MOD_ROG_CORE)
+	kStream << m_iOriginCity;
 	kStream << m_iMoveLfetAttackMod;
 	kStream << m_iMoveUsedAttackMod;
 	kStream << m_iGoldenAgeMod;

@@ -368,6 +368,13 @@ public:
 	int GetYieldFromBorderGrowth(int i) const;
 	int* GetYieldFromBorderGrowthArray() const;
 
+	int GetYieldFromPillage(int i) const;
+	int* GetYieldFromPillageArray() const;
+	int GetYieldFromPillageGlobal(int i) const;
+	int* GetYieldFromPillageGlobalArray() const;
+	int GetYieldFromPillageGlobalPlayer(int i) const;
+	int* GetYieldFromPillageGlobalPlayerArray() const;
+
 	int GetYieldModifierFromWonder(int i) const;;
 	int* GetYieldModifierFromWonderArray() const;
 #endif
@@ -744,6 +751,9 @@ private:
 	int* m_piYieldFromUnitProduction;
 	int* m_piYieldFromBirth;
 	int* m_piYieldFromBorderGrowth;
+	int* m_piYieldFromPillage;
+	int* m_piYieldFromPillageGlobal;
+	int* m_piYieldFromPillageGlobalPlayer;
 	int* m_piYieldModifierFromWonder;
 #endif
 
