@@ -1366,6 +1366,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iIgnoreGreatGeneralBenefit = 0;
 	m_iIgnoreZOC = 0;
 	m_iCanDoFallBackDamage = 0;
+	m_iCanParadropAnyWhere = 0;
 #if defined(MOD_UNITS_NO_SUPPLY)
 	m_iNoSupply = 0;
 #endif
@@ -7607,6 +7608,7 @@ bool CvUnit::canParadrop(const CvPlot* pPlot, bool bOnlyTestVisibility) const
 			return false;
 		}
 
+
 		if(pPlot->IsFriendlyTerritory(getOwner()))
 		{
 			// We're in friendly territory, call the event to see if we CAN'T start from here anyway
@@ -7643,6 +7645,12 @@ bool CvUnit::canParadrop(const CvPlot* pPlot, bool bOnlyTestVisibility) const
 		}
 		else
 		{
+
+			if (IsCanParadropAnyWhere())
+			{
+				return true;
+			}
+
 			// We're not in friendly territory, call the event to see if we CAN start from here anyway
 #if defined(MOD_EVENTS_PARADROPS)
 			if (MOD_EVENTS_PARADROPS) {
@@ -22609,6 +22617,18 @@ void CvUnit::ChangeCanDoFallBackDamageCount(int iChange)
 
 
 //	--------------------------------------------------------------------------------
+bool CvUnit::IsCanParadropAnyWhere() const
+{
+	return m_iCanParadropAnyWhere > 0;
+}
+
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeCanParadropAnyWhereCount(int iChange)
+{
+	m_iCanParadropAnyWhere += iChange;
+}
+
+//	--------------------------------------------------------------------------------
 bool CvUnit::IsSapper() const
 {
 	return (m_iSapperCount > 0);
@@ -24742,6 +24762,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeIgnoreGreatGeneralBenefitCount(thisPromotion.IsIgnoreGreatGeneralBenefit() ? iChange: 0);
 		ChangeIgnoreZOCCount(thisPromotion.IsIgnoreZOC() ? iChange: 0);
 		ChangeCanDoFallBackDamageCount(thisPromotion.IsCanDoFallBackDamage() ? iChange : 0);
+		ChangeCanParadropAnyWhereCount(thisPromotion.IsCanParadropAnyWhere() ? iChange : 0);
 		ChangeImmueMeleeAttackCount(thisPromotion.IsImmueMeleeAttack() ? iChange : 0);
 #if defined(MOD_UNITS_NO_SUPPLY)
 		changeNoSupply(thisPromotion.IsNoSupply() ? iChange : 0);
@@ -25250,6 +25271,7 @@ void CvUnit::read(FDataStream& kStream)
 	}
 
 	kStream >> m_iCaptureDefeatedEnemyChance;
+	kStream >> m_iCanParadropAnyWhere;
 	kStream >> m_iCannotBeCapturedCount;
 
 #if defined(MOD_DEFENSE_MOVES_BONUS)
@@ -25597,6 +25619,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iIgnoreGreatGeneralBenefit;
 	kStream << m_iIgnoreZOC;
 	kStream << m_iCanDoFallBackDamage;
+	kStream << m_iCanParadropAnyWhere;
 	kStream << m_iCaptureDefeatedEnemyChance;
 	kStream << m_iCannotBeCapturedCount;
 

@@ -1285,6 +1285,8 @@ public:
 	void ChangeIgnoreZOCCount(int iChange);
 	bool IsCanDoFallBackDamage() const;
 	void ChangeCanDoFallBackDamageCount(int iChange);
+	bool IsCanParadropAnyWhere() const;
+	void ChangeCanParadropAnyWhereCount(int iChange);
 	bool IsSapper() const;
 	void ChangeSapperCount(int iChange);
 	bool IsSappingCity(const CvCity* pTargetCity) const;
@@ -2199,6 +2201,7 @@ protected:
 	int m_iIgnoreGreatGeneralBenefit;
 	int m_iIgnoreZOC;
 	int m_iCanDoFallBackDamage;
+	int m_iCanParadropAnyWhere;
 	int m_iImmueMeleeAttack;
 #if defined(MOD_UNITS_NO_SUPPLY)
 	int m_iNoSupply;
