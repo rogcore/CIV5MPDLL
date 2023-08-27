@@ -1365,6 +1365,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iGreatGeneralCombatModifier = 0;
 	m_iIgnoreGreatGeneralBenefit = 0;
 	m_iIgnoreZOC = 0;
+	m_iCanDoFallBackDamage = 0;
 #if defined(MOD_UNITS_NO_SUPPLY)
 	m_iNoSupply = 0;
 #endif
@@ -22593,6 +22594,20 @@ void CvUnit::ChangeIgnoreZOCCount(int iChange)
 	m_iIgnoreZOC += iChange;
 }
 
+
+//	--------------------------------------------------------------------------------
+bool CvUnit::IsCanDoFallBackDamage() const
+{
+	return m_iCanDoFallBackDamage > 0;
+}
+
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeCanDoFallBackDamageCount(int iChange)
+{
+	m_iCanDoFallBackDamage += iChange;
+}
+
+
 //	--------------------------------------------------------------------------------
 bool CvUnit::IsSapper() const
 {
@@ -24726,6 +24741,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 
 		ChangeIgnoreGreatGeneralBenefitCount(thisPromotion.IsIgnoreGreatGeneralBenefit() ? iChange: 0);
 		ChangeIgnoreZOCCount(thisPromotion.IsIgnoreZOC() ? iChange: 0);
+		ChangeCanDoFallBackDamageCount(thisPromotion.IsCanDoFallBackDamage() ? iChange : 0);
 		ChangeImmueMeleeAttackCount(thisPromotion.IsImmueMeleeAttack() ? iChange : 0);
 #if defined(MOD_UNITS_NO_SUPPLY)
 		changeNoSupply(thisPromotion.IsNoSupply() ? iChange : 0);
@@ -25580,7 +25596,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iGreatGeneralCombatModifier;
 	kStream << m_iIgnoreGreatGeneralBenefit;
 	kStream << m_iIgnoreZOC;
-
+	kStream << m_iCanDoFallBackDamage;
 	kStream << m_iCaptureDefeatedEnemyChance;
 	kStream << m_iCannotBeCapturedCount;
 

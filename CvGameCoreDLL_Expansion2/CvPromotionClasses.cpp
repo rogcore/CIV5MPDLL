@@ -290,6 +290,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_bCaptureDefeatedEnemy(false),
 	m_bIgnoreGreatGeneralBenefit(false),
 	m_bIgnoreZOC(false),
+	m_bCanDoFallBackDamage(false),
 	m_bImmueMeleeAttack(false),
 	m_bHasPostCombatPromotions(false),
 	m_bPostCombatPromotionsExclusive(false),
@@ -579,6 +580,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_bCaptureDefeatedEnemy = kResults.GetBool("CaptureDefeatedEnemy");
 	m_bIgnoreGreatGeneralBenefit = kResults.GetBool("IgnoreGreatGeneralBenefit");
 	m_bIgnoreZOC = kResults.GetBool("IgnoreZOC");
+	m_bCanDoFallBackDamage = kResults.GetBool("CanDoFallBackDamage");
 	m_bImmueMeleeAttack = kResults.GetBool("ImmueMeleeAttack");
 	m_bHasPostCombatPromotions = kResults.GetBool("HasPostCombatPromotions");
 	m_bPostCombatPromotionsExclusive = kResults.GetBool("PostCombatPromotionsExclusive");
@@ -2669,6 +2671,12 @@ bool CvPromotionEntry::IsImmueMeleeAttack() const
 bool CvPromotionEntry::IsIgnoreZOC() const
 {
 	return m_bIgnoreZOC;
+}
+
+/// Accessor: Can this unit do Fall Back Damage when attacking?
+bool CvPromotionEntry::IsCanDoFallBackDamage() const
+{
+	return m_bCanDoFallBackDamage;
 }
 
 /// Accessor: Is this a Sapper unit (when next to a city, provides city attack bonus to nearby units)?
