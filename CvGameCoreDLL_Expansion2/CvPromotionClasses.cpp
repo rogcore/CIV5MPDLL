@@ -48,6 +48,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iAirSweepCombatModifier(0),
 	m_iInterceptChanceChange(0),
 	m_iNumInterceptionChange(0),
+	m_iAirInterceptRangeChange(0),
 	m_iEvasionChange(0),
 	m_iCargoChange(0),
 	m_iEnemyHealChange(0),
@@ -168,6 +169,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iAdjacentMod(0),
 	m_iAttackMod(0),
 	m_iDefenseMod(0),
+	m_iGetGroundAttackDamage(0),
 	m_iDropRange(0),
 	m_iExtraNavalMoves(0),
 	m_iHPHealedIfDefeatEnemy(0),
@@ -583,6 +585,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iAirSweepCombatModifier = kResults.GetInt("AirSweepCombatModifier");
 	m_iInterceptChanceChange = kResults.GetInt("InterceptChanceChange");
 	m_iNumInterceptionChange = kResults.GetInt("NumInterceptionChange");
+	m_iAirInterceptRangeChange = kResults.GetInt("AirInterceptRangeChange");
 	m_iEvasionChange = kResults.GetInt("EvasionChange");
 	m_iCargoChange = kResults.GetInt("CargoChange");
 	m_iEnemyHealChange = kResults.GetInt("EnemyHealChange");
@@ -642,6 +645,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iAdjacentMod = kResults.GetInt("AdjacentMod");
 	m_iAttackMod = kResults.GetInt("AttackMod");
 	m_iDefenseMod = kResults.GetInt("DefenseMod");
+	m_iGetGroundAttackDamage = kResults.GetInt("GetGroundAttackDamage");
 	m_iDropRange = kResults.GetInt("DropRange");
 	m_iExtraNavalMoves = kResults.GetInt("ExtraNavalMovement");
 	m_iHPHealedIfDefeatEnemy = kResults.GetInt("HPHealedIfDestroyEnemy");
@@ -1553,6 +1557,12 @@ int CvPromotionEntry::GetNumInterceptionChange() const
 	return m_iNumInterceptionChange;
 }
 
+/// Accessor: How much additional range this promotion allows an unit to perform interception (can be negative)
+int CvPromotionEntry::GetAirInterceptRangeChange() const
+{
+	return m_iAirInterceptRangeChange;
+}
+
 /// Accessor: How well an air unit can evade interception
 int CvPromotionEntry::GetEvasionChange() const
 {
@@ -2122,6 +2132,13 @@ int CvPromotionEntry::GetDefenseMod() const
 {
 	return m_iDefenseMod;
 }
+
+
+int CvPromotionEntry::GetGroundAttackDamage() const
+{
+	return m_iGetGroundAttackDamage;
+}
+
 
 /// Accessor: Number of tiles away a unit may paradrop
 int CvPromotionEntry::GetDropRange() const

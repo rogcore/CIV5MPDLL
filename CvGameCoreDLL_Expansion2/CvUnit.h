@@ -676,6 +676,9 @@ public:
 	void SetCombatBonusFromNearbyUnitClass(UnitClassTypes eUnitClass);
 #endif
 
+	bool canIntercept() const;
+	int GetAirInterceptRange() const;
+
 #if defined(MOD_PROMOTIONS_CROSS_MOUNTAINS)
 	bool canCrossMountains() const;
 	int getCanCrossMountainsCount() const;
@@ -784,7 +787,8 @@ public:
 	void changeAttackModifier(int iValue);
 	int getDefenseModifier() const;
 	void changeDefenseModifier(int iValue);
-
+	int getGroundAttackDamage() const;
+	void changeGroundAttackDamage(int iValue);
 	int cityAttackModifier() const;
 	int cityDefenseModifier() const;
 	int rangedDefenseModifier() const;
@@ -1091,8 +1095,11 @@ public:
 	int getExtraRange() const;
 	void changeExtraRange(int iChange);
 
-	int getExtraIntercept() const;
-	void changeExtraIntercept(int iChange);
+	int getInterceptChance() const;
+	void changeInterceptChance(int iChange);
+
+	//int getExtraIntercept() const;
+	//void changeExtraIntercept(int iChange);
 
 	int getExtraEvasion() const;
 	void changeExtraEvasion(int iChange);
@@ -1336,6 +1343,9 @@ public:
 	int GetNumInterceptions() const;
 	void ChangeNumInterceptions(int iChange);
 
+	int GetExtraAirInterceptRange() const; // JJ: New
+	void ChangeExtraAirInterceptRange(int iChange);
+
 	bool isOutOfInterceptions() const;
 	int getMadeInterceptionCount() const;
 	void setMadeInterception(bool bNewValue);
@@ -1545,6 +1555,8 @@ public:
 
 	bool potentialWarAction(const CvPlot* pPlot) const;
 	bool willRevealByMove(const CvPlot& pPlot) const;
+
+	bool attemptGroundAttacks(const CvPlot& pPlot);
 
 	bool isAlwaysHostile(const CvPlot& pPlot) const;
 	void changeAlwaysHostileCount(int iValue);
@@ -2021,7 +2033,7 @@ protected:
 	FAutoVariable<int, CvUnit> m_iExtraMoves;
 	FAutoVariable<int, CvUnit> m_iExtraMoveDiscount;
 	FAutoVariable<int, CvUnit> m_iExtraRange;
-	FAutoVariable<int, CvUnit> m_iExtraIntercept;
+	FAutoVariable<int, CvUnit> m_iInterceptChance;
 	FAutoVariable<int, CvUnit> m_iExtraEvasion;
 	FAutoVariable<int, CvUnit> m_iExtraFirstStrikes;
 	FAutoVariable<int, CvUnit> m_iExtraChanceFirstStrikes;
@@ -2055,6 +2067,7 @@ protected:
 	FAutoVariable<int, CvUnit> m_iAirSweepCombatModifier;
 	FAutoVariable<int, CvUnit> m_iAttackModifier;
 	FAutoVariable<int, CvUnit> m_iDefenseModifier;
+	FAutoVariable<int, CvUnit> m_iGroundAttackDamage;
 	FAutoVariable<int, CvUnit> m_iExtraCombatPercent;
 	FAutoVariable<int, CvUnit> m_iExtraCityAttackPercent;
 	FAutoVariable<int, CvUnit> m_iExtraCityDefensePercent;
@@ -2228,6 +2241,7 @@ protected:
 	FAutoVariable<int, CvUnit> m_iOutsideFriendlyLandsModifier;
 	FAutoVariable<int, CvUnit> m_iHealIfDefeatExcludeBarbariansCount;
 	FAutoVariable<int, CvUnit> m_iNumInterceptions;
+	FAutoVariable<int, CvUnit> m_iExtraAirInterceptRange;
 	FAutoVariable<int, CvUnit> m_iMadeInterceptionCount;
 	int m_iEverSelectedCount;
 	int m_iSapperCount;

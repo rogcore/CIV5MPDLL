@@ -4018,14 +4018,34 @@ CvUnitCombat::ATTACK_RESULT CvUnitCombat::AttackAirSweep(CvUnit& kAttacker, CvPl
 	}
 	else
 	{
-		// attempted to do a sweep in a plot that had no interceptors
-		// consume the movement and finish its moves
-		if(kAttacker.getOwner() == GC.getGame().getActivePlayer())
+		bool bFallbackAttack = false;
+		if (MOD_ROG_CORE)
+			bFallbackAttack = kAttacker.attemptGroundAttacks(targetPlot);
+
+		if (bFallbackAttack)
 		{
-			Localization::String localizedText = Localization::Lookup("TXT_KEY_AIR_PATROL_FOUND_NOTHING");
-			localizedText << kAttacker.getUnitInfo().GetTextKey();
-			GC.GetEngineUserInterface()->AddMessage(0, kAttacker.getOwner(), false, GC.getEVENT_MESSAGE_TIME(), localizedText.toUTF8());
-			MILITARYLOG(kAttacker.getOwner(), localizedText.toUTF8(), kAttacker.plot(), kAttacker.getOwner());
+			int iExperience = /*5*/ GD_INT_GET(EXPERIENCE_ATTACKING_AIR_SWEEP);
+			kAttacker.changeExperienceTimes100(100 * iExperience, -1, true, targetPlot.getOwner() == kAttacker.getOwner(), true);
+			kAttacker.testPromotionReady();
+			// attempted to do a sweep in a plot that had no interceptors
+			// consume the movement and finish its moves
+			if (kAttacker.getOwner() == GC.getGame().getActivePlayer())
+			{
+				Localization::String localizedText = Localization::Lookup("TXT_KEY_AIR_PATROL_BOMBED_GROUND_TARGETS");
+				localizedText << kAttacker.getUnitInfo().GetTextKey();
+				GC.GetEngineUserInterface()->AddMessage(0, kAttacker.getOwner(), false, /*10*/ GD_INT_GET(EVENT_MESSAGE_TIME), localizedText.toUTF8());
+			}
+		}
+
+		else
+		{
+			if (kAttacker.getOwner() == GC.getGame().getActivePlayer())
+			{
+				Localization::String localizedText = Localization::Lookup("TXT_KEY_AIR_PATROL_FOUND_NOTHING");
+				localizedText << kAttacker.getUnitInfo().GetTextKey();
+				GC.GetEngineUserInterface()->AddMessage(0, kAttacker.getOwner(), false, GC.getEVENT_MESSAGE_TIME(), localizedText.toUTF8());
+				MILITARYLOG(kAttacker.getOwner(), localizedText.toUTF8(), kAttacker.plot(), kAttacker.getOwner());
+			}
 		}
 
 		// Spend a move for this attack

@@ -82,6 +82,7 @@ public:
 	int  GetAirSweepCombatModifier() const;
 	int  GetInterceptChanceChange() const;
 	int  GetNumInterceptionChange() const;
+	int  GetAirInterceptRangeChange() const;
 	int  GetEvasionChange() const;
 	int  GetCargoChange() const;
 	int  GetEnemyHealChange() const;
@@ -228,7 +229,7 @@ public:
 	int GetAdjacentMod() const;
 	int GetAttackMod() const;
 	int GetDefenseMod() const;
-
+	int GetGroundAttackDamage() const;
 	int GetDropRange() const;
 	int GetExtraNavalMoves() const;
 	int GetHPHealedIfDefeatEnemy() const;
@@ -509,6 +510,7 @@ protected:
 	int m_iAirSweepCombatModifier;
 	int m_iInterceptChanceChange;
 	int m_iNumInterceptionChange;
+	int m_iAirInterceptRangeChange;
 	int m_iEvasionChange;
 	int m_iCargoChange;
 	int m_iEnemyHealChange;
@@ -563,6 +565,7 @@ protected:
 	int m_iAdjacentMod;
 	int m_iAttackMod;
 	int m_iDefenseMod;
+	int m_iGetGroundAttackDamage;
 	int m_iDropRange;
 	int m_iExtraNavalMoves;
 	int m_iHPHealedIfDefeatEnemy;
