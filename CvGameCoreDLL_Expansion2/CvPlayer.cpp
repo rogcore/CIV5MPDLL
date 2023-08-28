@@ -290,6 +290,10 @@ CvPlayer::CvPlayer() :
 #endif
 	, m_iNumTradeRouteBonus("CvPlayer::m_iNumTradeRouteBonus", m_syncArchive)
 	, m_viTradeRouteDomainExtraRange("CvPlayer::m_viTradeRouteDomainExtraRange", m_syncArchive)
+#if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	, m_iTradeRouteSeaGoldBonusGlobal("CvPlayer::m_iTradeRouteSeaGoldBonusGlobal", m_syncArchive)
+	, m_iTradeRouteLandGoldBonusGlobal("CvPlayer::m_iTradeRouteLandGoldBonusGlobal", m_syncArchive)
+#endif
 	, m_iImprovementCostModifier("CvPlayer::m_iImprovementCostModifier", m_syncArchive)
 	, m_iImprovementUpgradeRateModifier("CvPlayer::m_iImprovementUpgradeRateModifier", m_syncArchive)
 	, m_iSpecialistProductionModifier("CvPlayer::m_iSpecialistProductionModifier", m_syncArchive)
@@ -1065,6 +1069,10 @@ void CvPlayer::uninit()
 	m_iNumTradeRouteBonus = 0;
 	m_viTradeRouteDomainExtraRange.clear();
 	m_viTradeRouteDomainExtraRange.resize(NUM_DOMAIN_TYPES, 0);
+#if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	m_iTradeRouteSeaGoldBonusGlobal = 0;
+	m_iTradeRouteLandGoldBonusGlobal = 0;
+#endif
 	m_iImprovementCostModifier = 0;
 	m_iImprovementUpgradeRateModifier = 0;
 	m_iSpecialistProductionModifier = 0;
@@ -9777,6 +9785,11 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 
 	changeNumTradeRouteBonus(pBuildingInfo->GetNumTradeRouteBonus() * iChange);
 
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	changeTradeRouteSeaGoldBonusGlobal(pBuildingInfo->GetTradeRouteSeaGoldBonusGlobal() * iChange);
+	changeTradeRouteLandGoldBonusGlobal(pBuildingInfo->GetTradeRouteLandGoldBonusGlobal() * iChange);
+#endif
+
 
 	for(iI = 0; iI < NUM_YIELD_TYPES; iI++)
 	{
@@ -16700,6 +16713,30 @@ void CvPlayer::changeTradeRouteDomainExtraRange(DomainTypes eIndex, int iChange)
 }
 
 
+//	--------------------------------------------------------------------------------
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+int CvPlayer::getTradeRouteSeaGoldBonusGlobal() const
+{
+	return m_iTradeRouteSeaGoldBonusGlobal;
+}
+void CvPlayer::changeTradeRouteSeaGoldBonusGlobal(int iChange)
+{
+	m_iTradeRouteSeaGoldBonusGlobal += iChange;
+}
+
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::getTradeRouteLandGoldBonusGlobal() const
+{
+	return m_iTradeRouteLandGoldBonusGlobal;
+}
+void CvPlayer::changeTradeRouteLandGoldBonusGlobal(int iChange)
+{
+	m_iTradeRouteLandGoldBonusGlobal += iChange;
+}
+
+
+#endif
 //	--------------------------------------------------------------------------------
 int CvPlayer::getImprovementCostModifier() const
 {
@@ -27183,6 +27220,10 @@ void CvPlayer::Read(FDataStream& kStream)
 #endif
 	kStream >> m_iNumTradeRouteBonus;
 	kStream >> m_viTradeRouteDomainExtraRange;
+#if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	kStream >> m_iTradeRouteSeaGoldBonusGlobal;
+	kStream >> m_iTradeRouteLandGoldBonusGlobal;
+#endif
 	kStream >> m_iImprovementCostModifier;
 	kStream >> m_iImprovementUpgradeRateModifier;
 	kStream >> m_iSpecialistProductionModifier;
@@ -27884,6 +27925,10 @@ void CvPlayer::Write(FDataStream& kStream) const
 #endif
 	kStream << m_iNumTradeRouteBonus;
 	kStream << m_viTradeRouteDomainExtraRange;
+#if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	kStream << m_iTradeRouteSeaGoldBonusGlobal;
+	kStream << m_iTradeRouteLandGoldBonusGlobal;
+#endif
 	kStream << m_iImprovementCostModifier;
 	kStream << m_iImprovementUpgradeRateModifier;
 	kStream << m_iSpecialistProductionModifier;
