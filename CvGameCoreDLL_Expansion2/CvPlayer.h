@@ -1059,6 +1059,9 @@ public:
 
 	void ChangeDomainFreeExperience(DomainTypes eDomain, int iChange);
 	int GetDomainFreeExperience(DomainTypes) const;
+
+	void ChangeUnitTypePrmoteHealGlobal(UnitTypes eUnit, int iChange);
+	int GetUnitTypePrmoteHealGlobal(UnitTypes) const;
 #endif
 
 	int getMilitaryFoodProductionCount() const;
@@ -2512,6 +2515,7 @@ protected:
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiDomainFreeExperiencePerGreatWorkGlobal;
 
 	std::map<int, int> m_piDomainFreeExperience;
+	std::map<int, int> m_piUnitTypePrmoteHealGlobal;
 #endif
 	std::vector<int> m_aiYieldModifierFromActiveSpies;
 

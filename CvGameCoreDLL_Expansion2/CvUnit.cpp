@@ -12137,14 +12137,27 @@ void CvUnit::promote(PromotionTypes ePromotion, int iLeaderUnitId)
 		changeLevel(1);
 	}
 
+
+	int value = -GC.getINSTA_HEAL_RATE();
+
 	// Insta-Heal: never earned
 	if(pkPromotionInfo->IsInstaHeal())
-	{
-		changeDamage(-GC.getINSTA_HEAL_RATE());
+	{	
+#if defined(MOD_ROG_CORE)
+		int extraheal = -GET_PLAYER(getOwner()).GetUnitTypePrmoteHealGlobal(getUnitType());
+		int healtotal = value + extraheal;
+#else
+		int healtotal = value;
+#endif
+		changeDamage(healtotal);
 	}
 	// Set that we have this Promotion
 	else
 	{
+#if defined(MOD_ROG_CORE)
+		int extraheal = -GET_PLAYER(getOwner()).GetUnitTypePrmoteHealGlobal(getUnitType());
+		changeDamage(extraheal);
+#endif	
 		setHasPromotion(ePromotion, true);
 
 #if defined(MOD_EVENTS_UNIT_UPGRADES)

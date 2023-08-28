@@ -265,6 +265,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piYieldModifierFromWonder(NULL),
 	m_piDomainFreeExperiencePerGreatWorkGlobal(NULL),
 	m_piDomainFreeExperienceGlobal(),
+	m_piUnitTypePrmoteHealGlobal(),
 	m_paiSpecificGreatPersonRateModifier(NULL),
 #endif
 
@@ -356,6 +357,7 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	SAFE_DELETE_ARRAY(m_piYieldModifierFromWonder);
 	SAFE_DELETE_ARRAY(m_piDomainFreeExperiencePerGreatWorkGlobal);
 	m_piDomainFreeExperienceGlobal.clear();
+	m_piUnitTypePrmoteHealGlobal.clear();
 #endif
 
 	SAFE_DELETE_ARRAY(m_piDomainProductionModifier);
@@ -836,8 +838,6 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 		}
 	}
 #if defined(MOD_ROG_CORE)
-
-
 	//Building_DomainFreeExperiencesGlobal
 	{
 		std::string strKey("Building_DomainFreeExperiencesGlobal");
@@ -861,6 +861,32 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 		//Trim extra memory off container since this is mostly read-only.
 		std::map<int, int>(m_piDomainFreeExperienceGlobal).swap(m_piDomainFreeExperienceGlobal);
+	}
+
+
+	//Building_UnitTypePrmoteHealGlobal
+	{
+		std::string strKey("Building_UnitTypePrmoteHealGlobal");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Units.ID as UnitID, Heal from Building_UnitTypePrmoteHealGlobal inner join Units on Units.Type = UnitType where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType);
+
+		while (pResults->Step())
+		{
+			const int iUnit = pResults->GetInt(0);
+			const int iHeal = pResults->GetInt(1);
+
+			m_piUnitTypePrmoteHealGlobal[iUnit] += iHeal;
+		}
+
+		pResults->Reset();
+
+		//Trim extra memory off container since this is mostly read-only.
+		std::map<int, int>(m_piUnitTypePrmoteHealGlobal).swap(m_piUnitTypePrmoteHealGlobal);
 	}
 #endif
 
@@ -3036,7 +3062,19 @@ int CvBuildingEntry::GetDomainFreeExperienceGlobal(int i) const
 	{
 		return it->second;
 	}
+	return 0;
+}
 
+int CvBuildingEntry::GetUnitTypePrmoteHealGlobal(int i) const
+{
+	CvAssertMsg(i < GC.getNumUnitInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+
+	std::map<int, int>::const_iterator it = m_piUnitTypePrmoteHealGlobal.find(i);
+	if (it != m_piUnitTypePrmoteHealGlobal.end()) // find returns the iterator to map::end if the key i is not present in the map
+	{
+		return it->second;
+	}
 	return 0;
 }
 #endif

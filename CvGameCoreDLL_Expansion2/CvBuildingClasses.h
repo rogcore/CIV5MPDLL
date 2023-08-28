@@ -404,6 +404,7 @@ public:
 #if defined(MOD_ROG_CORE)
 	int GetDomainFreeExperiencePerGreatWorkGlobal(int i) const;
 	int GetDomainFreeExperienceGlobal(int i) const;
+	int GetUnitTypePrmoteHealGlobal(int i) const;
 #endif
 
 	int GetDomainProductionModifier(int i) const;
@@ -769,6 +770,7 @@ private:
 #if defined(MOD_ROG_CORE)
 	int* m_piDomainFreeExperiencePerGreatWorkGlobal;
 	std::map<int, int> m_piDomainFreeExperienceGlobal;
+	std::map<int, int> m_piUnitTypePrmoteHealGlobal;
 #endif
 
 
