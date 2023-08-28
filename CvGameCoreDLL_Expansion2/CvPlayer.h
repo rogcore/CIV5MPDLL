@@ -1687,6 +1687,9 @@ public:
 	int GetGlobalRangedStrikeModifier() const;
 	void SetGlobalRangedStrikeModifier(int iValue);
 	void ChangeGlobalRangedStrikeModifier(int iChange);
+	int GetLiberatedInfluence() const;
+	void SetLiberatedInfluence(int iValue);
+	void ChangeLiberatedInfluence(int iChange);
 #endif
 
 	int GetCityGrowthMod() const;
@@ -2410,6 +2413,7 @@ protected:
 #if defined(MOD_ROG_CORE)
 	FAutoVariable<int, CvPlayer> m_iGlobalCityStrengthMod;
 	FAutoVariable<int, CvPlayer> m_iGlobalRangedStrikeModifier;
+	FAutoVariable<int, CvPlayer> m_iLiberatedInfluence;
 #endif
 
 #if defined(MOD_TRAITS_CITY_WORKING) || defined(MOD_BUILDINGS_CITY_WORKING) || defined(MOD_POLICIES_CITY_WORKING) || defined(MOD_TECHS_CITY_WORKING)

@@ -156,6 +156,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_iRangedStrikeModifier(0),
 	m_iPopulationChange(0),
 	m_iMinorCivFriendship(0),
+	m_iLiberatedInfluence(0),
 	m_iResetDamageValue(0),
 	m_iReduceDamageValue(0),
 
@@ -460,6 +461,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iRangedStrikeModifier = kResults.GetInt("RangedStrikeModifier");
 	m_iPopulationChange = kResults.GetInt("PopulationChange");
 	m_iMinorCivFriendship = kResults.GetInt("MinorCivFriendship");
+	m_iLiberatedInfluence = kResults.GetInt("LiberatedInfluence");
 	m_iResetDamageValue = kResults.GetInt("ResetDamageValue");
 	m_iReduceDamageValue = kResults.GetInt("ReduceDamageValue");
 
@@ -2011,6 +2013,11 @@ int CvBuildingEntry::GetPopulationChange() const
 int CvBuildingEntry::GetMinorCivFriendship() const
 {
 	return m_iMinorCivFriendship;
+}
+
+int CvBuildingEntry::GetLiberatedInfluence() const
+{
+	return m_iLiberatedInfluence;
 }
 
 int CvBuildingEntry::GetResetDamageValue() const

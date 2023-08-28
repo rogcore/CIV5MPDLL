@@ -201,6 +201,7 @@ public:
 	int CityRangedStrikeModifier() const;
 	int GetPopulationChange() const;
 	int GetMinorCivFriendship() const;
+	int GetLiberatedInfluence() const;
 	int GetGlobalCityStrengthMod() const;
 	int GetGlobalRangedStrikeModifier() const;
 
@@ -568,19 +569,16 @@ private:
 
 #if defined(MOD_ROG_CORE)
 	int* m_piGreatWorkYieldChange;
-
 	int m_iExtraDamageHeal;
 	int m_iRangedStrikeModifier;
 	int m_iPopulationChange;
 	int m_iMinorCivFriendship;
+	int m_iLiberatedInfluence;
 	int m_iResetDamageValue;
 	int m_iReduceDamageValue;
 
 	int m_iGlobalCityStrengthMod;
 	int m_iGlobalRangedStrikeModifier;
-
-
-
 	int m_iWaterTileDamage;
 	int m_iWaterTileMovementReduce;
 	int m_iWaterTileTurnDamage;

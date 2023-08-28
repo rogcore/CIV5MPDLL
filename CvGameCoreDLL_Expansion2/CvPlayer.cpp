@@ -380,6 +380,7 @@ CvPlayer::CvPlayer() :
 	, m_aiYieldFromPillage()
 	, m_iGlobalCityStrengthMod("CvPlayer::m_iGlobalCityStrengthMod", m_syncArchive)
 	, m_iGlobalRangedStrikeModifier("CvPlayer::m_iGlobalRangedStrikeModifier", m_syncArchive)
+	, m_iLiberatedInfluence("CvPlayer::m_iLiberatedInfluence", m_syncArchive)
 #endif
 
 	, m_iPopRushHurryCount("CvPlayer::m_iPopRushHurryCount", m_syncArchive)
@@ -1155,6 +1156,7 @@ void CvPlayer::uninit()
 #if defined(MOD_ROG_CORE)
 	m_iGlobalCityStrengthMod = 0;
 	m_iGlobalRangedStrikeModifier = 0;
+	m_iLiberatedInfluence = 0;
 #endif
 
 	m_iBorderObstacleCount = 0;
@@ -3958,6 +3960,25 @@ void CvPlayer::DoLiberatePlayer(PlayerTypes ePlayer, int iOldCityID)
 			}
 		}
 	}
+
+#if defined(MOD_ROG_CORE)
+	if (MOD_ROG_CORE) 
+	{
+	    // Instant Friendship change with all Minors
+		int iMinorFriendshipChange = GetLiberatedInfluence();
+		if (iMinorFriendshipChange != 0)
+		{
+			for (int iMinorLoop = MAX_MAJOR_CIVS; iMinorLoop < MAX_CIV_PLAYERS; iMinorLoop++)
+			{
+				TeamTypes eTeam = GET_PLAYER((PlayerTypes)iMinorLoop).getTeam();
+				if (getTeam() != eTeam && GET_TEAM(eTeam).isHasMet(getTeam()))
+				{
+					GET_PLAYER((PlayerTypes)iMinorLoop).GetMinorCivAI()->ChangeFriendshipWithMajor(GetID(), iMinorFriendshipChange);
+				}
+			}
+		}
+	}
+#endif
 
 #if defined(MOD_EVENTS_LIBERATION)
 	if (MOD_EVENTS_LIBERATION) {
@@ -9698,6 +9719,7 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 #if defined(MOD_ROG_CORE)
 	ChangeCityStrengthMod(pBuildingInfo->GetGlobalCityStrengthMod()* iChange);
 	ChangeGlobalRangedStrikeModifier(pBuildingInfo->GetGlobalRangedStrikeModifier()* iChange);
+	ChangeLiberatedInfluence(pBuildingInfo->GetLiberatedInfluence()* iChange);
 #endif
 
 	if(pBuildingInfo->GetFreeBuildingClass() != NO_BUILDINGCLASS)
@@ -28997,6 +29019,29 @@ void CvPlayer::ChangeGlobalRangedStrikeModifier(int iChange)
 	if (iChange != 0)
 	{
 		SetGlobalRangedStrikeModifier(GetGlobalRangedStrikeModifier() + iChange);
+	}
+}
+
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetLiberatedInfluence() const
+{
+	return m_iLiberatedInfluence;
+}
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::SetLiberatedInfluence(int iValue)
+{
+	CvAssert(iValue >= 0);
+	m_iLiberatedInfluence = iValue;
+}
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::ChangeLiberatedInfluence(int iChange)
+{
+	if (iChange != 0)
+	{
+		SetLiberatedInfluence(GetLiberatedInfluence() + iChange);
 	}
 }
 #endif
