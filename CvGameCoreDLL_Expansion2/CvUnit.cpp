@@ -256,6 +256,7 @@ CvUnit::CvUnit() :
 	, m_iAttackModifier("CvUnit::m_iAttackModifier", m_syncArchive)
 	, m_iDefenseModifier("CvUnit::m_iDefenseModifier", m_syncArchive)
 	, m_iGroundAttackDamage("CvUnit::m_iGroundAttackDamage", m_syncArchive)
+	, m_iGroundAttackRange("CvUnit::m_iGroundAttackRange", m_syncArchive)
 	, m_iExtraCombatPercent("CvUnit::m_iExtraCombatPercent", m_syncArchive)
 	, m_iExtraCityAttackPercent("CvUnit::m_iExtraCityAttackPercent", m_syncArchive)
 	, m_iExtraCityDefensePercent("CvUnit::m_iExtraCityDefensePercent", m_syncArchive)
@@ -1200,6 +1201,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iAttackModifier = 0;
 	m_iDefenseModifier = 0;
 	m_iGroundAttackDamage = 0;
+	m_iGroundAttackRange = 0;
 	m_iExtraCityAttackPercent = 0;
 	m_iExtraCityDefensePercent = 0;
 	m_iExtraRangedDefenseModifier = 0;
@@ -18226,6 +18228,24 @@ void CvUnit::changeGroundAttackDamage(int iValue)
 		}
 }
 
+
+//	--------------------------------------------------------------------------------
+int CvUnit::getGroundAttackRange() const
+{
+	VALIDATE_OBJECT
+	return m_iGroundAttackRange;
+}
+
+//	--------------------------------------------------------------------------------
+void CvUnit::changeGroundAttackRange(int iValue)
+{
+	VALIDATE_OBJECT
+		if (iValue != 0)
+		{
+			m_iGroundAttackRange += iValue;
+		}
+}
+
 //	--------------------------------------------------------------------------------
 int CvUnit::cityAttackModifier() const
 {
@@ -24950,6 +24970,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		changeAttackModifier(thisPromotion.GetAttackMod() * iChange);
 		changeDefenseModifier(thisPromotion.GetDefenseMod() * iChange);
 		changeGroundAttackDamage(thisPromotion.GetGroundAttackDamage() * iChange);
+		changeGroundAttackRange(thisPromotion.GetGroundAttackRange()* iChange);
 		changeExtraCombatPercent(thisPromotion.GetCombatPercent() * iChange);
 		changeExtraCityAttackPercent(thisPromotion.GetCityAttackPercent() * iChange);
 		changeExtraCityDefensePercent(thisPromotion.GetCityDefensePercent() * iChange);
@@ -26495,63 +26516,71 @@ bool CvUnit::attemptGroundAttacks(const CvPlot& pPlot)
 		return bFoundSomething;
 
 	int iAirSweepDamage = getGroundAttackDamage();
+	int iRange = getGroundAttackRange();
+	int iRangeFinal = 1;
 
 	CvString strAppendText = GetLocalizedText("TXT_KEY_PROMOTION_AIR_SWEEP");
 
-	int iRange = 1;
-	for (int i = -iRange; i <= iRange; ++i)
+	if (iRange >= 0)
 	{
-		for (int j = -iRange; j <= iRange; ++j)
+		if (iRange == 1)
 		{
-			CvPlot* pLoopPlot = ::plotXYWithRangeCheck(pPlot.getX(), pPlot.getY(), i, j, iRange);
-			if (NULL != pLoopPlot)
-			{
-				pLoopPlot->changeVisibilityCount(getTeam(), 1, NO_INVISIBLE, false, false, this);
-
-				if (pLoopPlot->getOwner() == NO_PLAYER || pLoopPlot->getOwner() == getOwner())
-					continue;
-
-				const IDInfo* pUnitNode = pLoopPlot->headUnitNode();
-				while (pUnitNode != NULL)
-				{
-					CvUnit* pLoopUnit = (CvUnit*)GetPlayerUnit(*pUnitNode);
-					//CvUnit* pLoopUnit = GetPlayerUnit(*pUnitNode);
-					pUnitNode = pLoopPlot->nextUnitNode(pUnitNode);
-
-					if (pLoopUnit == NULL)
-						continue;
-					if (!pLoopUnit->canIntercept() && pLoopUnit->getDomainType() != DOMAIN_AIR)
-						continue;
-					if (pLoopUnit->isSuicide())
-						continue;
-					if (pLoopUnit->isCargo())
-						continue;
-					if (!GET_TEAM(pLoopUnit->getTeam()).isAtWar(getTeam()))
-						continue;
-
-#if defined(MOD_API_UNIT_STATS)
-					pLoopUnit->changeDamage(iAirSweepDamage, getOwner(), GetID(), 0.25f, &strAppendText);
-#else
-					pLoopUnit->changeDamage(iAirSweepDamage, getOwner(), 0.25f, &strAppendText);
-#endif
-					if (pLoopUnit->IsDead())
-					{
-						CvString strBuffer;
-						int iActivePlayerID = GC.getGame().getActivePlayer();
-
-						if (iActivePlayerID == getOwner())
-						{
-							strBuffer = GetLocalizedText("TXT_KEY_MISC_YOU_UNIT_DESTROYED_ENEMY", getNameKey(), iAirSweepDamage, pLoopUnit->getNameKey());
-							GC.GetEngineUserInterface()->AddMessage(0, getOwner(), true, /*10*/ GD_INT_GET(EVENT_MESSAGE_TIME), strBuffer/*, GC.getEraInfo(GC.getGame().getCurrentEra())->getAudioUnitVictoryScript(), MESSAGE_TYPE_INFO, NULL, (ColorTypes)GC.getInfoTypeForString("COLOR_GREEN"), pkTargetPlot->getX(), pkTargetPlot->getY()*/);
-						}
-						
-						CvUnitCombat::ApplyPostCombatTraitEffects(this, pLoopUnit);
-					}
-
-					bFoundSomething = true;
-				}
-			}
+			iRange = 2;
+			iRangeFinal = 2;
 		}
+		else if (iRange == 0)
+		{
+			iRange = 2;
+			iRangeFinal = 1;
+		}
+		else
+		{
+			iRange = getGroundAttackRange() + 1;
+			iRangeFinal = getGroundAttackRange() + 1;
+		}
+		for (int i = -iRange; i <= iRange; ++i)
+		{
+			for (int j = -iRange; j <= iRange; ++j)
+			{
+				CvPlot* pLoopPlot = ::plotXYWithRangeCheck(pPlot.getX(), pPlot.getY(), i, j, iRangeFinal);
+				if (NULL != pLoopPlot)
+				{
+					pLoopPlot->changeVisibilityCount(getTeam(), 1, NO_INVISIBLE, false, false, this);
+
+					const IDInfo* pUnitNode = pLoopPlot->headUnitNode();
+					while (pUnitNode != NULL)
+					{
+						CvUnit* pLoopUnit = (CvUnit*)GetPlayerUnit(*pUnitNode);
+						pUnitNode = pLoopPlot->nextUnitNode(pUnitNode);
+
+						if (pLoopUnit == NULL)
+							continue;
+						if (!GET_TEAM(pLoopUnit->getTeam()).isAtWar(getTeam()))
+							continue;
+#if defined(MOD_API_UNIT_STATS)
+						pLoopUnit->changeDamage(iAirSweepDamage, getOwner(), GetID(), 0.25f, &strAppendText);
+#else
+						pLoopUnit->changeDamage(iAirSweepDamage, getOwner(), 0.25f, &strAppendText);
+#endif
+						if (pLoopUnit->IsDead())
+						{
+							CvString strBuffer;
+							int iActivePlayerID = GC.getGame().getActivePlayer();
+
+							if (iActivePlayerID == getOwner())
+							{
+								strBuffer = GetLocalizedText("TXT_KEY_MISC_YOU_UNIT_DESTROYED_ENEMY", getNameKey(), iAirSweepDamage, pLoopUnit->getNameKey());
+								GC.GetEngineUserInterface()->AddMessage(0, getOwner(), true, /*10*/ GD_INT_GET(EVENT_MESSAGE_TIME), strBuffer/*, GC.getEraInfo(GC.getGame().getCurrentEra())->getAudioUnitVictoryScript(), MESSAGE_TYPE_INFO, NULL, (ColorTypes)GC.getInfoTypeForString("COLOR_GREEN"), pkTargetPlot->getX(), pkTargetPlot->getY()*/);
+							}
+
+							CvUnitCombat::ApplyPostCombatTraitEffects(this, pLoopUnit);
+					    }
+
+						bFoundSomething = true;
+				    }
+			    }
+		    }
+	    }
 	}
 	return bFoundSomething;
 }

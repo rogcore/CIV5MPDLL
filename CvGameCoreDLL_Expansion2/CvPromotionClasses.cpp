@@ -170,6 +170,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iAttackMod(0),
 	m_iDefenseMod(0),
 	m_iGetGroundAttackDamage(0),
+	m_iGetGroundAttackRange(0),
 	m_iDropRange(0),
 	m_iExtraNavalMoves(0),
 	m_iHPHealedIfDefeatEnemy(0),
@@ -646,6 +647,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iAttackMod = kResults.GetInt("AttackMod");
 	m_iDefenseMod = kResults.GetInt("DefenseMod");
 	m_iGetGroundAttackDamage = kResults.GetInt("GetGroundAttackDamage");
+	m_iGetGroundAttackRange = kResults.GetInt("GetGroundAttackRange");
 	m_iDropRange = kResults.GetInt("DropRange");
 	m_iExtraNavalMoves = kResults.GetInt("ExtraNavalMovement");
 	m_iHPHealedIfDefeatEnemy = kResults.GetInt("HPHealedIfDestroyEnemy");
@@ -2139,6 +2141,10 @@ int CvPromotionEntry::GetGroundAttackDamage() const
 	return m_iGetGroundAttackDamage;
 }
 
+int CvPromotionEntry::GetGroundAttackRange() const
+{
+	return m_iGetGroundAttackRange;
+}
 
 /// Accessor: Number of tiles away a unit may paradrop
 int CvPromotionEntry::GetDropRange() const
