@@ -25511,8 +25511,8 @@ void CvUnit::read(FDataStream& kStream)
 	}
 	kStream >> m_iPillageReplenishAttck;
 	kStream >> m_iCanDoFallBackDamage;
-	kStream >> m_iCaptureDefeatedEnemyChance;
 	kStream >> m_iCanParadropAnyWhere;
+	kStream >> m_iCaptureDefeatedEnemyChance;
 	kStream >> m_iCannotBeCapturedCount;
 
 #if defined(MOD_DEFENSE_MOVES_BONUS)

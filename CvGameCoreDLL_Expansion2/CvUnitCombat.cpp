@@ -4776,6 +4776,20 @@ void CvUnitCombat::DoSplashDamage(const CvCombatInfo& kCombatInfo)
 	{
 		CvUnit* pAOEUnit = iter->first;
 		int iAOEDamage = iter->second;
+
+#if defined(MOD_ROG_CORE)
+		if (pAOEUnit->getForcedDamageValue() != 0)
+		{
+			iAOEDamage = pAOEUnit->getForcedDamageValue();
+		}
+		if (pAOEUnit->getChangeDamageValue() != 0)
+		{
+			iAOEDamage += pAOEUnit->getChangeDamageValue();
+			if (iAOEDamage <= 0)
+				iAOEDamage = 0;
+		}
+#endif
+
 		if (iAOEDamage == 0)
 		{
 			continue;
@@ -4894,6 +4908,20 @@ void CvUnitCombat::DoCollateralDamage(const CvCombatInfo& kCombatInfo)
 	{
 		CvUnit* pAffectedUnit = iter->first;
 		int iDamage = iter->second;
+
+#if defined(MOD_ROG_CORE)
+		if (pAffectedUnit->getForcedDamageValue() != 0)
+		{
+			iDamage = pAffectedUnit->getForcedDamageValue();
+		}
+		if (pAffectedUnit->getChangeDamageValue() != 0)
+		{
+			iDamage += pAffectedUnit->getChangeDamageValue();
+			if (iDamage <= 0)
+				iDamage = 0;
+		}
+#endif
+
 		if (iDamage == 0)
 		{
 			continue;
