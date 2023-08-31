@@ -82,6 +82,7 @@ public:
 	int  GetAirSweepCombatModifier() const;
 	int  GetInterceptChanceChange() const;
 	int  GetNumInterceptionChange() const;
+	int  GetAirInterceptRangeChange() const;
 	int  GetEvasionChange() const;
 	int  GetCargoChange() const;
 	int  GetEnemyHealChange() const;
@@ -183,10 +184,10 @@ public:
 	int GetOutsideCapitalLandAttackMod() const;
 	int GetOnCapitalLandDefenseMod() const;
 	int GetOutsideCapitalLandDefenseMod() const;
-
 	int GetBarbarianCombatBonus() const;
 	int GetAOEDamageOnKill() const;
 	int GetDamageAoEFortified() const;
+	int GetMoraleBreakChance() const;
 	int GetWorkRateMod() const;
 #endif
 
@@ -195,6 +196,10 @@ public:
 
 
 #if defined(MOD_ROG_CORE)
+	int GetPillageReplenishMoves() const;
+	bool PillageReplenishAttck() const;
+	int GetPillageReplenishHealth() const;
+
 	int GetNumSpyDefenseMod() const;
 	int GetNumSpyAttackMod() const;
 
@@ -224,7 +229,8 @@ public:
 	int GetAdjacentMod() const;
 	int GetAttackMod() const;
 	int GetDefenseMod() const;
-
+	int GetGroundAttackDamage() const;
+	int GetGroundAttackRange() const;
 	int GetDropRange() const;
 	int GetExtraNavalMoves() const;
 	int GetHPHealedIfDefeatEnemy() const;
@@ -343,6 +349,8 @@ public:
 	bool IsCaptureDefeatedEnemy() const;
 	bool IsIgnoreGreatGeneralBenefit() const;
 	bool IsIgnoreZOC() const;
+	bool IsCanDoFallBackDamage() const;
+	bool IsCanParadropAnyWhere() const;
 	bool IsImmueMeleeAttack() const;
 	bool IsSapper() const;
 	bool IsCanHeavyCharge() const;
@@ -503,6 +511,7 @@ protected:
 	int m_iAirSweepCombatModifier;
 	int m_iInterceptChanceChange;
 	int m_iNumInterceptionChange;
+	int m_iAirInterceptRangeChange;
 	int m_iEvasionChange;
 	int m_iCargoChange;
 	int m_iEnemyHealChange;
@@ -557,6 +566,8 @@ protected:
 	int m_iAdjacentMod;
 	int m_iAttackMod;
 	int m_iDefenseMod;
+	int m_iGetGroundAttackDamage;
+	int m_iGetGroundAttackRange;
 	int m_iDropRange;
 	int m_iExtraNavalMoves;
 	int m_iHPHealedIfDefeatEnemy;
@@ -653,8 +664,8 @@ protected:
 	int m_iNearbyUnitClassBonusRange;
 	UnitClassTypes m_iCombatBonusFromNearbyUnitClass;
 
-
 	int m_iAOEDamageOnKill;
+	int m_iMoraleBreakChance;
 	int m_iDamageAoEFortified;
 	int m_iWorkRateMod;
 	int m_iBarbarianCombatBonus;
@@ -663,7 +674,10 @@ protected:
 	int m_iCaptureDefeatedEnemyChance;
 	bool m_bCannotBeCaptured;
 
-#if defined(MOD_ROG_CORE)	
+#if defined(MOD_ROG_CORE)
+	int m_iPillageReplenishMoves;
+	int m_iPillageReplenishAttck;
+	int m_iPillageReplenishHealth;
 	int m_iAoEDamageOnMove;
 	int m_iForcedDamageValue;
 	int m_iChangeDamageValue;
@@ -773,6 +787,8 @@ protected:
 	bool m_bCaptureDefeatedEnemy;
 	bool m_bIgnoreGreatGeneralBenefit;
 	bool m_bIgnoreZOC;
+	bool m_bCanDoFallBackDamage;
+	bool m_bCanParadropAnyWhere;
 	bool m_bImmueMeleeAttack;
 	bool m_bHasPostCombatPromotions;
 	bool m_bPostCombatPromotionsExclusive;
@@ -813,11 +829,7 @@ protected:
 #if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
 	std::vector<int> m_vPrePromotions;
 #endif	
-
-
 	bool* m_pbUnitType;
-
-
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 	bool* m_pbUnitName;
 #endif

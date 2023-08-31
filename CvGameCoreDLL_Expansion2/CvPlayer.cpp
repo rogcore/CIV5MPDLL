@@ -254,6 +254,7 @@ CvPlayer::CvPlayer() :
 	, m_iGreatPeopleThresholdModifier("CvPlayer::m_iGreatPeopleThresholdModifier", m_syncArchive)
 	, m_iGreatGeneralsThresholdModifier("CvPlayer::m_iGreatGeneralsThresholdModifier", m_syncArchive)
 	, m_iGreatAdmiralsThresholdModifier(0)
+	, m_iAlwaysWeLoveKindDayInGoldenAge()
 	, m_iNoResistance()
 	, m_iUpgradeAllTerritory()
 	, m_iCityCaptureHealGlobal(0)
@@ -375,9 +376,11 @@ CvPlayer::CvPlayer() :
 	, m_iMoveAfterCreated(0)
 
 #if defined(MOD_ROG_CORE)
+	, m_aiYieldFromPillageGlobal()
 	, m_aiYieldFromPillage()
 	, m_iGlobalCityStrengthMod("CvPlayer::m_iGlobalCityStrengthMod", m_syncArchive)
 	, m_iGlobalRangedStrikeModifier("CvPlayer::m_iGlobalRangedStrikeModifier", m_syncArchive)
+	, m_iLiberatedInfluence("CvPlayer::m_iLiberatedInfluence", m_syncArchive)
 #endif
 
 	, m_iPopRushHurryCount("CvPlayer::m_iPopRushHurryCount", m_syncArchive)
@@ -435,21 +438,16 @@ CvPlayer::CvPlayer() :
 	, m_ePersonalityType("CvPlayer::m_ePersonalityType", m_syncArchive)
 	, m_aiCityYieldChange("CvPlayer::m_aiCityYieldChange", m_syncArchive)
 
-	
 #if defined(MOD_ROG_CORE)
 	, m_aiDomainFreeExperiencePerGreatWorkGlobal("CvPlayer::m_aiDomainFreeExperiencePerGreatWorkGlobal", m_syncArchive)
 	, m_piDomainFreeExperience()
+	, m_piUnitTypePrmoteHealGlobal()
 #endif
-
-
-
 	, m_aiCoastalCityYieldChange("CvPlayer::m_aiCoastalCityYieldChange", m_syncArchive)
 	, m_aiCapitalYieldChange("CvPlayer::m_aiCapitalYieldChange", m_syncArchive)
 	, m_aiCapitalYieldPerPopChange("CvPlayer::m_aiCapitalYieldPerPopChange", m_syncArchive)
 	, m_aiSeaPlotYield("CvPlayer::m_aiSeaPlotYield", m_syncArchive)
-
 	, m_aiYieldFromProcessModifierGlobal("CvPlayer::m_aiYieldFromProcessModifierGlobal", m_syncArchive)
-
 	, m_aiCityLoveKingDayYieldMod("CvPlayer::m_aiCityLoveKingDayYieldMod", m_syncArchive)
 	, m_aiYieldRateModifier("CvPlayer::m_aiYieldRateModifier", m_syncArchive)
 	, m_aiCapitalYieldRateModifier("CvPlayer::m_aiCapitalYieldRateModifier", m_syncArchive)
@@ -512,8 +510,6 @@ CvPlayer::CvPlayer() :
 	, m_iNumFreePoliciesEver("CvPlayer::m_iNumFreePoliciesEver", m_syncArchive)
 	, m_iNumFreeTenets(0)
 	, m_ownedNaturalWonders()
-
-
 	, m_iMaxEffectiveCities(1)
 	, m_iLastSliceMoved(0)
 	, m_eEndTurnBlockingType(NO_ENDTURN_BLOCKING_TYPE)
@@ -563,15 +559,11 @@ CvPlayer::CvPlayer() :
 	m_pMilitaryLog = NULL;
 #endif
 	m_pDiplomacyRequests = NULL;
-
 	m_iNextOperationID = 0;
-
 	m_aiPlots.clear();
 	m_bfEverConqueredBy.ClearAll();
-
 	m_aiGreatWorkYieldChange.clear();
 	m_aiSiphonLuxuryCount.clear();
-
 	reset(NO_PLAYER, true);
 }
 
@@ -961,6 +953,7 @@ void CvPlayer::uninit()
 	
 #if defined(MOD_ROG_CORE)
 	m_piDomainFreeExperience.clear();
+	m_piUnitTypePrmoteHealGlobal.clear();
 #endif
 
 
@@ -1023,6 +1016,7 @@ void CvPlayer::uninit()
 	m_iGreatPeopleThresholdModifier = 0;
 	m_iGreatGeneralsThresholdModifier = 0;
 	m_iGreatAdmiralsThresholdModifier = 0;
+	m_iAlwaysWeLoveKindDayInGoldenAge = 0;
 	m_iNoResistance = 0;
 	m_iUpgradeAllTerritory = 0;
 	m_iCityCaptureHealGlobal = 0;
@@ -1152,6 +1146,7 @@ void CvPlayer::uninit()
 #if defined(MOD_ROG_CORE)
 	m_iGlobalCityStrengthMod = 0;
 	m_iGlobalRangedStrikeModifier = 0;
+	m_iLiberatedInfluence = 0;
 #endif
 
 	m_iBorderObstacleCount = 0;
@@ -1264,6 +1259,7 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 	m_aiDomainFreeExperiencePerGreatWorkGlobal.resize(NUM_DOMAIN_TYPES, 0);
 
 	m_piDomainFreeExperience.clear();
+	m_piUnitTypePrmoteHealGlobal.clear();
 #endif
 
 	m_ownedNaturalWonders.clear();
@@ -1271,6 +1267,8 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 #ifdef MOD_ROG_CORE
 	m_aiWorldWonderCityYieldRateModifier.clear();
 	m_aiWorldWonderCityYieldRateModifier.resize(NUM_YIELD_TYPES, 0);
+	m_aiYieldFromPillageGlobal.clear();
+	m_aiYieldFromPillageGlobal.resize(NUM_YIELD_TYPES, 0);
 	m_aiYieldFromPillage.clear();
 	m_aiYieldFromPillage.resize(NUM_YIELD_TYPES, 0);
 #endif
@@ -3954,6 +3952,25 @@ void CvPlayer::DoLiberatePlayer(PlayerTypes ePlayer, int iOldCityID)
 		}
 	}
 
+#if defined(MOD_ROG_CORE)
+	if (MOD_ROG_CORE) 
+	{
+	    // Instant Friendship change with all Minors
+		int iMinorFriendshipChange = GetLiberatedInfluence();
+		if (iMinorFriendshipChange != 0)
+		{
+			for (int iMinorLoop = MAX_MAJOR_CIVS; iMinorLoop < MAX_CIV_PLAYERS; iMinorLoop++)
+			{
+				TeamTypes eTeam = GET_PLAYER((PlayerTypes)iMinorLoop).getTeam();
+				if (getTeam() != eTeam && GET_TEAM(eTeam).isHasMet(getTeam()))
+				{
+					GET_PLAYER((PlayerTypes)iMinorLoop).GetMinorCivAI()->ChangeFriendshipWithMajor(GetID(), iMinorFriendshipChange);
+				}
+			}
+		}
+	}
+#endif
+
 #if defined(MOD_EVENTS_LIBERATION)
 	if (MOD_EVENTS_LIBERATION) {
 		GAMEEVENTINVOKE_HOOK(GAMEEVENT_PlayerLiberated, GetID(), ePlayer, pNewCity->GetID());
@@ -5057,6 +5074,14 @@ void CvPlayer::doTurnPostDiplomacy()
 	{
 		ChangeTourismBonusTurns(-1);
 	}
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	if (MOD_API_UNIFIED_YIELDS_MORE)
+	{
+		DoChangeGreatGeneralRate();
+		DoChangeGreatAdmiralRate();
+	}
+#endif
 
 	// Golden Age
 	DoProcessGoldenAge();
@@ -9680,11 +9705,28 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 			}
 		}
 	}
+
+
+	// Loop through adding the available units
+	for (int iUnitLoop = 0; iUnitLoop < GC.getNumUnitInfos(); iUnitLoop++)
+	{
+		UnitTypes eLoopUnit = (UnitTypes)iUnitLoop;
+		if (eLoopUnit != NO_UNIT)
+		{
+			int iNewHeal = 0;
+			iNewHeal = pBuildingInfo->GetUnitTypePrmoteHealGlobal(eLoopUnit);
+			if (iNewHeal > 0)
+			{
+				ChangeUnitTypePrmoteHealGlobal(eLoopUnit, iNewHeal);
+			}
+		}
+	}
 #endif
 
 #if defined(MOD_ROG_CORE)
 	ChangeCityStrengthMod(pBuildingInfo->GetGlobalCityStrengthMod()* iChange);
 	ChangeGlobalRangedStrikeModifier(pBuildingInfo->GetGlobalRangedStrikeModifier()* iChange);
+	ChangeLiberatedInfluence(pBuildingInfo->GetLiberatedInfluence()* iChange);
 #endif
 
 	if(pBuildingInfo->GetFreeBuildingClass() != NO_BUILDINGCLASS)
@@ -9799,10 +9841,12 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 		}
 
 
+
 #if defined(MOD_ROG_CORE)
+		ChangeYieldFromPillage(((YieldTypes)iI), (pBuildingInfo->GetYieldFromPillageGlobal(iI) * iChange));
+		ChangeYieldFromPillagePlayer(((YieldTypes)iI), (pBuildingInfo->GetYieldFromPillageGlobalPlayer(iI) * iChange));
 
 		changeWorldWonderCityYieldRateModifier(((YieldTypes)iI), (pBuildingInfo->GetYieldModifierFromWonder(iI) * iChange));
-
 
 		int iMod = pBuildingInfo->GetGreatWorkYieldChange(iI) * iChange;
 		if (iMod != 0)
@@ -9818,35 +9862,28 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	}
 
 
-
-
 	for (iJ = 0; iJ < NUM_YIELD_TYPES; iJ++)
 	{
-		YieldTypes eYield = (YieldTypes)iJ;
-
-
 		for (int iK = 0; iK < GC.getNumImprovementInfos(); iK++)
 		{
 			ImprovementTypes eImprovement = (ImprovementTypes)iK;
 			if (eImprovement != NO_IMPROVEMENT)
 			{
-				int iYieldChange = pBuildingInfo->GetImprovementYieldChangeGlobal(eImprovement, eYield);
+				int iYieldChange = pBuildingInfo->GetImprovementYieldChangeGlobal(eImprovement, ((YieldTypes)iJ));
 				if (iYieldChange != 0)
 				{
-					ChangeImprovementExtraYield(eImprovement, eYield, (iYieldChange * iChange));
+					ChangeImprovementExtraYield(eImprovement, ((YieldTypes)iJ), (iYieldChange * iChange));
 				}
 			}
 		}
-	}
 
-
-	for(iI = 0; iI < GC.getNumSpecialistInfos(); iI++)
-	{
-		for(iJ = 0; iJ < NUM_YIELD_TYPES; iJ++)
+		for (iI = 0; iI < GC.getNumSpecialistInfos(); iI++)
 		{
-			changeSpecialistExtraYield(((SpecialistTypes)iI), ((YieldTypes)iJ), (pBuildingInfo->GetSpecialistYieldChange(iI, iJ) * iChange));
+				changeSpecialistExtraYield(((SpecialistTypes)iI), ((YieldTypes)iJ), (pBuildingInfo->GetSpecialistYieldChange(iI, iJ) * iChange));
 		}
+
 	}
+
 
 	int iOldEspionageModifier = GetEspionageModifier();
 	ChangeEspionageModifier(pBuildingInfo->GetGlobalEspionageModifier() * iChange);
@@ -14534,6 +14571,141 @@ CvString CvPlayer::GetInternationalTourismTooltip()
 	}
 	return szRtnValue;
 }
+
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+void CvPlayer::DoChangeGreatGeneralRate()
+{
+	//Check for buildings and beliefs that add Great General points.
+	int iLoop = 0;
+	int iGreatGeneralPoints = 0;
+
+	UnitClassTypes eUnitClassGeneral = (UnitClassTypes)GC.getInfoTypeForString("UNITCLASS_GREAT_GENERAL");
+	GreatPersonTypes eGreatPerson = GetGreatPersonFromUnitClass(eUnitClassGeneral);
+	for (CvCity* pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
+	{
+		if (pLoopCity != NULL)
+		{
+			iGreatGeneralPoints += pLoopCity->getYieldRate(YIELD_GREAT_GENERAL_POINTS, false);
+
+			const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(pLoopCity->GetCityReligions()->GetReligiousMajority(), pLoopCity->getOwner());
+			BeliefTypes eSecondaryPantheon = NO_BELIEF;
+			if (pReligion)
+			{
+				int iReligionYieldChange = pReligion->m_Beliefs.GetCityYieldChange(pLoopCity->getPopulation(), YIELD_GREAT_GENERAL_POINTS);
+				if (iReligionYieldChange > 0)
+				{
+					iGreatGeneralPoints += iReligionYieldChange;
+				}
+				eSecondaryPantheon = pLoopCity->GetCityReligions()->GetSecondaryReligionPantheonBelief();
+				if (eSecondaryPantheon != NO_BELIEF && pLoopCity->getPopulation() >= GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetMinPopulation())
+				{
+					iReligionYieldChange = GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetCityYieldChange(YIELD_GREAT_GENERAL_POINTS);
+					if (iReligionYieldChange > 0)
+					{
+						iGreatGeneralPoints += iReligionYieldChange;
+					}
+				}
+				if (eGreatPerson != NO_GREATPERSON)
+				{
+					iGreatGeneralPoints += pReligion->m_Beliefs.GetGreatPersonPoints(eGreatPerson, pLoopCity->isCapital(), false);
+				}
+			}
+		}
+	}
+	//Check for policies that add Great General points.
+	for (int iPolicyLoop = 0; iPolicyLoop < GC.getNumPolicyInfos(); iPolicyLoop++)
+	{
+		PolicyTypes pPolicy = (PolicyTypes)iPolicyLoop;
+		CvPolicyEntry* pkPolicyInfo = GC.getPolicyInfo(pPolicy);
+		if (pkPolicyInfo)
+		{
+			if (GetPlayerPolicies()->HasPolicy(pPolicy) && !GetPlayerPolicies()->IsPolicyBlocked(pPolicy))
+			{
+				if (pkPolicyInfo->GetCityYieldChange(YIELD_GREAT_GENERAL_POINTS) > 0)
+				{
+					for (CvCity* pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
+					{
+						if (pLoopCity != NULL)
+						{
+							iGreatGeneralPoints += pkPolicyInfo->GetCityYieldChange(YIELD_GREAT_GENERAL_POINTS);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	changeCombatExperienceTimes100(iGreatGeneralPoints * 100);
+}
+void CvPlayer::DoChangeGreatAdmiralRate()
+{
+	//Check for buildings and beliefs that add Great General points.
+	int iLoop = 0;
+	int iGreatAdmiralPoints = 0;
+
+	UnitClassTypes eUnitClassAdmiral = (UnitClassTypes)GC.getInfoTypeForString("UNITCLASS_GREAT_ADMIRAL");
+	GreatPersonTypes eGreatPerson = GetGreatPersonFromUnitClass(eUnitClassAdmiral);
+
+	for (CvCity* pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
+	{
+		if (pLoopCity != NULL)
+		{
+			iGreatAdmiralPoints += pLoopCity->getYieldRate(YIELD_GREAT_ADMIRAL_POINTS, false);
+
+			const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(pLoopCity->GetCityReligions()->GetReligiousMajority(), pLoopCity->getOwner());
+			BeliefTypes eSecondaryPantheon = NO_BELIEF;
+			if (pReligion)
+			{
+				int iReligionYieldChange = pReligion->m_Beliefs.GetCityYieldChange(pLoopCity->getPopulation(), YIELD_GREAT_ADMIRAL_POINTS);
+				if (iReligionYieldChange > 0)
+				{
+					iGreatAdmiralPoints += iReligionYieldChange;
+				}
+				eSecondaryPantheon = pLoopCity->GetCityReligions()->GetSecondaryReligionPantheonBelief();
+				if (eSecondaryPantheon != NO_BELIEF && pLoopCity->getPopulation() >= GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetMinPopulation())
+				{
+					iReligionYieldChange = GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetCityYieldChange(YIELD_GREAT_ADMIRAL_POINTS);
+					if (iReligionYieldChange > 0)
+					{
+						iGreatAdmiralPoints += iReligionYieldChange;
+					}
+				}
+
+				if (eGreatPerson != NO_GREATPERSON)
+				{
+					iGreatAdmiralPoints += pReligion->m_Beliefs.GetGreatPersonPoints(eGreatPerson, pLoopCity->isCapital(), false);
+				}
+			}
+		}
+	}
+	//Check for policies that add Great Admiral points.
+	for (int iPolicyLoop = 0; iPolicyLoop < GC.getNumPolicyInfos(); iPolicyLoop++)
+	{
+		PolicyTypes pPolicy = (PolicyTypes)iPolicyLoop;
+		CvPolicyEntry* pkPolicyInfo = GC.getPolicyInfo(pPolicy);
+		if (pkPolicyInfo)
+		{
+			if (GetPlayerPolicies()->HasPolicy(pPolicy) && !GetPlayerPolicies()->IsPolicyBlocked(pPolicy))
+			{
+				if (pkPolicyInfo->GetCityYieldChange(YIELD_GREAT_ADMIRAL_POINTS) > 0)
+				{
+					for (CvCity* pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
+					{
+						if (pLoopCity != NULL)
+						{
+							iGreatAdmiralPoints += pkPolicyInfo->GetCityYieldChange(YIELD_GREAT_ADMIRAL_POINTS);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	changeNavalCombatExperienceTimes100(iGreatAdmiralPoints * 100);
+}
+#endif
+
 //	--------------------------------------------------------------------------------
 #if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 int CvPlayer::GetGoldenAgePointPerTurnFromCitys() const
@@ -15899,6 +16071,30 @@ void CvPlayer::ChangeProductionBeakerMod(int iChange)
 
 
 //	--------------------------------------------------------------------------------
+bool CvPlayer::CanAlwaysWeLoveKindDayInGoldenAge() const
+{
+	if (GetAlwaysWeLoveKindDayInGoldenAge() > 0)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetAlwaysWeLoveKindDayInGoldenAge() const
+{
+	return m_iAlwaysWeLoveKindDayInGoldenAge;
+}
+//	--------------------------------------------------------------------------------
+void CvPlayer::ChangeAlwaysWeLoveKindDayInGoldenAge(int iChange)
+{
+	m_iAlwaysWeLoveKindDayInGoldenAge += iChange;
+}
+
+
+
+//	--------------------------------------------------------------------------------
 bool CvPlayer::CanNoResistance() const
 {
 	if (GetNoResistance() > 0)
@@ -17224,6 +17420,29 @@ void CvPlayer::ChangeDomainFreeExperience(DomainTypes eIndex, int iChange)
 	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
 
 	m_piDomainFreeExperience[(int)eIndex] += iChange;
+}
+
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetUnitTypePrmoteHealGlobal(UnitTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < GC.getNumUnitInfos(), "eIndex expected to be < NUM_UNIT_TYPES");
+	std::map<int, int>::const_iterator it = m_piUnitTypePrmoteHealGlobal.find((int)eIndex);
+	if (it != m_piUnitTypePrmoteHealGlobal.end()) // find returns the iterator to map::end if the key i is not present in the map
+	{
+		return it->second;
+	}
+	return 0;
+}
+//	--------------------------------------------------------------------------------
+void CvPlayer::ChangeUnitTypePrmoteHealGlobal(UnitTypes eIndex, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < GC.getNumUnitInfos(), "eIndex expected to be < NUM_UNIT_TYPES");
+	m_piUnitTypePrmoteHealGlobal[(int)eIndex] += iChange;
 }
 #endif
 
@@ -20196,7 +20415,37 @@ void CvPlayer::ChangeImprovementExtraYield(ImprovementTypes eImprovement, YieldT
 		updateYield();
 	}
 }
+
 int CvPlayer::GetYieldFromPillage(YieldTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	return m_aiYieldFromPillageGlobal[eIndex];
+}
+
+//	--------------------------------------------------------------------------------
+/// Extra yield from building
+void CvPlayer::ChangeYieldFromPillage(YieldTypes eIndex, int iChange)
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+
+	if (iChange != 0)
+	{
+		m_aiYieldFromPillageGlobal[eIndex] = m_aiYieldFromPillageGlobal[eIndex] + iChange;
+
+		invalidateYieldRankCache(eIndex);
+
+		if (getTeam() == GC.getGame().getActiveTeam())
+		{
+			GC.GetEngineUserInterface()->setDirty(CityInfo_DIRTY_BIT, true);
+		}
+	}
+}
+
+
+int CvPlayer::GetYieldFromPillagePlayer(YieldTypes eIndex) const
 {
 	VALIDATE_OBJECT
 	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
@@ -20206,7 +20455,7 @@ int CvPlayer::GetYieldFromPillage(YieldTypes eIndex) const
 
 //	--------------------------------------------------------------------------------
 /// Extra yield from building
-void CvPlayer::ChangeYieldFromPillage(YieldTypes eIndex, int iChange)
+void CvPlayer::ChangeYieldFromPillagePlayer(YieldTypes eIndex, int iChange)
 {
 	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
 	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
@@ -21368,16 +21617,17 @@ void CvPlayer::AddIncomingUnit(PlayerTypes eFromPlayer, CvUnit* pUnit)
 			CvUnit* pNewUnit = initUnit(eType, iX, iY);
 			CvAssert(pNewUnit);
 			if (pNewUnit)
-#if defined(MOD_BUGFIX_MOVE_AFTER_PURCHASE)
 			{
 				if (!pUnit->getUnitInfo().CanMoveAfterPurchase())
 				{
-#endif
 					pNewUnit->finishMoves();
-#if defined(MOD_BUGFIX_MOVE_AFTER_PURCHASE)
+				}
+
+				if (getCapitalCity() != NULL)
+				{
+					pNewUnit->setOriginCity(getCapitalCity()->GetID());
 				}
 			}
-#endif
 		}
 	}
 	else
@@ -23091,6 +23341,7 @@ void CvPlayer::changeYieldFromBarbarianKills(YieldTypes eYield, int iChange)
 		m_piYieldFromBarbarianKills[eYield] += iChange;
 	}
 }
+
 
 //	--------------------------------------------------------------------------------
 int CvPlayer::GetYieldChangeTradeRoute(YieldTypes eYield) const
@@ -25589,6 +25840,10 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 		ChangeNoResistance(pPolicy->IsNoResistance() * iChange);
 	}
 
+	if (pPolicy->IsAlwaysWeLoveKindDayInGoldenAge())
+	{
+		ChangeAlwaysWeLoveKindDayInGoldenAge(pPolicy->IsAlwaysWeLoveKindDayInGoldenAge() * iChange);
+	}
 
 	if (pPolicy->IsUpgradeAllTerritory())
 	{
@@ -26953,6 +27208,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iGreatPeopleThresholdModifier;
 	kStream >> m_iGreatGeneralsThresholdModifier;
 	kStream >> m_iGreatAdmiralsThresholdModifier;
+	kStream >> m_iAlwaysWeLoveKindDayInGoldenAge;
 	kStream >> m_iNoResistance;
 	kStream >> m_iUpgradeAllTerritory;
 	kStream >> m_iCityCaptureHealGlobal;
@@ -27218,12 +27474,14 @@ void CvPlayer::Read(FDataStream& kStream)
 #if defined(MOD_ROG_CORE)
 	kStream >> m_aiDomainFreeExperiencePerGreatWorkGlobal;
 	kStream >> m_piDomainFreeExperience;
+	kStream >> m_piUnitTypePrmoteHealGlobal;
 #endif
 
 	kStream >> m_ownedNaturalWonders;
 
 #ifdef MOD_ROG_CORE
 	kStream >> m_aiWorldWonderCityYieldRateModifier;
+	kStream >> m_aiYieldFromPillageGlobal;
 	kStream >> m_aiYieldFromPillage;
 #endif
 
@@ -27671,6 +27929,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iGreatPeopleThresholdModifier;
 	kStream << m_iGreatGeneralsThresholdModifier;
 	kStream << m_iGreatAdmiralsThresholdModifier;
+	kStream << m_iAlwaysWeLoveKindDayInGoldenAge;
 	kStream << m_iNoResistance;
 	kStream << m_iUpgradeAllTerritory;
 	kStream << m_iCityCaptureHealGlobal;
@@ -27875,12 +28134,14 @@ void CvPlayer::Write(FDataStream& kStream) const
 #if defined(MOD_ROG_CORE)
 	kStream << m_aiDomainFreeExperiencePerGreatWorkGlobal;
 	kStream << m_piDomainFreeExperience;
+	kStream << m_piUnitTypePrmoteHealGlobal;
 #endif
 
 	kStream << m_ownedNaturalWonders;
 
 #ifdef MOD_ROG_CORE
 	kStream << m_aiWorldWonderCityYieldRateModifier;
+	kStream << m_aiYieldFromPillageGlobal;
 	kStream << m_aiYieldFromPillage;
 #endif
 	kStream << m_aiYieldModifierFromActiveSpies;
@@ -28170,6 +28431,13 @@ void CvPlayer::createGreatGeneral(UnitTypes eGreatPersonUnit, int iX, int iY)
 		CvAssert(false);
 		return;
 	}
+#if defined(MOD_ROG_CORE)
+	if (pGreatPeopleUnit->IsCombatUnit() && getCapitalCity() != NULL)
+	{
+		getCapitalCity()->addProductionExperience(pGreatPeopleUnit);
+		pGreatPeopleUnit->setOriginCity(getCapitalCity()->GetID());
+	}
+#endif
 
 	ChangeNumGreatPeople(1);
 
@@ -28777,6 +29045,29 @@ void CvPlayer::ChangeGlobalRangedStrikeModifier(int iChange)
 	if (iChange != 0)
 	{
 		SetGlobalRangedStrikeModifier(GetGlobalRangedStrikeModifier() + iChange);
+	}
+}
+
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetLiberatedInfluence() const
+{
+	return m_iLiberatedInfluence;
+}
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::SetLiberatedInfluence(int iValue)
+{
+	CvAssert(iValue >= 0);
+	m_iLiberatedInfluence = iValue;
+}
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::ChangeLiberatedInfluence(int iChange)
+{
+	if (iChange != 0)
+	{
+		SetLiberatedInfluence(GetLiberatedInfluence() + iChange);
 	}
 }
 #endif

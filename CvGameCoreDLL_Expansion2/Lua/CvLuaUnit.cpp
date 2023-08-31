@@ -4904,7 +4904,7 @@ int CvLuaUnit::lGetExtraIntercept(lua_State* L)
 {
 	CvUnit* pkUnit = GetInstance(L);
 
-	const int iResult = pkUnit->getExtraIntercept();
+	const int iResult = pkUnit->getInterceptChance();
 	lua_pushinteger(L, iResult);
 	return 1;
 }

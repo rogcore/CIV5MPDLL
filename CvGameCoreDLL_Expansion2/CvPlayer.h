@@ -689,6 +689,11 @@ public:
 	int GetGoldenAgePointPerTurnFromCitys() const;
 #endif	
 
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	void DoChangeGreatGeneralRate();
+	void DoChangeGreatAdmiralRate();
+#endif
+
 	// Golden Age Stuff
 
 	void DoProcessGoldenAge();
@@ -839,6 +844,10 @@ public:
 	void SetProductionBeakerMod(int iValue);
 	void ChangeProductionBeakerMod(int iChange);
 
+	bool CanAlwaysWeLoveKindDayInGoldenAge() const;
+	int GetAlwaysWeLoveKindDayInGoldenAge() const;
+	void ChangeAlwaysWeLoveKindDayInGoldenAge(int iValue);
+
 	bool CanNoResistance() const;
 	int GetNoResistance() const;
 	void ChangeNoResistance(int iValue);
@@ -849,7 +858,6 @@ public:
 
 	int getCityCaptureHealGlobal() const;
 	void changeCityCaptureHealGlobal(int iChange);
-
 	int getOriginalCapitalCaptureTech() const;
 	void changeOriginalCapitalCaptureTech(int iChange);
 	int getOriginalCapitalCapturePolicy() const;
@@ -1051,6 +1059,9 @@ public:
 
 	void ChangeDomainFreeExperience(DomainTypes eDomain, int iChange);
 	int GetDomainFreeExperience(DomainTypes) const;
+
+	void ChangeUnitTypePrmoteHealGlobal(UnitTypes eUnit, int iChange);
+	int GetUnitTypePrmoteHealGlobal(UnitTypes) const;
 #endif
 
 	int getMilitaryFoodProductionCount() const;
@@ -1355,8 +1366,12 @@ public:
 	int GetImprovementExtraYield(ImprovementTypes eImprovement, YieldTypes eYield) const;
 	void ChangeImprovementExtraYield(ImprovementTypes eImprovement, YieldTypes eYield, int iChange);
 
+
 	int GetYieldFromPillage(YieldTypes eIndex) const;
 	void ChangeYieldFromPillage(YieldTypes eIndex, int iChange);
+
+	int GetYieldFromPillagePlayer(YieldTypes eIndex) const;
+	void ChangeYieldFromPillagePlayer(YieldTypes eIndex, int iChange);
 #endif
 
 	// Science
@@ -1675,6 +1690,9 @@ public:
 	int GetGlobalRangedStrikeModifier() const;
 	void SetGlobalRangedStrikeModifier(int iValue);
 	void ChangeGlobalRangedStrikeModifier(int iChange);
+	int GetLiberatedInfluence() const;
+	void SetLiberatedInfluence(int iValue);
+	void ChangeLiberatedInfluence(int iChange);
 #endif
 
 	int GetCityGrowthMod() const;
@@ -2255,6 +2273,7 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iGreatPeopleThresholdModifier;
 	FAutoVariable<int, CvPlayer> m_iGreatGeneralsThresholdModifier;
 	int m_iGreatAdmiralsThresholdModifier;
+	int m_iAlwaysWeLoveKindDayInGoldenAge;
 	int m_iNoResistance;
 	int m_iUpgradeAllTerritory;
 	int m_iCityCaptureHealGlobal;
@@ -2397,6 +2416,7 @@ protected:
 #if defined(MOD_ROG_CORE)
 	FAutoVariable<int, CvPlayer> m_iGlobalCityStrengthMod;
 	FAutoVariable<int, CvPlayer> m_iGlobalRangedStrikeModifier;
+	FAutoVariable<int, CvPlayer> m_iLiberatedInfluence;
 #endif
 
 #if defined(MOD_TRAITS_CITY_WORKING) || defined(MOD_BUILDINGS_CITY_WORKING) || defined(MOD_POLICIES_CITY_WORKING) || defined(MOD_TECHS_CITY_WORKING)
@@ -2495,6 +2515,7 @@ protected:
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiDomainFreeExperiencePerGreatWorkGlobal;
 
 	std::map<int, int> m_piDomainFreeExperience;
+	std::map<int, int> m_piUnitTypePrmoteHealGlobal;
 #endif
 	std::vector<int> m_aiYieldModifierFromActiveSpies;
 
@@ -2544,6 +2565,7 @@ protected:
 
 #if defined(MOD_ROG_CORE)
 	std::vector< Firaxis::Array<int, NUM_YIELD_TYPES > > m_ppiImprovementYieldChange;
+	std::vector<int> m_aiYieldFromPillageGlobal;
 	std::vector<int> m_aiYieldFromPillage;
 #endif
 

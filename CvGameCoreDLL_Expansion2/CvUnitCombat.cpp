@@ -213,10 +213,6 @@ void CvUnitCombat::GenerateMeleeCombatInfo(CvUnit& kAttacker, CvUnit* pkDefender
 			iAttackerStrength = kAttacker.GetMaxAttackStrength(kAttacker.plot(), &plot, pkDefender);
 		}
 
-		if (kAttacker.IsCanHeavyCharge() && !pkDefender->CanFallBackFromMelee(kAttacker))
-		{
-			iAttackerStrength = (iAttackerStrength * 150) / 100;
-		}
 
 		int iAttackerDamageInflicted = kAttacker.getCombatDamage(iAttackerStrength, iDefenderStrength, kAttacker.getDamage(), /*bIncludeRand*/ true, /*bAttackerIsCity*/ false, /*bDefenderIsCity*/ false);
 		int iDefenderDamageInflicted = pkDefender->getCombatDamage(iDefenderStrength, iAttackerStrength, pkDefender->getDamage(), /*bIncludeRand*/ true, /*bAttackerIsCity*/ false, /*bDefenderIsCity*/ false);
@@ -643,10 +639,9 @@ void CvUnitCombat::ResolveMeleeCombat(const CvCombatInfo& kCombatInfo, uint uiPa
 		{
 			if(pkTargetPlot)
 			{
-				if (pkAttacker->IsCanHeavyCharge() && bAttackerDidMoreDamage)
+				if (pkAttacker->IsCanHeavyCharge() && !pkDefender->isDelayedDeath() && bAttackerDidMoreDamage)
 				{
-					if (!pkDefender->isDelayedDeath())
-						pkDefender->DoFallBackFromMelee(*pkAttacker);
+					pkDefender->DoFallBack(*pkAttacker);
 					DoHeavyChargeEffects(pkAttacker, pkDefender, pkTargetPlot);
 				}
 
@@ -1126,6 +1121,38 @@ void CvUnitCombat::ResolveRangedUnitVsCombat(const CvCombatInfo& kCombatInfo, ui
 							MILITARYLOG(pkAttacker->getOwner(), strBuffer.c_str(), pkDefender->plot(), pkDefender->getOwner());
 						}
 						strBuffer = GetLocalizedText("TXT_KEY_MISC_YOU_ARE_ATTACKED_BY_AIR", pkDefender->getNameKey(), pkAttacker->getNameKey(), iDamage);
+
+#if defined(MOD_ROG_CORE)
+						if (pkAttacker->GetMoraleBreakChance() > 0 && !pkDefender->isDelayedDeath() && pkDefender->CanFallBack(*pkAttacker, false))
+						{
+							int iRand = GC.getGame().getSmallFakeRandNum(100, pkDefender->GetID() + pkDefender->plot()->GetPlotIndex());
+							if (iRand <= pkAttacker->GetMoraleBreakChance())
+							{
+								pkDefender->DoFallBack(*pkAttacker);
+
+								CvNotifications* pNotifications = GET_PLAYER(pkDefender->getOwner()).GetNotifications();
+								if (pNotifications)
+								{
+									Localization::String strMessage = Localization::Lookup("TXT_KEY_UNIT_MORALE_FALL_BACK");
+									strMessage << pkAttacker->getUnitInfo().GetTextKey();
+									strMessage << pkDefender->getUnitInfo().GetTextKey();
+									Localization::String strSummary = Localization::Lookup("TXT_KEY_UNIT_MORALE_FALL_BACK_S");
+									strSummary << pkDefender->getUnitInfo().GetTextKey();
+									pNotifications->Add(NOTIFICATION_GENERIC, strMessage.toUTF8(), strSummary.toUTF8(), pkDefender->getX(), pkDefender->getY(), (int)pkDefender->getUnitType(), pkDefender->getOwner());
+								}
+								CvNotifications* pNotificationsOther = GET_PLAYER(pkAttacker->getOwner()).GetNotifications();
+								if (pNotificationsOther)
+								{
+									Localization::String strMessage = Localization::Lookup("TXT_KEY_UNIT_MORALE_FALL_BACK_THEM");
+									strMessage << pkAttacker->getUnitInfo().GetTextKey();
+									strMessage << pkDefender->getUnitInfo().GetTextKey();
+									Localization::String strSummary = Localization::Lookup("TXT_KEY_UNIT_MORALE_FALL_BACK_S");
+									strSummary << pkDefender->getUnitInfo().GetTextKey();
+									pNotificationsOther->Add(NOTIFICATION_GENERIC, strMessage.toUTF8(), strSummary.toUTF8(), pkDefender->getX(), pkDefender->getY(), (int)pkDefender->getUnitType(), pkDefender->getOwner());
+								}
+							}
+						}
+#endif
 					}
 
 					//red icon over attacking unit
@@ -3499,9 +3526,9 @@ CvUnitCombat::ATTACK_RESULT CvUnitCombat::Attack(CvUnit& kAttacker, CvPlot& targ
 
 	CvAssertMsg(!kAttacker.isDelayedDeath() && !pDefender->isDelayedDeath(), "Trying to battle and one of the units is already dead!");
 
-	if(pDefender->getExtraWithdrawal() > 0 && pDefender->CanWithdrawFromMelee(kAttacker))
+	if(pDefender->getExtraWithdrawal() > 0 && pDefender->CanFallBack(kAttacker, true))
 	{
-		pDefender->DoWithdrawFromMelee(kAttacker);
+		pDefender->DoFallBack(kAttacker);
 
 		if(kAttacker.getOwner() == GC.getGame().getActivePlayer())
 		{
@@ -3991,14 +4018,34 @@ CvUnitCombat::ATTACK_RESULT CvUnitCombat::AttackAirSweep(CvUnit& kAttacker, CvPl
 	}
 	else
 	{
-		// attempted to do a sweep in a plot that had no interceptors
-		// consume the movement and finish its moves
-		if(kAttacker.getOwner() == GC.getGame().getActivePlayer())
+		bool bFallbackAttack = false;
+		if (MOD_ROG_CORE)
+			bFallbackAttack = kAttacker.attemptGroundAttacks(targetPlot);
+
+		if (bFallbackAttack)
 		{
-			Localization::String localizedText = Localization::Lookup("TXT_KEY_AIR_PATROL_FOUND_NOTHING");
-			localizedText << kAttacker.getUnitInfo().GetTextKey();
-			GC.GetEngineUserInterface()->AddMessage(0, kAttacker.getOwner(), false, GC.getEVENT_MESSAGE_TIME(), localizedText.toUTF8());
-			MILITARYLOG(kAttacker.getOwner(), localizedText.toUTF8(), kAttacker.plot(), kAttacker.getOwner());
+			int iExperience = /*5*/ GD_INT_GET(EXPERIENCE_ATTACKING_AIR_SWEEP);
+			kAttacker.changeExperienceTimes100(100 * iExperience, -1, true, targetPlot.getOwner() == kAttacker.getOwner(), true);
+			kAttacker.testPromotionReady();
+			// attempted to do a sweep in a plot that had no interceptors
+			// consume the movement and finish its moves
+			if (kAttacker.getOwner() == GC.getGame().getActivePlayer())
+			{
+				Localization::String localizedText = Localization::Lookup("TXT_KEY_AIR_PATROL_BOMBED_GROUND_TARGETS");
+				localizedText << kAttacker.getUnitInfo().GetTextKey();
+				GC.GetEngineUserInterface()->AddMessage(0, kAttacker.getOwner(), false, /*10*/ GD_INT_GET(EVENT_MESSAGE_TIME), localizedText.toUTF8());
+			}
+		}
+
+		else
+		{
+			if (kAttacker.getOwner() == GC.getGame().getActivePlayer())
+			{
+				Localization::String localizedText = Localization::Lookup("TXT_KEY_AIR_PATROL_FOUND_NOTHING");
+				localizedText << kAttacker.getUnitInfo().GetTextKey();
+				GC.GetEngineUserInterface()->AddMessage(0, kAttacker.getOwner(), false, GC.getEVENT_MESSAGE_TIME(), localizedText.toUTF8());
+				MILITARYLOG(kAttacker.getOwner(), localizedText.toUTF8(), kAttacker.plot(), kAttacker.getOwner());
+			}
 		}
 
 		// Spend a move for this attack
@@ -4705,6 +4752,7 @@ void CvUnitCombat::DoSplashDamage(const CvCombatInfo& kCombatInfo)
 
 					if (bAOEImmune) continue;
 					if (pAOEUnit->getDomainType() != DOMAIN_LAND && pAOEUnit->getDomainType() != DOMAIN_SEA) continue;
+					if (pAOEUnit== pDefenderUnit && !pAttackerUnit->IsCanDoFallBackDamage()) continue;
 					if (!kAttackPlayer.IsAtWarWith(pAOEUnit->getOwner())) continue;
 					if (dedupSet.count(pAOEUnit) > 0) continue;
 					dedupSet.insert(pAOEUnit);
@@ -4728,6 +4776,20 @@ void CvUnitCombat::DoSplashDamage(const CvCombatInfo& kCombatInfo)
 	{
 		CvUnit* pAOEUnit = iter->first;
 		int iAOEDamage = iter->second;
+
+#if defined(MOD_ROG_CORE)
+		if (pAOEUnit->getForcedDamageValue() != 0)
+		{
+			iAOEDamage = pAOEUnit->getForcedDamageValue();
+		}
+		if (pAOEUnit->getChangeDamageValue() != 0)
+		{
+			iAOEDamage += pAOEUnit->getChangeDamageValue();
+			if (iAOEDamage <= 0)
+				iAOEDamage = 0;
+		}
+#endif
+
 		if (iAOEDamage == 0)
 		{
 			continue;
@@ -4846,6 +4908,20 @@ void CvUnitCombat::DoCollateralDamage(const CvCombatInfo& kCombatInfo)
 	{
 		CvUnit* pAffectedUnit = iter->first;
 		int iDamage = iter->second;
+
+#if defined(MOD_ROG_CORE)
+		if (pAffectedUnit->getForcedDamageValue() != 0)
+		{
+			iDamage = pAffectedUnit->getForcedDamageValue();
+		}
+		if (pAffectedUnit->getChangeDamageValue() != 0)
+		{
+			iDamage += pAffectedUnit->getChangeDamageValue();
+			if (iDamage <= 0)
+				iDamage = 0;
+		}
+#endif
+
 		if (iDamage == 0)
 		{
 			continue;

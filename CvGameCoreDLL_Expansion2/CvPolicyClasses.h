@@ -271,6 +271,7 @@ public:
 #if defined(MOD_BUGFIX_DUMMY_POLICIES)
 	bool IsDummy() const;
 #endif
+	bool IsAlwaysWeLoveKindDayInGoldenAge() const;
 	bool IsNoResistance() const;
 	bool IsUpgradeAllTerritory() const;
 	int GetDefenseBoost() const;
@@ -489,6 +490,7 @@ private:
 #if defined(MOD_BUGFIX_DUMMY_POLICIES)
 	bool m_bDummy;
 #endif
+	bool m_bAlwaysWeLoveKindDayInGoldenAge;
 	bool m_bNoResistance;
 	bool m_bUpgradeAllTerritory;
 	int m_iDefenseBoost;

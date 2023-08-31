@@ -156,6 +156,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_iRangedStrikeModifier(0),
 	m_iPopulationChange(0),
 	m_iMinorCivFriendship(0),
+	m_iLiberatedInfluence(0),
 	m_iResetDamageValue(0),
 	m_iReduceDamageValue(0),
 
@@ -257,9 +258,14 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piYieldFromBirth(NULL),
 	m_piYieldFromBorderGrowth(NULL),
 
+	m_piYieldFromPillage(NULL),
+	m_piYieldFromPillageGlobal(NULL),
+	m_piYieldFromPillageGlobalPlayer(NULL),
+
 	m_piYieldModifierFromWonder(NULL),
 	m_piDomainFreeExperiencePerGreatWorkGlobal(NULL),
 	m_piDomainFreeExperienceGlobal(),
+	m_piUnitTypePrmoteHealGlobal(),
 	m_paiSpecificGreatPersonRateModifier(NULL),
 #endif
 
@@ -345,10 +351,13 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	SAFE_DELETE_ARRAY(m_piYieldFromUnitProduction);
 	SAFE_DELETE_ARRAY(m_piYieldFromBirth);
 	SAFE_DELETE_ARRAY(m_piYieldFromBorderGrowth);
-
+	SAFE_DELETE_ARRAY(m_piYieldFromPillage);
+	SAFE_DELETE_ARRAY(m_piYieldFromPillageGlobal);
+	SAFE_DELETE_ARRAY(m_piYieldFromPillageGlobalPlayer);
 	SAFE_DELETE_ARRAY(m_piYieldModifierFromWonder);
 	SAFE_DELETE_ARRAY(m_piDomainFreeExperiencePerGreatWorkGlobal);
 	m_piDomainFreeExperienceGlobal.clear();
+	m_piUnitTypePrmoteHealGlobal.clear();
 #endif
 
 	SAFE_DELETE_ARRAY(m_piDomainProductionModifier);
@@ -454,6 +463,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iRangedStrikeModifier = kResults.GetInt("RangedStrikeModifier");
 	m_iPopulationChange = kResults.GetInt("PopulationChange");
 	m_iMinorCivFriendship = kResults.GetInt("MinorCivFriendship");
+	m_iLiberatedInfluence = kResults.GetInt("LiberatedInfluence");
 	m_iResetDamageValue = kResults.GetInt("ResetDamageValue");
 	m_iReduceDamageValue = kResults.GetInt("ReduceDamageValue");
 
@@ -724,7 +734,9 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	kUtility.SetYields(m_piYieldFromUnitProduction, "Building_YieldFromUnitProduction", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldFromBirth, "Building_YieldFromBirth", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldFromBorderGrowth, "Building_YieldFromBorderGrowth", "BuildingType", szBuildingType);
-
+	kUtility.SetYields(m_piYieldFromPillage, "Building_YieldFromPillage", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldFromPillageGlobal, "Building_YieldFromPillageGlobal", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldFromPillageGlobalPlayer, "Building_YieldFromPillageGlobalPlayer", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldModifierFromWonder, "Building_CityWithWorldWonderYieldModifierGlobal", "BuildingType", szBuildingType);
 #endif
 
@@ -826,8 +838,6 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 		}
 	}
 #if defined(MOD_ROG_CORE)
-
-
 	//Building_DomainFreeExperiencesGlobal
 	{
 		std::string strKey("Building_DomainFreeExperiencesGlobal");
@@ -851,6 +861,32 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 		//Trim extra memory off container since this is mostly read-only.
 		std::map<int, int>(m_piDomainFreeExperienceGlobal).swap(m_piDomainFreeExperienceGlobal);
+	}
+
+
+	//Building_UnitTypePrmoteHealGlobal
+	{
+		std::string strKey("Building_UnitTypePrmoteHealGlobal");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Units.ID as UnitID, Heal from Building_UnitTypePrmoteHealGlobal inner join Units on Units.Type = UnitType where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType);
+
+		while (pResults->Step())
+		{
+			const int iUnit = pResults->GetInt(0);
+			const int iHeal = pResults->GetInt(1);
+
+			m_piUnitTypePrmoteHealGlobal[iUnit] += iHeal;
+		}
+
+		pResults->Reset();
+
+		//Trim extra memory off container since this is mostly read-only.
+		std::map<int, int>(m_piUnitTypePrmoteHealGlobal).swap(m_piUnitTypePrmoteHealGlobal);
 	}
 #endif
 
@@ -2005,6 +2041,11 @@ int CvBuildingEntry::GetMinorCivFriendship() const
 	return m_iMinorCivFriendship;
 }
 
+int CvBuildingEntry::GetLiberatedInfluence() const
+{
+	return m_iLiberatedInfluence;
+}
+
 int CvBuildingEntry::GetResetDamageValue() const
 {
 	return m_iResetDamageValue;
@@ -2816,6 +2857,45 @@ int* CvBuildingEntry::GetYieldFromBorderGrowthArray() const
 	return m_piYieldFromBorderGrowth;
 }
 
+/// Change to yield if pillaging
+int CvBuildingEntry::GetYieldFromPillage(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromPillage ? m_piYieldFromPillage[i] : -1;
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromPillageArray() const
+{
+	return m_piYieldFromPillage;
+}
+
+/// Change to yield if pillaging
+int CvBuildingEntry::GetYieldFromPillageGlobal(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromPillageGlobal ? m_piYieldFromPillageGlobal[i] : -1;
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromPillageGlobalArray() const
+{
+	return m_piYieldFromPillageGlobal;
+}
+
+/// Change to yield if pillaging
+int CvBuildingEntry::GetYieldFromPillageGlobalPlayer(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromPillageGlobalPlayer ? m_piYieldFromPillageGlobalPlayer[i] : -1;
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromPillageGlobalPlayerArray() const
+{
+	return m_piYieldFromPillageGlobalPlayer;
+}
+
 int CvBuildingEntry::GetYieldModifierFromWonder(int i) const
 {
 	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
@@ -2982,7 +3062,19 @@ int CvBuildingEntry::GetDomainFreeExperienceGlobal(int i) const
 	{
 		return it->second;
 	}
+	return 0;
+}
 
+int CvBuildingEntry::GetUnitTypePrmoteHealGlobal(int i) const
+{
+	CvAssertMsg(i < GC.getNumUnitInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+
+	std::map<int, int>::const_iterator it = m_piUnitTypePrmoteHealGlobal.find(i);
+	if (it != m_piUnitTypePrmoteHealGlobal.end()) // find returns the iterator to map::end if the key i is not present in the map
+	{
+		return it->second;
+	}
 	return 0;
 }
 #endif

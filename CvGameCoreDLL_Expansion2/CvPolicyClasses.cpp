@@ -180,6 +180,7 @@ CvPolicyEntry::CvPolicyEntry(void):
 #if defined(MOD_BUGFIX_DUMMY_POLICIES)
 	m_bDummy(false),
 #endif
+	m_bAlwaysWeLoveKindDayInGoldenAge(false),
 	m_bNoResistance(false),
 	m_bUpgradeAllTerritory(false),
 	m_iDefenseBoost(0),
@@ -469,6 +470,7 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 		m_bDummy = kResults.GetBool("Dummy");
 	}
 #endif
+	m_bAlwaysWeLoveKindDayInGoldenAge = kResults.GetInt("AlwaysWeLoveKindDayInGoldenAge");
 	m_bNoResistance = kResults.GetInt("NoResistance");
 	m_bUpgradeAllTerritory = kResults.GetInt("UpgradeAllTerritory");
 	m_iDefenseBoost = kResults.GetInt("DefenseBoostAllCities");
@@ -2170,6 +2172,11 @@ bool CvPolicyEntry::IsDummy() const
 	return m_bDummy;
 }
 #endif
+
+bool CvPolicyEntry::IsAlwaysWeLoveKindDayInGoldenAge() const
+{
+	return m_bAlwaysWeLoveKindDayInGoldenAge;
+}
 
 bool CvPolicyEntry::IsNoResistance() const
 {

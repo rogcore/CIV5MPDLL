@@ -23,7 +23,9 @@ ALTER TABLE UnitPromotions ADD COLUMN 'ExtraResourceCombatModifierMax' INTEGER D
 ALTER TABLE UnitPromotions ADD COLUMN 'ExtraHappinessCombatModifier' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD COLUMN 'ExtraHappinessCombatModifierMax' INTEGER DEFAULT -1;
 
-
+ALTER TABLE UnitPromotions ADD COLUMN 'GetGroundAttackDamage' INTEGER DEFAULT 0;
+ALTER TABLE UnitPromotions ADD AirInterceptRangeChange INTEGER DEFAULT 0;
+ALTER TABLE UnitPromotions ADD COLUMN 'GetGroundAttackRange' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD COLUMN 'CannotBeRangedAttacked' BOOLEAN DEFAULT 0 NOT NULL; 
 ALTER TABLE UnitPromotions ADD COLUMN 'AoEDamageOnMove' INTEGER DEFAULT 0; 
 ALTER TABLE UnitPromotions ADD COLUMN 'ForcedDamageValue' INTEGER DEFAULT 0;
@@ -44,10 +46,10 @@ ALTER TABLE UnitPromotions ADD COLUMN 'MoveUsedAttackMod' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD 'HPHealedIfDestroyEnemyGlobal' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD 'NumOriginalCapitalAttackMod' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD 'NumOriginalCapitalDefenseMod' INTEGER DEFAULT 0;
-
+ALTER TABLE UnitPromotions ADD  'CanParadropAnyWhere' BOOLEAN DEFAULT 0;
 ALTER TABLE UnitPromotions_Domains ADD COLUMN 'Attack' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions_Domains ADD COLUMN 'Defense' INTEGER DEFAULT 0;
-
+ALTER TABLE Buildings ADD COLUMN 'LiberatedInfluence' INTEGER DEFAULT 0;  
 ALTER TABLE Buildings ADD COLUMN 'PopulationChange' INTEGER DEFAULT 0;
 ALTER TABLE Buildings ADD COLUMN 'RangedStrikeModifier' INTEGER DEFAULT 0;
 ALTER TABLE Buildings ADD COLUMN 'ResetDamageValue' INTEGER DEFAULT 0;
@@ -148,8 +150,6 @@ ALTER TABLE Features ADD PseudoNaturalWonder INTEGER DEFAULT 0;
 
 ALTER TABLE UnitPromotions ADD 'OriginalCapitalDamageFix' INTEGER DEFAULT 0;
 
-
-
 ALTER TABLE Technologies ADD BombardRange INTEGER DEFAULT 0;
 ALTER TABLE Technologies ADD BombardIndirect INTEGER DEFAULT 0;
 ALTER TABLE Buildings ADD BombardRange INTEGER DEFAULT 0;
@@ -162,17 +162,18 @@ ALTER TABLE Buildings ADD COLUMN 'MoveAfterCreated' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions  ADD COLUMN 'ShowInUnitPanel' INTEGER DEFAULT 1;
 ALTER TABLE UnitPromotions ADD COLUMN 'ShowInTooltip' INTEGER DEFAULT 1;
 ALTER TABLE UnitPromotions ADD COLUMN 'ShowInPedia' INTEGER DEFAULT 1;
-
-
+ALTER TABLE UnitPromotions ADD COLUMN 'PillageReplenishMoves' INTEGER DEFAULT 0;
+ALTER TABLE UnitPromotions ADD COLUMN 'PillageReplenishAttck'  BOOLEAN DEFAULT 0;
+ALTER TABLE UnitPromotions ADD COLUMN 'PillageReplenishHealth' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD COLUMN 'PlagueChance' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD COLUMN 'PlaguePromotion' TEXT DEFAULT NULL REFERENCES UnitPromotions(Type);
 ALTER TABLE UnitPromotions ADD COLUMN 'IsPlague' BOOLEAN DEFAULT 0;
 ALTER TABLE UnitPromotions ADD COLUMN 'PlagueID' INTEGER DEFAULT -1;
 ALTER TABLE UnitPromotions ADD COLUMN 'PlaguePriority' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD COLUMN 'PlagueIDImmunity' INTEGER DEFAULT 0;
-
+ALTER TABLE UnitPromotions ADD COLUMN 'MoraleBreakChance' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD 'ImmuePlague' BOOLEAN DEFAULT 0;
-
+ALTER TABLE UnitPromotions ADD  'CanDoFallBackDamage' BOOLEAN DEFAULT 0;
 ALTER TABLE Units ADD COLUMN 'UnitTechUpgrade' BOOLEAN DEFAULT 0;
 
 ALTER TABLE Features ADD  'Volcano'  boolean default 0;
@@ -189,6 +190,7 @@ ALTER TABLE Policies ADD COLUMN 'CityCaptureHealGlobal' INTEGER DEFAULT 0;
 ALTER TABLE Policies ADD COLUMN 'OriginalCapitalCaptureTech' INTEGER DEFAULT 0;
 ALTER TABLE Policies ADD COLUMN 'OriginalCapitalCapturePolicy' INTEGER DEFAULT 0;
 ALTER TABLE Policies ADD COLUMN 'OriginalCapitalCaptureGreatPerson' INTEGER DEFAULT 0;
+ALTER TABLE Policies ADD COLUMN 'AlwaysWeLoveKindDayInGoldenAge' BOOLEAN DEFAULT 0;
 ALTER TABLE Traits ADD COLUMN 'NoResistance'  BOOLEAN DEFAULT 0;
 ALTER TABLE Traits ADD COLUMN 'GoldenAgeOnWar' BOOLEAN DEFAULT 0;
 ALTER TABLE Traits ADD COLUMN 'BuyOwnedTiles' BOOLEAN DEFAULT 0;

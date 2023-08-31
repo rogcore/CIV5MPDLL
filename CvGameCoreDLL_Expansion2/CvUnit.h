@@ -478,6 +478,10 @@ public:
 	UnitCombatTypes getUnitPromotionType() const;
 #endif
 	DomainTypes getDomainType() const;
+#if defined(MOD_ROG_CORE)
+	//check if plot type matches the (primary) domain type
+	bool isNativeDomain(const CvPlot* pPlot) const;
+#endif
 
 	int flavorValue(FlavorTypes eFlavor) const;
 
@@ -672,6 +676,9 @@ public:
 	void SetCombatBonusFromNearbyUnitClass(UnitClassTypes eUnitClass);
 #endif
 
+	bool canIntercept() const;
+	int GetAirInterceptRange() const;
+
 #if defined(MOD_PROMOTIONS_CROSS_MOUNTAINS)
 	bool canCrossMountains() const;
 	int getCanCrossMountainsCount() const;
@@ -780,7 +787,10 @@ public:
 	void changeAttackModifier(int iValue);
 	int getDefenseModifier() const;
 	void changeDefenseModifier(int iValue);
-
+	int getGroundAttackDamage() const;
+	void changeGroundAttackDamage(int iValue);
+	int getGroundAttackRange() const;
+	void changeGroundAttackRange(int iValue);
 	int cityAttackModifier() const;
 	int cityDefenseModifier() const;
 	int rangedDefenseModifier() const;
@@ -846,7 +856,10 @@ public:
 	int getArea() const;
 	CvArea* area() const;
 	bool onMap() const;
-
+#if defined(MOD_ROG_CORE)
+	void setOriginCity(int ID);
+	CvCity* getOriginCity() const;
+#endif
 	int getLastMoveTurn() const;
 	void setLastMoveTurn(int iNewValue);
 
@@ -1084,8 +1097,11 @@ public:
 	int getExtraRange() const;
 	void changeExtraRange(int iChange);
 
-	int getExtraIntercept() const;
-	void changeExtraIntercept(int iChange);
+	int getInterceptChance() const;
+	void changeInterceptChance(int iChange);
+
+	//int getExtraIntercept() const;
+	//void changeExtraIntercept(int iChange);
 
 	int getExtraEvasion() const;
 	void changeExtraEvasion(int iChange);
@@ -1279,7 +1295,10 @@ public:
 
 	bool IsIgnoreZOC() const;
 	void ChangeIgnoreZOCCount(int iChange);
-
+	bool IsCanDoFallBackDamage() const;
+	void ChangeCanDoFallBackDamageCount(int iChange);
+	bool IsCanParadropAnyWhere() const;
+	void ChangeCanParadropAnyWhereCount(int iChange);
 	bool IsSapper() const;
 	void ChangeSapperCount(int iChange);
 	bool IsSappingCity(const CvCity* pTargetCity) const;
@@ -1325,6 +1344,9 @@ public:
 
 	int GetNumInterceptions() const;
 	void ChangeNumInterceptions(int iChange);
+
+	int GetExtraAirInterceptRange() const; // JJ: New
+	void ChangeExtraAirInterceptRange(int iChange);
 
 	bool isOutOfInterceptions() const;
 	int getMadeInterceptionCount() const;
@@ -1500,6 +1522,8 @@ public:
 
 	bool canAcquirePromotion(PromotionTypes ePromotion) const;
 	bool canAcquirePromotionAny() const;
+
+
 	bool isPromotionValid(PromotionTypes ePromotion) const;
 	bool isHasPromotion(PromotionTypes eIndex) const;
 	void setHasPromotion(PromotionTypes eIndex, bool bNewValue);
@@ -1533,6 +1557,8 @@ public:
 
 	bool potentialWarAction(const CvPlot* pPlot) const;
 	bool willRevealByMove(const CvPlot& pPlot) const;
+
+	bool attemptGroundAttacks(const CvPlot& pPlot);
 
 	bool isAlwaysHostile(const CvPlot& pPlot) const;
 	void changeAlwaysHostileCount(int iValue);
@@ -1692,12 +1718,20 @@ public:
 	void ChangeRangedSupportFireMod(int iValue);
 	int GetRangedSupportFireMod() const;
 
-
+	int GetMoraleBreakChance() const;
+	void ChangeMoraleBreakChance(int iChange);
 	int GetDamageAoEFortified() const;
 	void ChangeDamageAoEFortified(int iChange);
 
 	int GetWorkRateMod() const;
 	void ChangeWorkRateMod(int iChange);
+
+	int GetPillageReplenishMoves() const;
+	void ChangePillageReplenishMoves(int iChange);
+	bool IsPillageReplenishAttck() const;
+	void ChangePillageReplenishAttckount(int iChange);
+	int GetPillageReplenishHealth() const;
+	void ChangePillageReplenishHealth(int iChange);
 
 	int getAOEDamageOnKill() const;
 	void changeAOEDamageOnKill(int iChange);
@@ -2001,7 +2035,7 @@ protected:
 	FAutoVariable<int, CvUnit> m_iExtraMoves;
 	FAutoVariable<int, CvUnit> m_iExtraMoveDiscount;
 	FAutoVariable<int, CvUnit> m_iExtraRange;
-	FAutoVariable<int, CvUnit> m_iExtraIntercept;
+	FAutoVariable<int, CvUnit> m_iInterceptChance;
 	FAutoVariable<int, CvUnit> m_iExtraEvasion;
 	FAutoVariable<int, CvUnit> m_iExtraFirstStrikes;
 	FAutoVariable<int, CvUnit> m_iExtraChanceFirstStrikes;
@@ -2035,6 +2069,8 @@ protected:
 	FAutoVariable<int, CvUnit> m_iAirSweepCombatModifier;
 	FAutoVariable<int, CvUnit> m_iAttackModifier;
 	FAutoVariable<int, CvUnit> m_iDefenseModifier;
+	FAutoVariable<int, CvUnit> m_iGroundAttackDamage;
+	FAutoVariable<int, CvUnit> m_iGroundAttackRange;
 	FAutoVariable<int, CvUnit> m_iExtraCombatPercent;
 	FAutoVariable<int, CvUnit> m_iExtraCityAttackPercent;
 	FAutoVariable<int, CvUnit> m_iExtraCityDefensePercent;
@@ -2192,7 +2228,8 @@ protected:
 	int m_iGreatGeneralCombatModifier;
 	int m_iIgnoreGreatGeneralBenefit;
 	int m_iIgnoreZOC;
-
+	int m_iCanDoFallBackDamage;
+	int m_iCanParadropAnyWhere;
 	int m_iImmueMeleeAttack;
 #if defined(MOD_UNITS_NO_SUPPLY)
 	int m_iNoSupply;
@@ -2207,6 +2244,7 @@ protected:
 	FAutoVariable<int, CvUnit> m_iOutsideFriendlyLandsModifier;
 	FAutoVariable<int, CvUnit> m_iHealIfDefeatExcludeBarbariansCount;
 	FAutoVariable<int, CvUnit> m_iNumInterceptions;
+	FAutoVariable<int, CvUnit> m_iExtraAirInterceptRange;
 	FAutoVariable<int, CvUnit> m_iMadeInterceptionCount;
 	int m_iEverSelectedCount;
 	int m_iSapperCount;
@@ -2277,6 +2315,7 @@ protected:
 #endif
 	FAutoVariable<std::vector<int>, CvUnit> m_extraUnitCombatModifier;
 	FAutoVariable<std::vector<int>, CvUnit> m_unitClassModifier;
+
 	int m_iMissionTimer;
 	FAutoVariable<int, CvUnit> m_iMissionAIX;
 	FAutoVariable<int, CvUnit> m_iMissionAIY;
@@ -2303,14 +2342,18 @@ protected:
 #endif
 
 #if defined(MOD_ROG_CORE)
+	int m_iOriginCity;
 	int m_iMoveLfetAttackMod;
 	int m_iMoveUsedAttackMod;
 	int m_iGoldenAgeMod;
 	int m_iRangedSupportFireMod;
-
 	int m_iBarbCombatBonus;
+	int m_iCanMoraleBreak;
 	int m_iDamageAoEFortified;
 	int m_iWorkRateMod;
+	int m_iPillageReplenishMoves;
+	int m_iPillageReplenishAttck;
+	int m_iPillageReplenishHealth;
 	int m_iAOEDamageOnKill;
 #endif
 
@@ -2411,16 +2454,15 @@ protected:
 
 	CvUnit* airStrikeTarget(CvPlot& pPlot, bool bNoncombatAllowed) const;
 
-	bool CanWithdrawFromMelee(CvUnit& pAttacker);
-	bool DoWithdrawFromMelee(CvUnit& pAttacker);
-
-	// these are do to a unit using Heavy Charge against you
-	bool CanFallBackFromMelee(CvUnit& pAttacker);
-	bool DoFallBackFromMelee(CvUnit& pAttacker);
 
  #ifdef MOD_GLOBAL_WAR_CASUALTIES
 	int m_iWarCasualtiesModifier = 0;
  #endif
+
+	bool CanFallBack(const CvUnit& pAttacker, bool bCheckChances) const;
+	int  GetWithdrawChance(const CvUnit& pAttacker, const bool bCheckChances) const;
+	bool DoFallBack(const CvUnit& pAttacker);
+
 
 private:
 

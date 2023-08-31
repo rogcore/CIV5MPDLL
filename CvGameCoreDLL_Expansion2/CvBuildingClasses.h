@@ -201,6 +201,7 @@ public:
 	int CityRangedStrikeModifier() const;
 	int GetPopulationChange() const;
 	int GetMinorCivFriendship() const;
+	int GetLiberatedInfluence() const;
 	int GetGlobalCityStrengthMod() const;
 	int GetGlobalRangedStrikeModifier() const;
 
@@ -368,6 +369,13 @@ public:
 	int GetYieldFromBorderGrowth(int i) const;
 	int* GetYieldFromBorderGrowthArray() const;
 
+	int GetYieldFromPillage(int i) const;
+	int* GetYieldFromPillageArray() const;
+	int GetYieldFromPillageGlobal(int i) const;
+	int* GetYieldFromPillageGlobalArray() const;
+	int GetYieldFromPillageGlobalPlayer(int i) const;
+	int* GetYieldFromPillageGlobalPlayerArray() const;
+
 	int GetYieldModifierFromWonder(int i) const;;
 	int* GetYieldModifierFromWonderArray() const;
 #endif
@@ -396,6 +404,7 @@ public:
 #if defined(MOD_ROG_CORE)
 	int GetDomainFreeExperiencePerGreatWorkGlobal(int i) const;
 	int GetDomainFreeExperienceGlobal(int i) const;
+	int GetUnitTypePrmoteHealGlobal(int i) const;
 #endif
 
 	int GetDomainProductionModifier(int i) const;
@@ -561,19 +570,16 @@ private:
 
 #if defined(MOD_ROG_CORE)
 	int* m_piGreatWorkYieldChange;
-
 	int m_iExtraDamageHeal;
 	int m_iRangedStrikeModifier;
 	int m_iPopulationChange;
 	int m_iMinorCivFriendship;
+	int m_iLiberatedInfluence;
 	int m_iResetDamageValue;
 	int m_iReduceDamageValue;
 
 	int m_iGlobalCityStrengthMod;
 	int m_iGlobalRangedStrikeModifier;
-
-
-
 	int m_iWaterTileDamage;
 	int m_iWaterTileMovementReduce;
 	int m_iWaterTileTurnDamage;
@@ -746,6 +752,9 @@ private:
 	int* m_piYieldFromUnitProduction;
 	int* m_piYieldFromBirth;
 	int* m_piYieldFromBorderGrowth;
+	int* m_piYieldFromPillage;
+	int* m_piYieldFromPillageGlobal;
+	int* m_piYieldFromPillageGlobalPlayer;
 	int* m_piYieldModifierFromWonder;
 #endif
 
@@ -761,6 +770,7 @@ private:
 #if defined(MOD_ROG_CORE)
 	int* m_piDomainFreeExperiencePerGreatWorkGlobal;
 	std::map<int, int> m_piDomainFreeExperienceGlobal;
+	std::map<int, int> m_piUnitTypePrmoteHealGlobal;
 #endif
 
 

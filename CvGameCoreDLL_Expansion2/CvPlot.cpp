@@ -456,15 +456,15 @@ void CvPlot::doTurn()
 		iFakeRandNum= GC.getGame().getSmallFakeRandNum(1000, GetPlotIndex());
 
 		bool bOutBreakLv1 = false, bOutBreakLv2 = false, bOutBreakLv3 = false;
-		if (iFakeRandNum <= 100)
+		if (iFakeRandNum <= 50)
 		{
 			bOutBreakLv1 = true;
 		}
-		else if (iFakeRandNum <= 600 && iFakeRandNum>=550)
+		else if (iFakeRandNum <= 600 && iFakeRandNum>=580)
 		{
 			bOutBreakLv2 = true;
 		}
-		else if (iFakeRandNum >= 970)
+		else if (iFakeRandNum >= 990)
 		{
 			bOutBreakLv3 = true;
 		}
@@ -13990,27 +13990,20 @@ bool CvPlot::IsWithinDistanceOfUnitPromotion(PlayerTypes ePlayer, PromotionTypes
 			pLoopUnit = this->getUnitByIndex(iI);
 			if (pLoopUnit != NULL)
 			{
-				for (int iPromotionLoop = 0; iPromotionLoop < GC.getNumPromotionInfos(); iPromotionLoop++)
+
+				if (pLoopUnit->isHasPromotion(eUnitPromotion))
 				{
-					const PromotionTypes ePromotion = (PromotionTypes)iPromotionLoop;
-					CvPromotionEntry* pkPromotionInfo = GC.getPromotionInfo(ePromotion);
-					if (pkPromotionInfo)
+					if (bIsFriendly && GET_PLAYER(pLoopUnit->getOwner()).getTeam() == GET_PLAYER(ePlayer).getTeam())
 					{
-						if (pLoopUnit->isHasPromotion(ePromotion) && ePromotion == eUnitPromotion)
-						{
-							if (bIsFriendly && GET_PLAYER(pLoopUnit->getOwner()).getTeam() == GET_PLAYER(ePlayer).getTeam())
-							{
-								return true;
-							}
-							else if (bIsEnemy && GET_TEAM(GET_PLAYER(pLoopUnit->getOwner()).getTeam()).isAtWar(GET_PLAYER(ePlayer).getTeam()))
-							{
-								return true;
-							}
-							else if (!bIsFriendly && !bIsEnemy)
-							{
-								return true;
-							}
-						}
+						return true;
+					}
+					else if (bIsEnemy && GET_TEAM(GET_PLAYER(pLoopUnit->getOwner()).getTeam()).isAtWar(GET_PLAYER(ePlayer).getTeam()))
+					{
+						return true;
+					}
+					else if (!bIsFriendly && !bIsEnemy)
+					{
+						return true;
 					}
 				}
 			}
@@ -14029,27 +14022,20 @@ bool CvPlot::IsWithinDistanceOfUnitPromotion(PlayerTypes ePlayer, PromotionTypes
 					pLoopUnit = pLoopPlot->getUnitByIndex(iI);
 					if (pLoopUnit != NULL)
 					{
-						for (int iPromotionLoop = 0; iPromotionLoop < GC.getNumPromotionInfos(); iPromotionLoop++)
+
+						if (pLoopUnit->isHasPromotion(eUnitPromotion))
 						{
-							const PromotionTypes ePromotion = (PromotionTypes)iPromotionLoop;
-							CvPromotionEntry* pkPromotionInfo = GC.getPromotionInfo(ePromotion);
-							if (pkPromotionInfo)
+							if (bIsFriendly && GET_PLAYER(pLoopUnit->getOwner()).getTeam() == GET_PLAYER(ePlayer).getTeam())
 							{
-								if (pLoopUnit->isHasPromotion(ePromotion) && ePromotion == eUnitPromotion)
-								{
-									if (bIsFriendly && GET_PLAYER(pLoopUnit->getOwner()).getTeam() == GET_PLAYER(ePlayer).getTeam())
-									{
-										return true;
-									}
-									else if (bIsEnemy && GET_TEAM(GET_PLAYER(pLoopUnit->getOwner()).getTeam()).isAtWar(GET_PLAYER(ePlayer).getTeam()))
-									{
-										return true;
-									}
-									else if (!bIsFriendly && !bIsEnemy)
-									{
-										return true;
-									}
-								}
+								return true;
+							}
+							else if (bIsEnemy && GET_TEAM(GET_PLAYER(pLoopUnit->getOwner()).getTeam()).isAtWar(GET_PLAYER(ePlayer).getTeam()))
+							{
+								return true;
+							}
+							else if (!bIsFriendly && !bIsEnemy)
+							{
+								return true;
 							}
 						}
 					}

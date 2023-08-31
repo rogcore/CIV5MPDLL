@@ -48,6 +48,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iAirSweepCombatModifier(0),
 	m_iInterceptChanceChange(0),
 	m_iNumInterceptionChange(0),
+	m_iAirInterceptRangeChange(0),
 	m_iEvasionChange(0),
 	m_iCargoChange(0),
 	m_iEnemyHealChange(0),
@@ -128,8 +129,8 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iNearbyUnitClassBonus(0),
 	m_iNearbyUnitClassBonusRange(0),
 	m_iCombatBonusFromNearbyUnitClass(NO_UNITCLASS),
-
 	m_iAOEDamageOnKill(0),
+	m_iMoraleBreakChance(0),
 	m_iDamageAoEFortified(0),
 	m_iWorkRateMod(0),
 	m_iBarbarianCombatBonus(0),
@@ -137,37 +138,28 @@ CvPromotionEntry::CvPromotionEntry():
 
 	m_iCaptureDefeatedEnemyChance(0),
 	m_bCannotBeCaptured(false),
-
 #if defined(MOD_ROG_CORE)
 	m_iHPHealedIfDefeatEnemyGlobal(0),
 	m_iNumOriginalCapitalAttackMod(0),
 	m_iNumOriginalCapitalDefenseMod(0),
-#endif
 
-#if defined(MOD_ROG_CORE)
+	m_iPillageReplenishMoves(0),
+	m_iPillageReplenishAttck(false),
+	m_iPillageReplenishHealth(0),
 	m_iOnCapitalLandAttackMod(0),
 	m_iOutsideCapitalLandAttackMod(0),
 	m_iOnCapitalLandDefenseMod(0),
 	m_iOutsideCapitalLandDefenseMod(0),
-#endif
 
-
-#if defined(MOD_ROG_CORE)
 	m_iNumSpyDefenseMod(0),
 	m_iNumSpyAttackMod(0),
-
 	m_iNumWonderDefenseMod(0),
 	m_iNumWonderAttackMod(0), 
-
 	m_iNumWorkDefenseMod(0),
 	m_iNumWorkAttackMod(0),
-
 	m_iNumSpyStayDefenseMod(0),
 	m_iNumSpyStayAttackMod(0),
-
 	m_bNoResourcePunishment(false),
-
-
 	m_iCurrentHitPointAttackMod(0),
 	m_iCurrentHitPointDefenseMod(0),
 #endif
@@ -177,6 +169,8 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iAdjacentMod(0),
 	m_iAttackMod(0),
 	m_iDefenseMod(0),
+	m_iGetGroundAttackDamage(0),
+	m_iGetGroundAttackRange(0),
 	m_iDropRange(0),
 	m_iExtraNavalMoves(0),
 	m_iHPHealedIfDefeatEnemy(0),
@@ -290,6 +284,8 @@ CvPromotionEntry::CvPromotionEntry():
 	m_bCaptureDefeatedEnemy(false),
 	m_bIgnoreGreatGeneralBenefit(false),
 	m_bIgnoreZOC(false),
+	m_bCanDoFallBackDamage(false),
+	m_bCanParadropAnyWhere(false),
 	m_bImmueMeleeAttack(false),
 	m_bHasPostCombatPromotions(false),
 	m_bPostCombatPromotionsExclusive(false),
@@ -493,63 +489,45 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iAttackBelowHealthMod = kResults.GetInt("AttackBelowEqual50HealthMod");
 	m_bStrongerDamaged = kResults.GetBool("StrongerDamaged");
 	m_bFightWellDamaged = kResults.GetBool("FightWellDamaged");
-
 	m_iMeleeDefenseMod = kResults.GetInt("MeleeDefenseMod");
+	m_iMoveLfetAttackMod = kResults.GetInt("MoveLfetAttackMod");
+	m_iMoveUsedAttackMod = kResults.GetInt("MoveUsedAttackMod");
+	m_iGoldenAgeMod = kResults.GetInt("GoldenAgeMod");
+	m_iRangedSupportFireMod = kResults.GetInt("RangedSupportFireMod");
+	m_iHPHealedIfDefeatEnemyGlobal = kResults.GetInt("HPHealedIfDestroyEnemyGlobal");
+	m_iNumOriginalCapitalAttackMod = kResults.GetInt("NumOriginalCapitalAttackMod");
+	m_iNumOriginalCapitalDefenseMod = kResults.GetInt("NumOriginalCapitalDefenseMod");
+	m_iOnCapitalLandAttackMod = kResults.GetInt("OnCapitalLandAttackMod");
+	m_iOutsideCapitalLandAttackMod = kResults.GetInt("OutsideCapitalLandAttackMod");
+	m_iOnCapitalLandDefenseMod = kResults.GetInt("OnCapitalLandDefenseMod");
+	m_iOutsideCapitalLandDefenseMod = kResults.GetInt("OutsideCapitalLandDefenseMod");
+	m_iMoraleBreakChance = kResults.GetInt("MoraleBreakChance");
+	m_iDamageAoEFortified = kResults.GetInt("AoEWhileFortified");
+	m_iWorkRateMod = kResults.GetInt("WorkRateMod");
+	m_iAOEDamageOnKill = kResults.GetInt("AOEDamageOnKill");
+	m_iBarbarianCombatBonus = kResults.GetInt("BarbarianCombatBonus");
+	m_iPillageReplenishMoves = kResults.GetInt("PillageReplenishMoves");
+	m_iPillageReplenishAttck = kResults.GetInt("PillageReplenishAttck");
+	m_iPillageReplenishHealth = kResults.GetInt("PillageReplenishHealth");
 #endif
 
-#if defined(MOD_ROG_CORE)
-	if (MOD_ROG_CORE) {
-		m_iMoveLfetAttackMod = kResults.GetInt("MoveLfetAttackMod");
-		m_iMoveUsedAttackMod = kResults.GetInt("MoveUsedAttackMod");
-		m_iGoldenAgeMod = kResults.GetInt("GoldenAgeMod");
-		m_iRangedSupportFireMod = kResults.GetInt("RangedSupportFireMod");
-	}
-#endif
+	m_iCaptureDefeatedEnemyChance = kResults.GetInt("CaptureDefeatedEnemyChance");
+	m_bCannotBeCaptured = kResults.GetBool("CannotBeCaptured");
 
 #if defined(MOD_ROG_CORE)
-     	m_iHPHealedIfDefeatEnemyGlobal = kResults.GetInt("HPHealedIfDestroyEnemyGlobal");
-		m_iNumOriginalCapitalAttackMod = kResults.GetInt("NumOriginalCapitalAttackMod");
-		m_iNumOriginalCapitalDefenseMod = kResults.GetInt("NumOriginalCapitalDefenseMod");
-#endif
-
-
-#if defined(MOD_ROG_CORE)
-		m_iOnCapitalLandAttackMod = kResults.GetInt("OnCapitalLandAttackMod");
-		m_iOutsideCapitalLandAttackMod = kResults.GetInt("OutsideCapitalLandAttackMod");
-		m_iOnCapitalLandDefenseMod = kResults.GetInt("OnCapitalLandDefenseMod");
-		m_iOutsideCapitalLandDefenseMod = kResults.GetInt("OutsideCapitalLandDefenseMod");
-
-
-		m_iDamageAoEFortified = kResults.GetInt("AoEWhileFortified");
-		m_iWorkRateMod = kResults.GetInt("WorkRateMod");
-		m_iAOEDamageOnKill = kResults.GetInt("AOEDamageOnKill");
-
-		m_iBarbarianCombatBonus = kResults.GetInt("BarbarianCombatBonus");
-#endif
-
-		m_iCaptureDefeatedEnemyChance = kResults.GetInt("CaptureDefeatedEnemyChance");
-		m_bCannotBeCaptured = kResults.GetBool("CannotBeCaptured");
-
-#if defined(MOD_ROG_CORE)
-			m_iNumSpyDefenseMod = kResults.GetInt("NumSpyDefenseMod");
-			m_iNumSpyAttackMod = kResults.GetInt("NumSpyAttackMod");
-
-			m_iNumWonderDefenseMod = kResults.GetInt("NumWonderDefenseMod");
-			m_iNumWonderAttackMod = kResults.GetInt("NumWonderAttackMod");
-
-			m_iNumWorkDefenseMod = kResults.GetInt("NumWorkDefenseMod");
-			m_iNumWorkAttackMod = kResults.GetInt("NumWorkAttackMod");
-
-			m_iNumSpyStayDefenseMod = kResults.GetInt("NumSpyStayDefenseMod");
-			m_iNumSpyStayAttackMod = kResults.GetInt("NumSpyStayAttackMod");
-
-			m_bNoResourcePunishment = kResults.GetBool("NoResourcePunishment");
-
-			m_iCurrentHitPointAttackMod = kResults.GetInt("CurrentHitPointAttackMod");
-			m_iCurrentHitPointDefenseMod = kResults.GetInt("CurrentHitPointDefenseMod");
-
-			m_iNearNumEnemyAttackMod = kResults.GetInt("NearNumEnemyAttackMod");
-			m_iNearNumEnemyDefenseMod = kResults.GetInt("NearNumEnemyDefenseMod");
+	m_iNumSpyDefenseMod = kResults.GetInt("NumSpyDefenseMod");
+	m_iNumSpyAttackMod = kResults.GetInt("NumSpyAttackMod");
+	m_iNumWonderDefenseMod = kResults.GetInt("NumWonderDefenseMod");
+	m_iNumWonderAttackMod = kResults.GetInt("NumWonderAttackMod");
+	m_iNumWorkDefenseMod = kResults.GetInt("NumWorkDefenseMod");
+	m_iNumWorkAttackMod = kResults.GetInt("NumWorkAttackMod");
+	m_iNumSpyStayDefenseMod = kResults.GetInt("NumSpyStayDefenseMod");
+	m_iNumSpyStayAttackMod = kResults.GetInt("NumSpyStayAttackMod");
+	m_bNoResourcePunishment = kResults.GetBool("NoResourcePunishment");
+	m_iCurrentHitPointAttackMod = kResults.GetInt("CurrentHitPointAttackMod");
+	m_iCurrentHitPointDefenseMod = kResults.GetInt("CurrentHitPointDefenseMod");
+	m_iNearNumEnemyAttackMod = kResults.GetInt("NearNumEnemyAttackMod");
+	m_iNearNumEnemyDefenseMod = kResults.GetInt("NearNumEnemyDefenseMod");
 #endif
 
 	m_bRoughTerrainEndsTurn = kResults.GetBool("RoughTerrainEndsTurn");
@@ -580,6 +558,8 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_bCaptureDefeatedEnemy = kResults.GetBool("CaptureDefeatedEnemy");
 	m_bIgnoreGreatGeneralBenefit = kResults.GetBool("IgnoreGreatGeneralBenefit");
 	m_bIgnoreZOC = kResults.GetBool("IgnoreZOC");
+	m_bCanDoFallBackDamage = kResults.GetBool("CanDoFallBackDamage");
+	m_bCanParadropAnyWhere = kResults.GetBool("CanParadropAnyWhere");
 	m_bImmueMeleeAttack = kResults.GetBool("ImmueMeleeAttack");
 	m_bHasPostCombatPromotions = kResults.GetBool("HasPostCombatPromotions");
 	m_bPostCombatPromotionsExclusive = kResults.GetBool("PostCombatPromotionsExclusive");
@@ -606,6 +586,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iAirSweepCombatModifier = kResults.GetInt("AirSweepCombatModifier");
 	m_iInterceptChanceChange = kResults.GetInt("InterceptChanceChange");
 	m_iNumInterceptionChange = kResults.GetInt("NumInterceptionChange");
+	m_iAirInterceptRangeChange = kResults.GetInt("AirInterceptRangeChange");
 	m_iEvasionChange = kResults.GetInt("EvasionChange");
 	m_iCargoChange = kResults.GetInt("CargoChange");
 	m_iEnemyHealChange = kResults.GetInt("EnemyHealChange");
@@ -665,6 +646,8 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iAdjacentMod = kResults.GetInt("AdjacentMod");
 	m_iAttackMod = kResults.GetInt("AttackMod");
 	m_iDefenseMod = kResults.GetInt("DefenseMod");
+	m_iGetGroundAttackDamage = kResults.GetInt("GetGroundAttackDamage");
+	m_iGetGroundAttackRange = kResults.GetInt("GetGroundAttackRange");
 	m_iDropRange = kResults.GetInt("DropRange");
 	m_iExtraNavalMoves = kResults.GetInt("ExtraNavalMovement");
 	m_iHPHealedIfDefeatEnemy = kResults.GetInt("HPHealedIfDestroyEnemy");
@@ -1576,6 +1559,12 @@ int CvPromotionEntry::GetNumInterceptionChange() const
 	return m_iNumInterceptionChange;
 }
 
+/// Accessor: How much additional range this promotion allows an unit to perform interception (can be negative)
+int CvPromotionEntry::GetAirInterceptRangeChange() const
+{
+	return m_iAirInterceptRangeChange;
+}
+
 /// Accessor: How well an air unit can evade interception
 int CvPromotionEntry::GetEvasionChange() const
 {
@@ -1911,6 +1900,11 @@ int CvPromotionEntry::GetAOEDamageOnKill() const
 	return m_iAOEDamageOnKill;
 }
 
+int CvPromotionEntry::GetMoraleBreakChance() const
+{
+	return m_iMoraleBreakChance;
+}
+
 int CvPromotionEntry::GetDamageAoEFortified() const
 {
 	return m_iDamageAoEFortified;
@@ -1918,6 +1912,20 @@ int CvPromotionEntry::GetDamageAoEFortified() const
 int CvPromotionEntry::GetWorkRateMod() const
 {
 	return m_iWorkRateMod;
+}
+
+
+int CvPromotionEntry::GetPillageReplenishMoves() const
+{
+	return m_iPillageReplenishMoves;
+}
+bool CvPromotionEntry::PillageReplenishAttck() const
+{
+	return m_iPillageReplenishAttck;
+}
+int CvPromotionEntry::GetPillageReplenishHealth() const
+{
+	return m_iPillageReplenishHealth;
 }
 #endif
 
@@ -2125,6 +2133,17 @@ int CvPromotionEntry::GetAttackMod() const
 int CvPromotionEntry::GetDefenseMod() const
 {
 	return m_iDefenseMod;
+}
+
+
+int CvPromotionEntry::GetGroundAttackDamage() const
+{
+	return m_iGetGroundAttackDamage;
+}
+
+int CvPromotionEntry::GetGroundAttackRange() const
+{
+	return m_iGetGroundAttackRange;
 }
 
 /// Accessor: Number of tiles away a unit may paradrop
@@ -2667,6 +2686,17 @@ bool CvPromotionEntry::IsIgnoreZOC() const
 	return m_bIgnoreZOC;
 }
 
+/// Accessor: Can this unit do Fall Back Damage when attacking?
+bool CvPromotionEntry::IsCanDoFallBackDamage() const
+{
+	return m_bCanDoFallBackDamage;
+}
+
+bool CvPromotionEntry::IsCanParadropAnyWhere() const
+{
+	return m_bCanParadropAnyWhere;
+}
+
 /// Accessor: Is this a Sapper unit (when next to a city, provides city attack bonus to nearby units)?
 bool CvPromotionEntry::IsSapper() const
 {
@@ -3065,6 +3095,8 @@ bool CvPromotionEntry::GetCivilianUnitType(int i) const
 
 	return false;
 }
+
+
 
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 /// If this a promotion that names a unit
