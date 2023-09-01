@@ -5,6 +5,7 @@
 	All other marks and trademarks are the property of their respective owners.  
 	All rights reserved. 
 	------------------------------------------------------------------------------------------------------- */
+#include "CustomMods.h"
 #include "CvGameCoreDLLPCH.h"
 #include "CvGameCoreDLLUtil.h"
 #include "ICvDLLUserInterface.h"
@@ -1625,6 +1626,22 @@ void CvPlayerEspionage::LevelUpSpy(uint uiSpyIndex)
 
 		// announce promotion through notification
 		m_aSpyList[uiSpyIndex].m_eRank = (CvSpyRank)(m_aSpyList[uiSpyIndex].m_eRank + 1);
+		
+#ifdef MOD_GLOBAL_CORRUPTION
+		if (MOD_GLOBAL_CORRUPTION)
+		{
+			const int iX = m_aSpyList[uiSpyIndex].m_iCityX;
+			const int iY = m_aSpyList[uiSpyIndex].m_iCityY;
+			CvPlot* pPlot = GC.getMap().plot(iX, iY);
+			if(pPlot)
+			{
+				CvCity* pCity = pPlot->getPlotCity();
+				if (pCity) {
+					pCity->UpdateCorruption();
+				}
+			}
+		}
+#endif
 
 		CvNotifications* pNotifications = m_pPlayer->GetNotifications();
 		if(pNotifications)
