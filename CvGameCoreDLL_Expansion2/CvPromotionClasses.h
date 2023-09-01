@@ -189,6 +189,12 @@ public:
 	int GetDamageAoEFortified() const;
 	int GetMoraleBreakChance() const;
 	int GetWorkRateMod() const;
+	int GetTurnDamage() const;
+	int GetTurnDamagePercent() const;
+	int GetNearbyEnemyDamage() const;
+	int GetAdjacentEnemySapMovement() const;
+	int GetAdjacentSapExperience() const;
+	int GetAdjacentFriendlySapMovement() const;
 #endif
 
 	bool CannotBeCaptured() const;
@@ -668,6 +674,12 @@ protected:
 	int m_iMoraleBreakChance;
 	int m_iDamageAoEFortified;
 	int m_iWorkRateMod;
+	int m_iTurnDamage;
+	int	m_iTurnDamagePercent;
+	int m_iNearbyEnemyDamage;
+	int m_iAdjacentEnemySapMovement;
+	int m_iAdjacentSapExperience;
+	int m_iAdjacentFriendlySapMovement;
 	int m_iBarbarianCombatBonus;
 #endif
 

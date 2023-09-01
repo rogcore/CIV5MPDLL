@@ -133,6 +133,12 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iMoraleBreakChance(0),
 	m_iDamageAoEFortified(0),
 	m_iWorkRateMod(0),
+	m_iTurnDamage(0),
+	m_iTurnDamagePercent(0),
+	m_iNearbyEnemyDamage(0),
+	m_iAdjacentEnemySapMovement(0),
+	m_iAdjacentSapExperience(0),
+	m_iAdjacentFriendlySapMovement(0),
 	m_iBarbarianCombatBonus(0),
 #endif
 
@@ -504,6 +510,13 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iMoraleBreakChance = kResults.GetInt("MoraleBreakChance");
 	m_iDamageAoEFortified = kResults.GetInt("AoEWhileFortified");
 	m_iWorkRateMod = kResults.GetInt("WorkRateMod");
+
+	m_iTurnDamage = kResults.GetInt("TurnDamage");
+	m_iTurnDamagePercent = kResults.GetInt("TurnDamagePercent");
+	m_iNearbyEnemyDamage = kResults.GetInt("NearbyEnemyDamage");
+	m_iAdjacentEnemySapMovement = kResults.GetInt("AdjacentEnemySapMovement");
+	m_iAdjacentSapExperience = kResults.GetInt("AdjacentSapExperience");
+	m_iAdjacentFriendlySapMovement = kResults.GetInt("AdjacentFriendlySapMovement");
 	m_iAOEDamageOnKill = kResults.GetInt("AOEDamageOnKill");
 	m_iBarbarianCombatBonus = kResults.GetInt("BarbarianCombatBonus");
 	m_iPillageReplenishMoves = kResults.GetInt("PillageReplenishMoves");
@@ -1912,6 +1925,33 @@ int CvPromotionEntry::GetDamageAoEFortified() const
 int CvPromotionEntry::GetWorkRateMod() const
 {
 	return m_iWorkRateMod;
+}
+
+
+
+int CvPromotionEntry::GetTurnDamage() const
+{
+	return m_iTurnDamage;
+}
+int CvPromotionEntry::GetTurnDamagePercent() const
+{
+	return m_iTurnDamagePercent;
+}
+int CvPromotionEntry::GetNearbyEnemyDamage() const
+{
+	return m_iNearbyEnemyDamage;
+}
+int CvPromotionEntry::GetAdjacentEnemySapMovement() const
+{
+	return m_iAdjacentEnemySapMovement;
+}
+int CvPromotionEntry::GetAdjacentSapExperience() const
+{
+	return m_iAdjacentSapExperience;
+}
+int CvPromotionEntry::GetAdjacentFriendlySapMovement() const
+{
+	return m_iAdjacentFriendlySapMovement;
 }
 
 

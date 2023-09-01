@@ -456,15 +456,15 @@ void CvPlot::doTurn()
 		iFakeRandNum= GC.getGame().getSmallFakeRandNum(1000, GetPlotIndex());
 
 		bool bOutBreakLv1 = false, bOutBreakLv2 = false, bOutBreakLv3 = false;
-		if (iFakeRandNum <= 50)
+		if (iFakeRandNum <= 30)
 		{
 			bOutBreakLv1 = true;
 		}
-		else if (iFakeRandNum <= 600 && iFakeRandNum>=580)
+		else if (iFakeRandNum <= 600 && iFakeRandNum>=590)
 		{
 			bOutBreakLv2 = true;
 		}
-		else if (iFakeRandNum >= 990)
+		else if (iFakeRandNum >= 995)
 		{
 			bOutBreakLv3 = true;
 		}
@@ -505,7 +505,7 @@ void CvPlot::doTurn()
 						}
 					}
 				}
-				SetBreakTurns(9);
+				SetBreakTurns(10);
 				CvString strBuffer = GetLocalizedText("TXT_KEY_VOLCANO_EVENT_1");
 				CvString strSummary = GetLocalizedText("TXT_KEY_VOLCAN_EVENT_TITLE");
 				if (isRevealed(GC.getGame().getActiveTeam(), false))
@@ -555,7 +555,7 @@ void CvPlot::doTurn()
 						}
 					}
 				}
-				SetBreakTurns(12);
+				SetBreakTurns(15);
 				CvString strBuffer = GetLocalizedText("TXT_KEY_VOLCANO_EVENT_2");
 				CvString strSummary = GetLocalizedText("TXT_KEY_VOLCAN_EVENT_TITLE");
 				if (isRevealed(GC.getGame().getActiveTeam(), false))
@@ -606,7 +606,7 @@ void CvPlot::doTurn()
 						}
 					}
 				}
-				SetBreakTurns(15);
+				SetBreakTurns(20);
 				CvString strBuffer = GetLocalizedText("TXT_KEY_VOLCANO_EVENT_3");
 				CvString strSummary = GetLocalizedText("TXT_KEY_VOLCAN_EVENT_TITLE");
 				if (isRevealed(GC.getGame().getActiveTeam(), false))
