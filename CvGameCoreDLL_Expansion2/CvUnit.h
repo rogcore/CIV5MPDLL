@@ -1726,6 +1726,18 @@ public:
 	int GetWorkRateMod() const;
 	void ChangeWorkRateMod(int iChange);
 
+	int GetTurnDamage() const;
+	void ChangeTurnDamage(int iChange);
+	int GetTurnDamagePercent() const;
+	void ChangeTurnDamagePercent(int iChange);
+	int GetNearbyEnemyDamage() const;
+	void ChangeNearbyEnemyDamage(int iChange);
+	int GetAdjacentEnemySapMovement() const;
+	void ChangeAdjacentEnemySapMovement(int iChange);
+	int GetAdjacentSapExperience() const;
+	void ChangeAdjacentSapExperience(int iChange);
+	int GetAdjacentFriendlySapMovement() const;
+	void ChangeAdjacentFriendlySapMovement(int iChange);
 	int GetPillageReplenishMoves() const;
 	void ChangePillageReplenishMoves(int iChange);
 	bool IsPillageReplenishAttck() const;
@@ -2351,6 +2363,12 @@ protected:
 	int m_iCanMoraleBreak;
 	int m_iDamageAoEFortified;
 	int m_iWorkRateMod;
+	int m_iTurnDamage;
+	int m_iTurnDamagePercent;
+	int m_iNearbyEnemyDamage;
+	int m_iAdjacentEnemySapMovement;
+	int m_iAdjacentSapExperience;
+	int m_iAdjacentFriendlySapMovement;
 	int m_iPillageReplenishMoves;
 	int m_iPillageReplenishAttck;
 	int m_iPillageReplenishHealth;

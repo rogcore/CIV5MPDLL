@@ -446,6 +446,12 @@ CvUnit::CvUnit() :
 		, m_iDamageAoEFortified(0)
 		, m_iCanMoraleBreak(0)
 		, m_iWorkRateMod(0)
+		, m_iTurnDamage(0)
+		, m_iTurnDamagePercent(0)
+		, m_iNearbyEnemyDamage(0)
+		, m_iAdjacentEnemySapMovement(0)
+		, m_iAdjacentSapExperience(0)
+		, m_iAdjacentFriendlySapMovement(0)
 		, m_iPillageReplenishMoves(0)
 		, m_iPillageReplenishHealth(0)
 		, m_iAOEDamageOnKill(0)
@@ -1288,6 +1294,12 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iDamageAoEFortified = 0;
 	m_iCanMoraleBreak = 0;
 	m_iWorkRateMod = 0;
+	m_iTurnDamage = 0;
+	m_iTurnDamagePercent = 0;
+	m_iNearbyEnemyDamage = 0;
+	m_iAdjacentEnemySapMovement = 0;
+	m_iAdjacentSapExperience = 0;
+	m_iAdjacentFriendlySapMovement = 0;
 	m_iPillageReplenishMoves = 0;
 	m_iPillageReplenishHealth = 0;
 	m_iAOEDamageOnKill = 0;
@@ -2641,10 +2653,119 @@ void CvUnit::doTurn()
 	testPromotionReady();
 
 #if defined(MOD_ROG_CORE)
-		// Only increase our Fortification level if we've actually been told to Fortify
+	int turndamage = GetTurnDamage()+ (GetMaxHitPoints() * GetTurnDamagePercent());
+	if (0 != turndamage)
+	{
+#if defined(MOD_API_UNIT_STATS)
+		changeDamage(turndamage);
+#else
+		changeDamage(turndamage, NO_PLAYER);
+#endif
+	}
+
+	    int damage = 0;
+		if (GetNearbyEnemyDamage() > 0)
+		{
+		damage = damage + GetNearbyEnemyDamage();
+		}
 		if (IsFortifiedThisTurn() && GetDamageAoEFortified() > 0)
 		{
-			DoAdjacentPlotDamage(plot(), GetDamageAoEFortified());
+		damage = damage + GetDamageAoEFortified();
+		}
+		if (damage>0)
+		{
+		  DoAdjacentPlotDamage(plot(), damage);
+		}
+
+
+		int iDX = 0, iDY = 0;
+		int iBlastRadius = 2;
+		int iTotalxp = 0;
+		int iTotalMove = 0;
+		for (iDX = -(iBlastRadius); iDX <= iBlastRadius; iDX++)
+		{
+			for (iDY = -(iBlastRadius); iDY <= iBlastRadius; iDY++)
+			{
+				CvPlot* pLoopPlot = plotXYWithRangeCheck(getX(),getY(), iDX, iDY,1);
+
+				if (pLoopPlot != NULL)
+				{
+					for (int iUnitLoop = 0; iUnitLoop < pLoopPlot->getNumUnits(); iUnitLoop++)
+					{
+						CvUnit* loopUnit = pLoopPlot->getUnitByIndex(iUnitLoop);
+						if (loopUnit == NULL)
+							continue;
+						if (!loopUnit->IsCombatUnit())
+							continue;
+						if (loopUnit->getDomainType() != getDomainType())
+							continue;
+						if (loopUnit->getOwner() != getOwner())
+							continue;
+						if (loopUnit== this)
+							continue;
+
+						int ixp = loopUnit->GetAdjacentSapExperience();
+						int iMoveExtra = loopUnit->GetAdjacentFriendlySapMovement();
+
+						if (ixp > 0)
+						{
+						 iTotalxp += ixp;
+						}
+						if (iMoveExtra > 0)
+						{
+						iTotalMove += iMoveExtra;
+						}
+
+					}
+				}
+			}
+		}
+
+		if (iTotalxp > 0)
+		{
+#if defined(MOD_UNITS_XP_TIMES_100)
+			changeExperienceTimes100(iTotalxp * 100);
+#else
+			changeExperience(iTotalxp);
+#endif
+		}
+		if (iTotalMove > 0)
+		{
+			changeMoves(iTotalMove);
+		}
+
+
+		int iTotalMovePenalty = 0;
+		for (int iI = 0; iI < NUM_DIRECTION_TYPES; ++iI)
+		{
+			CvPlot* pAdjacentPlot = plotDirection(getX(), getY(), ((DirectionTypes)iI));
+
+			if (pAdjacentPlot != NULL)
+			{
+				for (int iUnitLoop = 0; iUnitLoop < pAdjacentPlot->getNumUnits(); iUnitLoop++)
+				{
+					CvUnit* loopUnit = pAdjacentPlot->getUnitByIndex(iUnitLoop);
+					if (loopUnit == NULL)
+						continue;
+					if (!loopUnit->IsCombatUnit())
+						continue;
+					if (loopUnit->getDomainType() != getDomainType())
+						continue;
+					if (!loopUnit->isEnemy(getTeam(), plot()))
+						continue;
+
+					int iMovePenalty = loopUnit->GetAdjacentEnemySapMovement();
+					if (iMovePenalty <= 0)
+						continue;
+
+					iTotalMovePenalty += iMovePenalty;
+				}
+			}
+		}
+		if (iTotalMovePenalty > 0)
+		{
+			iTotalMovePenalty = min(getMoves() - 1, iTotalMovePenalty);
+			changeMoves(-iTotalMovePenalty);
 		}
 #endif
 
@@ -6267,6 +6388,76 @@ int CvUnit::GetWorkRateMod() const
 void CvUnit::ChangeWorkRateMod(int iChange)
 {
 	m_iWorkRateMod += iChange;
+}
+
+//	--------------------------------------------------------------------------------
+int CvUnit::GetTurnDamage() const
+{
+	return m_iTurnDamage;
+}
+
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeTurnDamage(int iChange)
+{
+	m_iTurnDamage += iChange;
+}
+
+//	--------------------------------------------------------------------------------
+int CvUnit::GetTurnDamagePercent() const
+{
+	return m_iTurnDamagePercent;
+}
+
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeTurnDamagePercent(int iChange)
+{
+	m_iTurnDamagePercent += iChange;
+}
+//	--------------------------------------------------------------------------------
+int CvUnit::GetNearbyEnemyDamage() const
+{
+	return m_iNearbyEnemyDamage;
+}
+
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeNearbyEnemyDamage(int iChange)
+{
+	m_iNearbyEnemyDamage += iChange;
+}
+//	--------------------------------------------------------------------------------
+int CvUnit::GetAdjacentEnemySapMovement() const
+{
+	return m_iAdjacentEnemySapMovement;
+}
+
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeAdjacentEnemySapMovement(int iChange)
+{
+	m_iAdjacentEnemySapMovement += iChange;
+}
+
+//	--------------------------------------------------------------------------------
+int CvUnit::GetAdjacentSapExperience() const
+{
+	return m_iAdjacentSapExperience;
+}
+
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeAdjacentSapExperience(int iChange)
+{
+	m_iAdjacentSapExperience += iChange;
+}
+
+//	--------------------------------------------------------------------------------
+int CvUnit::GetAdjacentFriendlySapMovement() const
+{
+	return m_iAdjacentFriendlySapMovement;
+}
+
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeAdjacentFriendlySapMovement(int iChange)
+{
+	m_iAdjacentFriendlySapMovement += iChange;
 }
 
 
@@ -24818,7 +25009,12 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeDamageAoEFortified((thisPromotion.GetDamageAoEFortified())* iChange);
 		ChangeMoraleBreakChance((thisPromotion.GetMoraleBreakChance()) * iChange);
 		ChangeWorkRateMod((thisPromotion.GetWorkRateMod())* iChange);
-
+		ChangeTurnDamage((thisPromotion.GetTurnDamage()) * iChange);
+		ChangeTurnDamagePercent((thisPromotion.GetTurnDamagePercent()) * iChange);
+		ChangeNearbyEnemyDamage((thisPromotion.GetNearbyEnemyDamage()) * iChange);
+		ChangeAdjacentEnemySapMovement((thisPromotion.GetAdjacentEnemySapMovement()) * iChange);
+		ChangeAdjacentSapExperience((thisPromotion.GetAdjacentSapExperience()) * iChange);
+		ChangeAdjacentFriendlySapMovement((thisPromotion.GetAdjacentFriendlySapMovement()) * iChange);
 		ChangeBarbarianCombatBonus((thisPromotion.GetBarbarianCombatBonus())* iChange);
 		changeAOEDamageOnKill(thisPromotion.GetAOEDamageOnKill()* iChange);
 #endif
@@ -25530,6 +25726,12 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iDamageAoEFortified;
 	kStream >> m_iCanMoraleBreak;
 	kStream >> m_iWorkRateMod;
+	kStream >> m_iTurnDamage;
+	kStream >> m_iTurnDamagePercent;
+	kStream >> m_iNearbyEnemyDamage;
+	kStream >> m_iAdjacentEnemySapMovement;
+	kStream >> m_iAdjacentSapExperience;
+	kStream >> m_iAdjacentFriendlySapMovement;
 	kStream >> m_iPillageReplenishMoves;
 	kStream >> m_iPillageReplenishHealth;
 	kStream >> m_iAOEDamageOnKill;
@@ -25883,6 +26085,12 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iDamageAoEFortified;
 	kStream << m_iCanMoraleBreak;
 	kStream << m_iWorkRateMod;
+	kStream << m_iTurnDamage;
+	kStream << m_iTurnDamagePercent;
+	kStream << m_iNearbyEnemyDamage;
+	kStream << m_iAdjacentEnemySapMovement;
+	kStream << m_iAdjacentSapExperience;
+	kStream << m_iAdjacentFriendlySapMovement;
 	kStream << m_iPillageReplenishMoves;
 	kStream << m_iPillageReplenishHealth;
 	kStream << m_iAOEDamageOnKill;
@@ -29354,6 +29562,21 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 		}
 		iValue += iTemp + iFlavorRanged * 2;
 	}
+
+
+	iTemp = pkPromotionInfo->GetAdjacentEnemySapMovement();
+	// nM: +120 Minelayer.                                       
+	if (iTemp != 0)
+	{
+		iExtra = iTemp * (iFlavorOffense + iFlavorDefense + iFlavorCityDefense);
+		iExtra *= 0.1;
+		if (IsCanAttackRanged())
+		{
+			iExtra /= max(1, GetRange());
+		}
+		iValue += iExtra;
+	}
+
 
 	iTemp = pkPromotionInfo->GetVisibilityChange();
 	if((AI_getUnitAIType() == UNITAI_EXPLORE_SEA) ||

@@ -38,7 +38,7 @@
 			<ID>10</ID>
 			<Type>YIELD_HEALTH</Type>
 			<Description>TXT_KEY_YIELD_HEALTH</Description>
-			<IconString>[ICON_CULTURE]</IconString>
+			<IconString>[ICON_HEALTH]</IconString>
 			<ImageTexture>YieldAtlas_128_Health.dds</ImageTexture>
 			<MinCity>0</MinCity>
 			<AIWeightPercent>80</AIWeightPercent>
@@ -47,7 +47,7 @@
 			<ID>11</ID>
 			<Type>YIELD_DISEASE</Type>
 			<Description>TXT_KEY_YIELD_DISEASE</Description>
-			<IconString>[ICON_CULTURE]</IconString>
+			<IconString>[ICON_DISEASE]</IconString>
 			<MinCity>0</MinCity>
 			<ImageTexture>YieldAtlas_128_Disease.dds</ImageTexture>
 			<AIWeightPercent>80</AIWeightPercent>
@@ -56,7 +56,7 @@
 			<ID>12</ID>
 			<Type>YIELD_CRIME</Type>
 			<Description>TXT_KEY_YIELD_CRIME</Description>
-			<IconString>[ICON_CULTURE]</IconString>
+			<IconString>[ICON_CRIME]</IconString>
 			<MinCity>0</MinCity>
 			<AIWeightPercent>80</AIWeightPercent>
 		</Row>
@@ -72,7 +72,7 @@
 			<ID>14</ID>
 			<Type>YIELD_SOVEREIGNTY</Type>
 			<Description>TXT_KEY_YIELD_SOVEREIGNTY</Description>
-			<IconString>[ICON_CULTURE]</IconString>
+			<IconString>[ICON_SOVEREIGNTY]</IconString>
 			<MinCity>0</MinCity>
 			<AIWeightPercent>80</AIWeightPercent>
 		</Row>
