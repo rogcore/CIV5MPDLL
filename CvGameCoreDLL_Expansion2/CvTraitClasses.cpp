@@ -2351,11 +2351,6 @@ void CvPlayerTraits::InitPlayerTraits()
 				//m_pPlayer->ChangeWoundedUnitDamageMod(iWoundedUnitDamageMod);
 			}
 
-			if (trait->IsBuyOwnedTiles())
-			{
-				m_bBuyOwnedTiles = true;
-			}
-
 			if(trait->IsMoveFriendlyWoodsAsRoad())
 			{
 				m_bMoveFriendlyWoodsAsRoad = true;
@@ -2393,15 +2388,9 @@ void CvPlayerTraits::InitPlayerTraits()
 				m_bFaithFromUnimprovedForest = true;
 			}
 
-			if (trait->IsGoldenAgeOnWar())
-			{
-				m_bGoldenAgeOnWar = true;
-			}
-
-			if (trait->IsNoResistance())
-			{
-				m_bNoResistance = true;
-			}
+			m_bBuyOwnedTiles = trait->IsBuyOwnedTiles();
+			m_bGoldenAgeOnWar = trait->IsGoldenAgeOnWar();
+			m_bNoResistance = trait->IsNoResistance();
 
 #if defined(MOD_TRAITS_ANY_BELIEF)
 			if(trait->IsAnyBelief())

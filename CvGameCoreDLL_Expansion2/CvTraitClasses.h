@@ -1300,44 +1300,44 @@ private:
 	int m_iTradeRouteSeaGoldBonus;
 #endif
 	// Saved
-	bool m_bTrainedAll;
-	bool m_bFightWellDamaged;
-	bool m_bBuyOwnedTiles;
-	bool m_bMoveFriendlyWoodsAsRoad;
-	bool m_bFasterAlongRiver;
-	bool m_bFasterInHills;
-	bool m_bEmbarkedAllWater;
-	bool m_bEmbarkedToLandFlatCost;
-	bool m_bNoHillsImprovementMaintenance;
-	bool m_bTechBoostFromCapitalScienceBuildings;
-	bool m_bStaysAliveZeroCities;
-	bool m_bFaithFromUnimprovedForest;
+	bool m_bTrainedAll = false;
+	bool m_bFightWellDamaged = false;
+	bool m_bBuyOwnedTiles = false;
+	bool m_bMoveFriendlyWoodsAsRoad = false;
+	bool m_bFasterAlongRiver = false;
+	bool m_bFasterInHills = false;
+	bool m_bEmbarkedAllWater = false;
+	bool m_bEmbarkedToLandFlatCost = false;
+	bool m_bNoHillsImprovementMaintenance = false;
+	bool m_bTechBoostFromCapitalScienceBuildings = false;
+	bool m_bStaysAliveZeroCities = false;
+	bool m_bFaithFromUnimprovedForest = false;
 #if defined(MOD_TRAITS_ANY_BELIEF)
 	bool m_bAnyBelief;
 #endif
-	bool m_bGoldenAgeOnWar;
-	bool m_bNoResistance;
-	bool m_bBonusReligiousBelief;
-	bool m_bAbleToAnnexCityStates;
-	bool m_bCrossesMountainsAfterGreatGeneral;
+	bool m_bGoldenAgeOnWar = false;
+	bool m_bNoResistance = false;
+	bool m_bBonusReligiousBelief = false;
+	bool m_bAbleToAnnexCityStates = false;
+	bool m_bCrossesMountainsAfterGreatGeneral = false;
 #if defined(MOD_TRAITS_CROSSES_ICE)
-	bool m_bCrossesIce;
+	bool m_bCrossesIce = false;
 #endif
 #if defined(MOD_TRAITS_GG_FROM_BARBARIANS)
-	bool m_bGGFromBarbarians;
+	bool m_bGGFromBarbarians = false;
 #endif
-	bool m_bMayaCalendarBonuses;
-	bool m_bNoAnnexing;
-	bool m_bTechFromCityConquer;
-	bool m_bUniqueLuxuryRequiresNewArea;
-	bool m_bRiverTradeRoad;
-	bool m_bAngerFreeIntrusionOfCityStates;
+	bool m_bMayaCalendarBonuses = false;
+	bool m_bNoAnnexing = false;
+	bool m_bTechFromCityConquer = false;
+	bool m_bUniqueLuxuryRequiresNewArea = false;
+	bool m_bRiverTradeRoad = false;
+	bool m_bAngerFreeIntrusionOfCityStates = false;
 
 #ifdef MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY
-	bool m_bCanFoundMountainCity;
+	bool m_bCanFoundMountainCity = false;
 #endif
 #ifdef MOD_TRAITS_CAN_FOUND_COAST_CITY
-	bool m_bCanFoundCoastCity;
+	bool m_bCanFoundCoastCity = false;
 #endif
 
 	UnitTypes m_eCampGuardType;
