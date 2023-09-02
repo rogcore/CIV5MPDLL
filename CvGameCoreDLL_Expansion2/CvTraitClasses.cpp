@@ -1385,6 +1385,11 @@ int CvTraitEntry::GetFreePolicyWhenFirstConquerMajorCapital() const
 	return m_iFreePolicyWhenFirstConquerMajorCapital;
 }
 
+int CvTraitEntry::GetInstantTourismBombWhenFirstConquerMajorCapital() const
+{
+	return m_iInstantTourismBombWhenFirstConquerMajorCapital;
+}
+
 /// Load XML data
 bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
@@ -2137,6 +2142,7 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 #endif
 
 	m_iFreePolicyWhenFirstConquerMajorCapital = kResults.GetInt("FreePolicyWhenFirstConquerMajorCapital");
+	m_iInstantTourismBombWhenFirstConquerMajorCapital = kResults.GetInt("InstantTourismBombWhenFirstConquerMajorCapital");
 
 	return true;
 }
@@ -2488,6 +2494,7 @@ void CvPlayerTraits::InitPlayerTraits()
 #endif
 
 			m_iFreePolicyWhenFirstConquerMajorCapital = trait->GetFreePolicyWhenFirstConquerMajorCapital();
+			m_iInstantTourismBombWhenFirstConquerMajorCapital = trait->GetInstantTourismBombWhenFirstConquerMajorCapital();
 
 			for(int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
 			{
@@ -4522,6 +4529,9 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	kStream >> m_bCorruptionLevelReduceByOne;
 	kStream >> m_iMaxCorruptionLevel;
 #endif
+
+	kStream >> m_iFreePolicyWhenFirstConquerMajorCapital;
+	kStream >> m_iInstantTourismBombWhenFirstConquerMajorCapital;
 }
 
 /// Serialization write
@@ -4772,6 +4782,9 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_bCorruptionLevelReduceByOne;
 	kStream << m_iMaxCorruptionLevel;
 #endif
+
+	kStream << m_iFreePolicyWhenFirstConquerMajorCapital;
+	kStream << m_iInstantTourismBombWhenFirstConquerMajorCapital;
 }
 
 // PRIVATE METHODS
@@ -4983,4 +4996,9 @@ int CvPlayerTraits::GetMaxCorruptionLevel() const
 int CvPlayerTraits::GetFreePolicyWhenFirstConquerMajorCapital() const
 {
 	return m_iFreePolicyWhenFirstConquerMajorCapital;
+}
+
+int CvPlayerTraits::GetInstantTourismBombWhenFirstConquerMajorCapital() const
+{
+	return m_iInstantTourismBombWhenFirstConquerMajorCapital;
 }

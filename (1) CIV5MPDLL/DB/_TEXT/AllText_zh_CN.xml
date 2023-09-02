@@ -511,6 +511,10 @@
 		<Row Tag="TXT_KEY_VOLCANO_EVENT_3">
 			<Text>一处火山发生了超大规模喷发。</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_NOTIFICATION_INSTANT_TOURISM_WHEN_CONQUER">
+      <Text>你征服了{1_city}，对所有已见面文明传播了+{2_num}[ICON_TOURISM]魅力影响。</Text>
+		</Row>
 	</Language_zh_CN>
 
 </GameData>

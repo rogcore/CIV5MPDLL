@@ -2371,6 +2371,24 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 			}
 		}
 	}
+
+	if (bConquest)
+	{
+		if (GetPlayerTraits()->GetInstantTourismBombWhenFirstConquerMajorCapital() > 0 && pOldCity->IsOriginalMajorCapital())
+		{
+			if (!pOldCity->isEverOwned(GetID()))
+			{
+				const int iValue = GetCulture()->GetTourismBlastStrength(GetPlayerTraits()->GetInstantTourismBombWhenFirstConquerMajorCapital());
+				if (iValue > 0)
+				{
+					GetCulture()->AddTourismAllKnownCivs(iValue);
+					CvString strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_INSTANT_TOURISM_WHEN_CONQUER", pOldCity->getNameKey(), iValue);
+					ICvUserInterface2* pkDLLInterface = GC.GetEngineUserInterface();
+					pkDLLInterface->AddMessage(0, GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer /*, "AS2D_COMBAT", MESSAGE_TYPE_INFO, pkDefender->getUnitInfo().GetButton(), (ColorTypes)GC.getInfoTypeForString("COLOR_GREEN"), pkTargetPlot->getX(), pkTargetPlot->getY()*/);
+				}
+			}
+		}
+	}
 	
 	if (bConquest)
 	{

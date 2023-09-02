@@ -287,6 +287,7 @@ public:
 #endif
 
 	int GetFreePolicyWhenFirstConquerMajorCapital() const;
+	int GetInstantTourismBombWhenFirstConquerMajorCapital() const;
 
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
@@ -513,6 +514,7 @@ protected:
 #endif
 
 	int m_iFreePolicyWhenFirstConquerMajorCapital = 0;
+	int m_iInstantTourismBombWhenFirstConquerMajorCapital = 0;
 
 private:
 	CvTraitEntry(const CvTraitEntry&);
@@ -1189,6 +1191,7 @@ public:
 #endif
 
 	int GetFreePolicyWhenFirstConquerMajorCapital() const;
+	int GetInstantTourismBombWhenFirstConquerMajorCapital() const;
 
 	// Serialization
 	void Read(FDataStream& kStream);
@@ -1429,6 +1432,7 @@ private:
 #endif
 
 	int m_iFreePolicyWhenFirstConquerMajorCapital = 0;
+	int m_iInstantTourismBombWhenFirstConquerMajorCapital = 0;
 };
 
 #endif //CIV5_TRAIT_CLASSES_H
