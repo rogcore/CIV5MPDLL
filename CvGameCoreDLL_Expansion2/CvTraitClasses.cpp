@@ -1379,6 +1379,12 @@ int CvTraitEntry::GetMaxCorruptionLevel() const
 }
 #endif
 
+
+int CvTraitEntry::GetFreePolicyWhenFirstConquerMajorCapital() const
+{
+	return m_iFreePolicyWhenFirstConquerMajorCapital;
+}
+
 /// Load XML data
 bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
@@ -2130,6 +2136,8 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	m_iMaxCorruptionLevel = kResults.GetInt("MaxCorruptionLevel");
 #endif
 
+	m_iFreePolicyWhenFirstConquerMajorCapital = kResults.GetInt("FreePolicyWhenFirstConquerMajorCapital");
+
 	return true;
 }
 
@@ -2478,6 +2486,8 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_bCorruptionLevelReduceByOne = trait->GetCorruptionLevelReduceByOne();
 			m_iMaxCorruptionLevel = trait->GetMaxCorruptionLevel();
 #endif
+
+			m_iFreePolicyWhenFirstConquerMajorCapital = trait->GetFreePolicyWhenFirstConquerMajorCapital();
 
 			for(int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
 			{
@@ -4969,3 +4979,8 @@ int CvPlayerTraits::GetMaxCorruptionLevel() const
 	return m_iMaxCorruptionLevel;
 }
 #endif
+
+int CvPlayerTraits::GetFreePolicyWhenFirstConquerMajorCapital() const
+{
+	return m_iFreePolicyWhenFirstConquerMajorCapital;
+}

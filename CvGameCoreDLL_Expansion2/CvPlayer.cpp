@@ -2361,6 +2361,16 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 		}
 	}
 
+	if (bConquest)
+	{
+		if (GetPlayerTraits()->GetFreePolicyWhenFirstConquerMajorCapital() > 0 && pOldCity->IsOriginalMajorCapital())
+		{
+			if (!pOldCity->isEverOwned(GetID()))
+			{
+				ChangeNumFreePolicies(GetPlayerTraits()->GetFreePolicyWhenFirstConquerMajorCapital());
+			}
+		}
+	}
 	
 	if (bConquest)
 	{

@@ -286,6 +286,8 @@ public:
 	int GetMaxCorruptionLevel() const;
 #endif
 
+	int GetFreePolicyWhenFirstConquerMajorCapital() const;
+
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
 protected:
@@ -509,6 +511,8 @@ protected:
 	bool m_bCorruptionLevelReduceByOne = 0;
 	int m_iMaxCorruptionLevel = -1;
 #endif
+
+	int m_iFreePolicyWhenFirstConquerMajorCapital = 0;
 
 private:
 	CvTraitEntry(const CvTraitEntry&);
@@ -1184,6 +1188,8 @@ public:
 	int GetMaxCorruptionLevel() const;
 #endif
 
+	int GetFreePolicyWhenFirstConquerMajorCapital() const;
+
 	// Serialization
 	void Read(FDataStream& kStream);
 	void Write(FDataStream& kStream);
@@ -1421,6 +1427,8 @@ private:
 	bool m_bCorruptionLevelReduceByOne = 0;
 	int m_iMaxCorruptionLevel = -1;
 #endif
+
+	int m_iFreePolicyWhenFirstConquerMajorCapital = 0;
 };
 
 #endif //CIV5_TRAIT_CLASSES_H
