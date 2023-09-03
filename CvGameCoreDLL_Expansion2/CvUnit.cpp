@@ -416,6 +416,7 @@ CvUnit::CvUnit() :
 #if defined(MOD_UNITS_MAX_HP)
 	, m_iMaxHitPointsBase(GC.getMAX_HIT_POINTS())
 	, m_iMaxHitPointsChange(0)
+	, m_iMaxHitPointsChangeFromRazedCityPop(0)
 	, m_iMaxHitPointsModifier(0)
 #endif
 	, m_iFriendlyLandsModifier("CvUnit::m_iFriendlyLandsModifier", m_syncArchive)
@@ -1461,6 +1462,7 @@ if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 #if defined(MOD_UNITS_MAX_HP)
 	m_iMaxHitPointsBase = (NO_UNIT != m_eUnitType) ? m_pUnitInfo->GetMaxHitPoints() : GC.getMAX_HIT_POINTS();
 	m_iMaxHitPointsChange = 0;
+	m_iMaxHitPointsChangeFromRazedCityPop = 0;
 	m_iMaxHitPointsModifier = 0;
 #endif
 	m_eLeaderUnitType = NO_UNIT;
@@ -22964,13 +22966,27 @@ void CvUnit::changeMaxHitPointsBase(int iChange)
 //	--------------------------------------------------------------------------------
 int CvUnit::getMaxHitPointsChange() const
 {
-	return m_iMaxHitPointsChange;
+	return m_iMaxHitPointsChange + getMaxHitPointsChangeFromRazedCityPop();
 }
 
 //	--------------------------------------------------------------------------------
 void CvUnit::changeMaxHitPointsChange(int iChange)
 {
 	m_iMaxHitPointsChange += iChange;
+
+	setInfoBarDirty(true);
+}
+
+//	--------------------------------------------------------------------------------
+int CvUnit::getMaxHitPointsChangeFromRazedCityPop() const
+{
+	return m_iMaxHitPointsChangeFromRazedCityPop;
+}
+
+//	--------------------------------------------------------------------------------
+void CvUnit::setMaxHitPointsChangeFromRazedCityPop(int iValue)
+{
+	m_iMaxHitPointsChangeFromRazedCityPop = iValue;
 
 	setInfoBarDirty(true);
 }
@@ -25749,6 +25765,7 @@ void CvUnit::read(FDataStream& kStream)
 #if defined(MOD_UNITS_MAX_HP)
 	MOD_SERIALIZE_READ(78, kStream, m_iMaxHitPointsBase, m_pUnitInfo->GetMaxHitPoints());
 	MOD_SERIALIZE_READ(77, kStream, m_iMaxHitPointsChange, 0);
+	MOD_SERIALIZE_READ(77, kStream, m_iMaxHitPointsChangeFromRazedCityPop, 0);
 	MOD_SERIALIZE_READ(77, kStream, m_iMaxHitPointsModifier, 0)
 #endif
 
@@ -26109,6 +26126,7 @@ void CvUnit::write(FDataStream& kStream) const
 #if defined(MOD_UNITS_MAX_HP)
 	MOD_SERIALIZE_WRITE(kStream, m_iMaxHitPointsBase);
 	MOD_SERIALIZE_WRITE(kStream, m_iMaxHitPointsChange);
+	MOD_SERIALIZE_WRITE(kStream, m_iMaxHitPointsChangeFromRazedCityPop);
 	MOD_SERIALIZE_WRITE(kStream, m_iMaxHitPointsModifier);
 #endif
 	kStream << m_iSapperCount;

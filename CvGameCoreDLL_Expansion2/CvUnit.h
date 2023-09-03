@@ -1289,6 +1289,9 @@ public:
 	
 	int getMaxHitPointsChange() const;
 	void changeMaxHitPointsChange(int iChange);
+	int getMaxHitPointsChangeFromRazedCityPop() const;
+	void changeMaxHitPointsChangeFromRazedCityPop(int iValue);
+	void setMaxHitPointsChangeFromRazedCityPop(int iChange);
 	int getMaxHitPointsModifier() const;
 	void changeMaxHitPointsModifier(int iChange);
 #endif
@@ -2249,6 +2252,7 @@ protected:
 #if defined(MOD_UNITS_MAX_HP)
 	int m_iMaxHitPointsBase;
 	int m_iMaxHitPointsChange;
+	int m_iMaxHitPointsChangeFromRazedCityPop = 0;
 	int m_iMaxHitPointsModifier;
 #endif
 	FAutoVariable<int, CvUnit> m_iFriendlyLandsModifier;
@@ -2480,7 +2484,6 @@ protected:
 	bool CanFallBack(const CvUnit& pAttacker, bool bCheckChances) const;
 	int  GetWithdrawChance(const CvUnit& pAttacker, const bool bCheckChances) const;
 	bool DoFallBack(const CvUnit& pAttacker);
-
 
 private:
 

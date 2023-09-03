@@ -289,6 +289,9 @@ public:
 	int GetFreePolicyWhenFirstConquerMajorCapital() const;
 	int GetInstantTourismBombWhenFirstConquerMajorCapital() const;
 
+	int GetUnitMaxHitPointChangePerRazedCityPop() const;
+	int GetUnitMaxHitPointChangePerRazedCityPopLimit() const;
+
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
 protected:
@@ -515,6 +518,9 @@ protected:
 
 	int m_iFreePolicyWhenFirstConquerMajorCapital = 0;
 	int m_iInstantTourismBombWhenFirstConquerMajorCapital = 0;
+
+	int m_iUnitMaxHitPointChangePerRazedCityPop = 0;
+	int m_iUnitMaxHitPointChangePerRazedCityPopLimit = 0;
 
 private:
 	CvTraitEntry(const CvTraitEntry&);
@@ -1193,6 +1199,9 @@ public:
 	int GetFreePolicyWhenFirstConquerMajorCapital() const;
 	int GetInstantTourismBombWhenFirstConquerMajorCapital() const;
 
+	int GetUnitMaxHitPointChangePerRazedCityPop() const;
+	int GetUnitMaxHitPointChangePerRazedCityPopLimit() const;
+
 	// Serialization
 	void Read(FDataStream& kStream);
 	void Write(FDataStream& kStream);
@@ -1433,6 +1442,9 @@ private:
 
 	int m_iFreePolicyWhenFirstConquerMajorCapital = 0;
 	int m_iInstantTourismBombWhenFirstConquerMajorCapital = 0;
+
+	int m_iUnitMaxHitPointChangePerRazedCityPop = 0;
+	int m_iUnitMaxHitPointChangePerRazedCityPopLimit = 0;
 };
 
 #endif //CIV5_TRAIT_CLASSES_H

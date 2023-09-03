@@ -26,3 +26,6 @@ alter table Traits add column `TradeRouteSeaGoldBonus` int not null default 0;
 
 alter table Traits add column `FreePolicyWhenFirstConquerMajorCapital` int not null default 0;
 alter table Traits add column `InstantTourismBombWhenFirstConquerMajorCapital` int not null default 0; -- apply tourism (x turn) pressure to all civs
+
+alter table Traits add column `UnitMaxHitPointChangePerRazedCityPop` int not null default 0;
+alter table Traits add column `UnitMaxHitPointChangePerRazedCityPopLimit` int not null default 0;
