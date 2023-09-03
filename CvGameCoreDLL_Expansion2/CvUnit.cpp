@@ -1945,6 +1945,8 @@ void CvUnit::convert(CvUnit* pUnit, bool bIsUpgrade)
 	setLeaderUnitType(pUnit->getLeaderUnitType());
 	ChangeNumGoodyHutsPopped(pUnit->GetNumGoodyHutsPopped());
 
+	setMaxHitPointsChangeFromRazedCityPop(pUnit->getMaxHitPointsChangeFromRazedCityPop());
+
 	pTransportUnit = pUnit->getTransportUnit();
 
 	if(pTransportUnit != NULL)
