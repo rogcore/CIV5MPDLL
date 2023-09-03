@@ -1327,6 +1327,7 @@ void CvUnitCombat::ResolveRangedCityVsUnitCombat(const CvCombatInfo& kCombatInfo
 
 						// Earn bonuses for kills?
 						CvPlayer& kAttackingPlayer = GET_PLAYER(pkAttacker->getOwner());
+						kAttackingPlayer.DoCombatStrengthChangeFromKill(NULL, pkDefender, pkDefender->getX(), pkDefender->getY(), 0);
 #if defined(MOD_API_UNIFIED_YIELDS)
 						kAttackingPlayer.DoYieldsFromKill(NULL, pkDefender, pkDefender->getX(), pkDefender->getY(), 0);
 #else
@@ -4334,6 +4335,8 @@ void CvUnitCombat::ApplyPostCombatTraitEffects(CvUnit* pkWinner, CvUnit* pkLoser
 			}
 		}
 	}
+
+	kPlayer.DoCombatStrengthChangeFromKill(pkWinner, pkLoser, pkLoser->getX(), pkLoser->getY(), iExistingDelay);
 
 	// Earn bonuses for kills?
 #if defined(MOD_API_UNIFIED_YIELDS)

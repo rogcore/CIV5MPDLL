@@ -1947,6 +1947,9 @@ void CvUnit::convert(CvUnit* pUnit, bool bIsUpgrade)
 
 	setMaxHitPointsChangeFromRazedCityPop(pUnit->getMaxHitPointsChangeFromRazedCityPop());
 
+	SetCombatStrengthChangeFromKilledUnits(pUnit->GetCombatStrengthChangeFromKilledUnits());
+	SetRangedCombatStrengthChangeFromKilledUnits(pUnit->GetRangedCombatStrengthChangeFromKilledUnits());
+
 	pTransportUnit = pUnit->getTransportUnit();
 
 	if(pTransportUnit != NULL)
@@ -13850,7 +13853,7 @@ int CvUnit::GetBaseCombatStrength(bool bIgnoreEmbarked) const
 		return GetEmbarkedUnitDefense() / 100;
 	}
 
-	return m_iBaseCombat;
+	return m_iBaseCombat + m_iCombatStrengthChangeFromKilledUnits;
 }
 
 
@@ -13902,6 +13905,37 @@ int CvUnit::GetBaseCombatStrengthConsideringDamage() const
 #endif
 
 	return iStrength;
+}
+
+
+int CvUnit::GetCombatStrengthChangeFromKilledUnits() const
+{
+	return m_iCombatStrengthChangeFromKilledUnits;
+}
+
+void CvUnit::ChangeCombatStrengthChangeFromKilledUnits(int iChange)
+{
+	m_iCombatStrengthChangeFromKilledUnits += iChange;
+}
+
+void CvUnit::SetCombatStrengthChangeFromKilledUnits(int iValue)
+{
+	m_iCombatStrengthChangeFromKilledUnits = iValue;
+}
+
+int CvUnit::GetRangedCombatStrengthChangeFromKilledUnits() const
+{
+	return m_iRangedCombatStrengthChangeFromKilledUnits;
+}
+
+void CvUnit::ChangeRangedCombatStrengthChangeFromKilledUnits(int iChange)
+{
+	m_iRangedCombatStrengthChangeFromKilledUnits += iChange;
+}
+
+void CvUnit::SetRangedCombatStrengthChangeFromKilledUnits(int iValue)
+{
+	m_iRangedCombatStrengthChangeFromKilledUnits = iValue;
 }
 
 //	--------------------------------------------------------------------------------
@@ -14969,7 +15003,7 @@ int CvUnit::GetBaseRangedCombatStrength() const
 #endif
 
 #if defined(MOD_API_EXTENSIONS)
-	return m_iBaseRangedCombat;
+	return m_iBaseRangedCombat + m_iCombatStrengthChangeFromKilledUnits;
 #else
 	return m_pUnitInfo->GetRangedCombat();
 #endif
@@ -19050,6 +19084,7 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 									}
 									else
 									{
+										kPlayer.DoCombatStrengthChangeFromKill(this, pLoopUnit, iX, iY, 0);
 #if defined(MOD_API_UNIFIED_YIELDS)
 										kPlayer.DoYieldsFromKill(this, pLoopUnit, iX, iY, 0);
 #else
@@ -19150,6 +19185,7 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 											DLLUI->AddUnitMessage(0, GetIDInfo(), getOwner(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer/*, GC.getEraInfo(GC.getGame().getCurrentEra())->getAudioUnitVictoryScript(), MESSAGE_TYPE_INFO, NULL, (ColorTypes)GC.getInfoTypeForString("COLOR_GREEN"), pkTargetPlot->getX(), pkTargetPlot->getY()*/);
 											MILITARYLOG(getOwner(), strBuffer.c_str(), plot(), pLoopUnit->getOwner());
 
+											kPlayer.DoCombatStrengthChangeFromKill(this, pLoopUnit, iX, iY, 0);
 #if defined(MOD_API_UNIFIED_YIELDS)
 											kPlayer.DoYieldsFromKill(this, pLoopUnit, iX, iY, 0);
 #else
@@ -21158,6 +21194,7 @@ void CvUnit::DoAdjacentPlotDamage(CvPlot* pWhere, int iValue)
 						// Earn bonuses for kills?
 						CvPlayer& kAttackingPlayer = GET_PLAYER(getOwner());
 
+						kAttackingPlayer.DoCombatStrengthChangeFromKill(this, pEnemyUnit, pEnemyUnit->getX(), pEnemyUnit->getY(), 0);
 #if defined(MOD_API_UNIFIED_YIELDS)
 						kAttackingPlayer.DoYieldsFromKill(this, pEnemyUnit, pEnemyUnit->getX(), pEnemyUnit->getY(), 0);
 #else
@@ -25974,6 +26011,10 @@ void CvUnit::read(FDataStream& kStream)
 #ifdef MOD_BATTLE_CAPTURE_NEW_RULE
 	kStream >> m_bIsNewCapture;
 #endif
+
+	kStream >> m_iCombatStrengthChangeFromKilledUnits;
+	kStream >> m_iRangedCombatStrengthChangeFromKilledUnits;
+
 	//  Read mission queue
 	UINT uSize;
 	kStream >> uSize;
@@ -26273,6 +26314,9 @@ void CvUnit::write(FDataStream& kStream) const
 #ifdef MOD_BATTLE_CAPTURE_NEW_RULE
 	kStream << m_bIsNewCapture;
 #endif
+
+	kStream << m_iCombatStrengthChangeFromKilledUnits;
+	kStream << m_iRangedCombatStrengthChangeFromKilledUnits;
 
 	//  Write mission list
 	kStream << m_missionQueue.getLength();

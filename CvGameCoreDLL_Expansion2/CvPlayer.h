@@ -453,6 +453,8 @@ public:
 	int GetNumCitiesFreeFoodBuilding() const;
 	void ChangeNumCitiesFreeFoodBuilding(int iChange);
 
+	void DoCombatStrengthChangeFromKill(CvUnit* pAttackingUnit, CvUnit* pDefendingUnit, int iX, int iY, int iExistingDelay);
+
 #if defined(MOD_API_UNIFIED_YIELDS)
 	void DoYieldsFromKill(CvUnit* pAttackingUnit, CvUnit* pDefendingUnit, int iX, int iY, int iExistingDelay);
 #if defined(MOD_API_EXTENSIONS)

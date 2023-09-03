@@ -547,6 +547,14 @@ public:
 	int GetBaseCombatStrength(bool bIgnoreEmbarked = false) const;
 	int GetBaseCombatStrengthConsideringDamage() const;
 
+	int GetCombatStrengthChangeFromKilledUnits() const;
+	void ChangeCombatStrengthChangeFromKilledUnits(int iChange);
+	void SetCombatStrengthChangeFromKilledUnits(int iValue);
+
+	int GetRangedCombatStrengthChangeFromKilledUnits() const;
+	void ChangeRangedCombatStrengthChangeFromKilledUnits(int iChange);
+	void SetRangedCombatStrengthChangeFromKilledUnits(int iValue);
+
 	int GetGenericMaxStrengthModifier(const CvUnit* pOtherUnit, const CvPlot* pBattlePlot, bool bIgnoreUnitAdjacency) const;
 	int GetMaxAttackStrength(const CvPlot* pFromPlot, const CvPlot* pToPlot, const CvUnit* pDefender) const;
 	int GetMaxDefenseStrength(const CvPlot* pInPlot, const CvUnit* pAttacker, bool bFromRangedAttack = false) const;
@@ -2484,6 +2492,9 @@ protected:
 	bool CanFallBack(const CvUnit& pAttacker, bool bCheckChances) const;
 	int  GetWithdrawChance(const CvUnit& pAttacker, const bool bCheckChances) const;
 	bool DoFallBack(const CvUnit& pAttacker);
+
+	int m_iCombatStrengthChangeFromKilledUnits = 0;
+	int m_iRangedCombatStrengthChangeFromKilledUnits = 0;
 
 private:
 

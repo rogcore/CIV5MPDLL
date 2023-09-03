@@ -25,6 +25,7 @@
 #include "CvEconomicAI.h"
 #include "CvMilitaryAI.h"
 #include "CvCitySpecializationAI.h"
+#include "CvUnitClasses.h"
 #include "CvWonderProductionAI.h"
 #include "CvGrandStrategyAI.h"
 #include "CvDiplomacyAI.h"
@@ -11594,6 +11595,20 @@ void CvPlayer::ChangeNumCitiesFreeFoodBuilding(int iChange)
 {
 	if(iChange != 0)
 		m_iNumCitiesFreeFoodBuilding += iChange;
+}
+
+void CvPlayer::DoCombatStrengthChangeFromKill(CvUnit* pAttackingUnit, CvUnit* pDefendingUnit, int iX, int iY, int iExistingDelay)
+{
+	if (pAttackingUnit)
+	{
+		CvUnitEntry& pInfo = pAttackingUnit->getUnitInfo();
+		if (pInfo.GetCombatStrengthChangeAfterKilling() != 0) {
+			pAttackingUnit->ChangeCombatStrengthChangeFromKilledUnits(pInfo.GetCombatStrengthChangeAfterKilling());
+		}
+		if (pInfo.GetRangedCombatStrengthChangeAfterKilling() != 0) {
+			pAttackingUnit->ChangeRangedCombatStrengthChangeFromKilledUnits(pInfo.GetRangedCombatStrengthChangeAfterKilling());
+		}
+	}
 }
 
 //	--------------------------------------------------------------------------------

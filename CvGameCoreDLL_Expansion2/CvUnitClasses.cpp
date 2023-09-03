@@ -303,6 +303,9 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 	m_bUnitArtInfoCulturalVariation = kResults.GetBool("UnitArtInfoCulturalVariation");
 	m_bUnitArtInfoEraVariation = kResults.GetBool("UnitArtInfoEraVariation");
 
+	m_iCombatStrengthChangeAfterKilling = kResults.GetInt("CombatStrengthChangeAfterKilling");
+	m_iRangedCombatStrengthChangeAfterKilling = kResults.GetInt("RangedCombatStrengthChangeAfterKilling");
+
 	//References
 	const char* szTextVal = NULL;
 	szTextVal = kResults.GetText("Class");
@@ -1824,6 +1827,16 @@ UnitMoveRate CvUnitEntry::GetMoveRate(int numHexes) const
 	if(numHexes > 11)
 		numHexes = 11;
 	return m_unitMoveRate[numHexes];
+}
+
+int CvUnitEntry::GetCombatStrengthChangeAfterKilling() const
+{
+	return m_iCombatStrengthChangeAfterKilling;
+}
+
+int CvUnitEntry::GetRangedCombatStrengthChangeAfterKilling() const
+{
+	return m_iRangedCombatStrengthChangeAfterKilling;
 }
 
 //=====================================
