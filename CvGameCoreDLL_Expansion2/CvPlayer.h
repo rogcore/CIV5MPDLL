@@ -453,6 +453,8 @@ public:
 	int GetNumCitiesFreeFoodBuilding() const;
 	void ChangeNumCitiesFreeFoodBuilding(int iChange);
 
+	void DoCombatStrengthChangeFromKill(CvUnit* pAttackingUnit, CvUnit* pDefendingUnit, int iX, int iY, int iExistingDelay);
+
 #if defined(MOD_API_UNIFIED_YIELDS)
 	void DoYieldsFromKill(CvUnit* pAttackingUnit, CvUnit* pDefendingUnit, int iX, int iY, int iExistingDelay);
 #if defined(MOD_API_EXTENSIONS)
@@ -923,7 +925,12 @@ public:
 	int getWorkerSpeedModifier() const;
 	void changeWorkerSpeedModifier(int iChange);
 
+	int getSharedIdeologyTourismModifier() const;
+	void changeSharedIdeologyTourismModifier(int iChange);
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	int getDifferentIdeologyTourismModifier() const;
+	void changeDifferentIdeologyTourismModifier(int iChange);
+
 	int getHappinessPerPolicy() const;
 	void changeHappinessPerPolicy(int iChange);
 
@@ -2308,7 +2315,9 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iFreeExperienceFromMinors;
 	FAutoVariable<int, CvPlayer> m_iFeatureProductionModifier;
 	FAutoVariable<int, CvPlayer> m_iWorkerSpeedModifier;
+	FAutoVariable<int, CvPlayer> m_iSharedIdeologyTourismModifier;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	FAutoVariable<int, CvPlayer> m_iDifferentIdeologyTourismModifier;
 	FAutoVariable<int, CvPlayer> m_iHappinessPerPolicy;
 	FAutoVariable<int, CvPlayer> m_iWaterBuildSpeedModifier;
 	FAutoVariable<int, CvPlayer> m_iSettlerProductionEraModifier;

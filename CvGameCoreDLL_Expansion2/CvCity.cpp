@@ -10829,6 +10829,32 @@ bool CvCity::DoRazingTurn()
 
 		ChangeRazingTurns(-1);
 
+		int iPopulationDropActual = min(iPopulationDrop, getPopulation());
+		if (kPlayer.GetPlayerTraits()->GetUnitMaxHitPointChangePerRazedCityPop() > 0) {
+#ifdef MOD_GLOBAL_CITY_WORKING
+			for(int iPlotLoop = 0; iPlotLoop < GetNumWorkablePlots(); iPlotLoop++)
+#else
+			for(int iPlotLoop = 0; iPlotLoop < NUM_CITY_PLOTS; iPlotLoop++)
+#endif
+			{
+				CvPlot* pLoopPlot = GetCityCitizens()->GetCityPlotFromIndex(iPlotLoop);
+
+				if (pLoopPlot != NULL && pLoopPlot->getWorkingCity() == this)
+				{
+					for (int iUnitLoop = 0; iUnitLoop < pLoopPlot->getNumUnits(); iUnitLoop++)
+					{
+						CvUnit* unit = pLoopPlot->getUnitByIndex(iUnitLoop);
+						if (unit && unit->IsCombatUnit() && unit->getOwner() == getOwner())
+						{
+							int iValue = min(kPlayer.GetPlayerTraits()->GetUnitMaxHitPointChangePerRazedCityPopLimit(),
+									unit->getMaxHitPointsChangeFromRazedCityPop() + kPlayer.GetPlayerTraits()->GetUnitMaxHitPointChangePerRazedCityPop()* iPopulationDropActual);
+							unit->setMaxHitPointsChangeFromRazedCityPop(iValue);
+						}
+					}
+				}
+			}
+		}
+
 		// Counter has reached 0, disband the City
 		if(GetRazingTurns() <= 0 || getPopulation() <= 1)
 		{

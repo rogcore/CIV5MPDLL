@@ -1379,6 +1379,27 @@ int CvTraitEntry::GetMaxCorruptionLevel() const
 }
 #endif
 
+
+int CvTraitEntry::GetFreePolicyWhenFirstConquerMajorCapital() const
+{
+	return m_iFreePolicyWhenFirstConquerMajorCapital;
+}
+
+int CvTraitEntry::GetInstantTourismBombWhenFirstConquerMajorCapital() const
+{
+	return m_iInstantTourismBombWhenFirstConquerMajorCapital;
+}
+
+int CvTraitEntry::GetUnitMaxHitPointChangePerRazedCityPop() const
+{
+	return m_iUnitMaxHitPointChangePerRazedCityPop;
+}
+
+int CvTraitEntry::GetUnitMaxHitPointChangePerRazedCityPopLimit() const
+{
+	return m_iUnitMaxHitPointChangePerRazedCityPopLimit;
+}
+
 /// Load XML data
 bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
@@ -2130,6 +2151,12 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	m_iMaxCorruptionLevel = kResults.GetInt("MaxCorruptionLevel");
 #endif
 
+	m_iFreePolicyWhenFirstConquerMajorCapital = kResults.GetInt("FreePolicyWhenFirstConquerMajorCapital");
+	m_iInstantTourismBombWhenFirstConquerMajorCapital = kResults.GetInt("InstantTourismBombWhenFirstConquerMajorCapital");
+
+	m_iUnitMaxHitPointChangePerRazedCityPop = kResults.GetInt("UnitMaxHitPointChangePerRazedCityPop");
+	m_iUnitMaxHitPointChangePerRazedCityPopLimit = kResults.GetInt("UnitMaxHitPointChangePerRazedCityPopLimit");
+
 	return true;
 }
 
@@ -2337,11 +2364,6 @@ void CvPlayerTraits::InitPlayerTraits()
 				//m_pPlayer->ChangeWoundedUnitDamageMod(iWoundedUnitDamageMod);
 			}
 
-			if (trait->IsBuyOwnedTiles())
-			{
-				m_bBuyOwnedTiles = true;
-			}
-
 			if(trait->IsMoveFriendlyWoodsAsRoad())
 			{
 				m_bMoveFriendlyWoodsAsRoad = true;
@@ -2379,15 +2401,9 @@ void CvPlayerTraits::InitPlayerTraits()
 				m_bFaithFromUnimprovedForest = true;
 			}
 
-			if (trait->IsGoldenAgeOnWar())
-			{
-				m_bGoldenAgeOnWar = true;
-			}
-
-			if (trait->IsNoResistance())
-			{
-				m_bNoResistance = true;
-			}
+			m_bBuyOwnedTiles = trait->IsBuyOwnedTiles();
+			m_bGoldenAgeOnWar = trait->IsGoldenAgeOnWar();
+			m_bNoResistance = trait->IsNoResistance();
 
 #if defined(MOD_TRAITS_ANY_BELIEF)
 			if(trait->IsAnyBelief())
@@ -2478,6 +2494,12 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_bCorruptionLevelReduceByOne = trait->GetCorruptionLevelReduceByOne();
 			m_iMaxCorruptionLevel = trait->GetMaxCorruptionLevel();
 #endif
+
+			m_iFreePolicyWhenFirstConquerMajorCapital = trait->GetFreePolicyWhenFirstConquerMajorCapital();
+			m_iInstantTourismBombWhenFirstConquerMajorCapital = trait->GetInstantTourismBombWhenFirstConquerMajorCapital();
+
+			m_iUnitMaxHitPointChangePerRazedCityPop = trait->GetUnitMaxHitPointChangePerRazedCityPop();
+			m_iUnitMaxHitPointChangePerRazedCityPopLimit = trait->GetUnitMaxHitPointChangePerRazedCityPopLimit();
 
 			for(int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
 			{
@@ -4512,6 +4534,12 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	kStream >> m_bCorruptionLevelReduceByOne;
 	kStream >> m_iMaxCorruptionLevel;
 #endif
+
+	kStream >> m_iFreePolicyWhenFirstConquerMajorCapital;
+	kStream >> m_iInstantTourismBombWhenFirstConquerMajorCapital;
+
+	kStream >> m_iUnitMaxHitPointChangePerRazedCityPop;
+	kStream >> m_iUnitMaxHitPointChangePerRazedCityPopLimit;
 }
 
 /// Serialization write
@@ -4762,6 +4790,12 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_bCorruptionLevelReduceByOne;
 	kStream << m_iMaxCorruptionLevel;
 #endif
+
+	kStream << m_iFreePolicyWhenFirstConquerMajorCapital;
+	kStream << m_iInstantTourismBombWhenFirstConquerMajorCapital;
+
+	kStream << m_iUnitMaxHitPointChangePerRazedCityPop;
+	kStream << m_iUnitMaxHitPointChangePerRazedCityPopLimit;
 }
 
 // PRIVATE METHODS
@@ -4969,3 +5003,23 @@ int CvPlayerTraits::GetMaxCorruptionLevel() const
 	return m_iMaxCorruptionLevel;
 }
 #endif
+
+int CvPlayerTraits::GetFreePolicyWhenFirstConquerMajorCapital() const
+{
+	return m_iFreePolicyWhenFirstConquerMajorCapital;
+}
+
+int CvPlayerTraits::GetInstantTourismBombWhenFirstConquerMajorCapital() const
+{
+	return m_iInstantTourismBombWhenFirstConquerMajorCapital;
+}
+
+int CvPlayerTraits::GetUnitMaxHitPointChangePerRazedCityPop() const
+{
+	return m_iUnitMaxHitPointChangePerRazedCityPop;
+}
+
+int CvPlayerTraits::GetUnitMaxHitPointChangePerRazedCityPopLimit() const
+{
+	return m_iUnitMaxHitPointChangePerRazedCityPopLimit;
+}

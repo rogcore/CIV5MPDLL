@@ -197,6 +197,9 @@ public:
 
 	UnitMoveRate GetMoveRate(int numHexes) const;
 
+	int GetCombatStrengthChangeAfterKilling() const;
+	int GetRangedCombatStrengthChangeAfterKilling() const;
+
 #ifdef MOD_BALANCE_CORE
 	int GetScalingFromOwnedImprovements(int i) const;
 	int GetScaleFromNumGWs() const;
@@ -369,6 +372,9 @@ private:
 	CvString* m_paszMiddleArtDefineTags;
 	CvString* m_paszUnitNames;
 	GreatWorkType* m_paeGreatWorks;
+
+	int m_iCombatStrengthChangeAfterKilling = 0;
+	int m_iRangedCombatStrengthChangeAfterKilling = 0;
 
 #ifdef MOD_BALANCE_CORE
 	int* m_piScalingFromOwnedImprovements;

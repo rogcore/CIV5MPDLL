@@ -4,3 +4,6 @@ create table UnitPromotions_Promotions (
     FreePromotionType text references UnitPromotions(Type),
     PrePromotionType text references UnitPromotions(Type)
 );
+
+ALTER TABLE Units ADD 'CombatStrengthChangeAfterKilling' INTEGER DEFAULT 0;
+ALTER TABLE Units ADD 'RangedCombatStrengthChangeAfterKilling' INTEGER DEFAULT 0;

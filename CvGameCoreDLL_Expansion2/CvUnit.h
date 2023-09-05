@@ -547,6 +547,14 @@ public:
 	int GetBaseCombatStrength(bool bIgnoreEmbarked = false) const;
 	int GetBaseCombatStrengthConsideringDamage() const;
 
+	int GetCombatStrengthChangeFromKilledUnits() const;
+	void ChangeCombatStrengthChangeFromKilledUnits(int iChange);
+	void SetCombatStrengthChangeFromKilledUnits(int iValue);
+
+	int GetRangedCombatStrengthChangeFromKilledUnits() const;
+	void ChangeRangedCombatStrengthChangeFromKilledUnits(int iChange);
+	void SetRangedCombatStrengthChangeFromKilledUnits(int iValue);
+
 	int GetGenericMaxStrengthModifier(const CvUnit* pOtherUnit, const CvPlot* pBattlePlot, bool bIgnoreUnitAdjacency) const;
 	int GetMaxAttackStrength(const CvPlot* pFromPlot, const CvPlot* pToPlot, const CvUnit* pDefender) const;
 	int GetMaxDefenseStrength(const CvPlot* pInPlot, const CvUnit* pAttacker, bool bFromRangedAttack = false) const;
@@ -1289,6 +1297,9 @@ public:
 	
 	int getMaxHitPointsChange() const;
 	void changeMaxHitPointsChange(int iChange);
+	int getMaxHitPointsChangeFromRazedCityPop() const;
+	void changeMaxHitPointsChangeFromRazedCityPop(int iValue);
+	void setMaxHitPointsChangeFromRazedCityPop(int iChange);
 	int getMaxHitPointsModifier() const;
 	void changeMaxHitPointsModifier(int iChange);
 #endif
@@ -2249,6 +2260,7 @@ protected:
 #if defined(MOD_UNITS_MAX_HP)
 	int m_iMaxHitPointsBase;
 	int m_iMaxHitPointsChange;
+	int m_iMaxHitPointsChangeFromRazedCityPop = 0;
 	int m_iMaxHitPointsModifier;
 #endif
 	FAutoVariable<int, CvUnit> m_iFriendlyLandsModifier;
@@ -2481,6 +2493,8 @@ protected:
 	int  GetWithdrawChance(const CvUnit& pAttacker, const bool bCheckChances) const;
 	bool DoFallBack(const CvUnit& pAttacker);
 
+	int m_iCombatStrengthChangeFromKilledUnits = 0;
+	int m_iRangedCombatStrengthChangeFromKilledUnits = 0;
 
 private:
 
