@@ -950,6 +950,12 @@ public:
 	void changeTradeRouteDomainExtraRange(DomainTypes eIndex, int iChange);
 
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	int getLandmarksTourismPercentGlobal() const;
+	void changeLandmarksTourismPercentGlobal(int iChange);
+
+	int getGreatWorksTourismModifierGlobal() const;
+	void changeGreatWorksTourismModifierGlobal(int iChange);
+
 	int getTradeRouteSeaGoldBonusGlobal() const;
 	void changeTradeRouteSeaGoldBonusGlobal(int iChange);
 
@@ -1070,6 +1076,8 @@ public:
 	void ChangeUnitTypePrmoteHealGlobal(UnitTypes eUnit, int iChange);
 	int GetUnitTypePrmoteHealGlobal(UnitTypes) const;
 #endif
+	int getPolicyModifiers(PolicyModifierType eIndex) const;
+	void changePolicyModifiers(PolicyModifierType eIndex, int iChange);
 
 	int getMilitaryFoodProductionCount() const;
 	bool isMilitaryFoodProduction() const;
@@ -2325,7 +2333,9 @@ protected:
 #endif
 	FAutoVariable<int, CvPlayer> m_iNumTradeRouteBonus;
 	FAutoVariable<std::vector<int>, CvPlayer> m_viTradeRouteDomainExtraRange;
-#if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	FAutoVariable<int, CvPlayer> m_iLandmarksTourismPercentGlobal;
+	FAutoVariable<int, CvPlayer> m_iGreatWorksTourismModifierGlobal;
 	FAutoVariable<int, CvPlayer> m_iTradeRouteSeaGoldBonusGlobal;
 	FAutoVariable<int, CvPlayer> m_iTradeRouteLandGoldBonusGlobal;
 #endif
@@ -2526,6 +2536,7 @@ protected:
 	std::map<int, int> m_piDomainFreeExperience;
 	std::map<int, int> m_piUnitTypePrmoteHealGlobal;
 #endif
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiPolicyModifiers;
 	std::vector<int> m_aiYieldModifierFromActiveSpies;
 
 	std::vector<FeatureTypes> m_ownedNaturalWonders;
