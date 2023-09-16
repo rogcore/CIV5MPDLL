@@ -10860,7 +10860,7 @@ bool CvCity::DoRazingTurn()
 		}
 
 		// Counter has reached 0, disband the City
-		if(GetRazingTurns() <= 0 || getPopulation() <= 1)
+		if(GetRazingTurns() <= 0 || getPopulation() - iPopulationDrop < 1)
 		{
 			CvPlot* pkPlot = plot();
 
