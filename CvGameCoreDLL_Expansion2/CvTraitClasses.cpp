@@ -1410,6 +1410,15 @@ int CvTraitEntry::GetUnitMaxHitPointChangePerRazedCityPopLimit() const
 	return m_iUnitMaxHitPointChangePerRazedCityPopLimit;
 }
 
+int CvTraitEntry::GetGoldenAgeResearchTotalCostModifier() const
+{
+	return m_iGoldenAgeResearchTotalCostModifier;
+}
+int CvTraitEntry::GetGoldenAgeResearchCityCountCostModifier() const
+{
+	return m_iGoldenAgeResearchCityCountCostModifier;
+}
+
 /// Load XML data
 bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
@@ -2169,6 +2178,9 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	m_iUnitMaxHitPointChangePerRazedCityPop = kResults.GetInt("UnitMaxHitPointChangePerRazedCityPop");
 	m_iUnitMaxHitPointChangePerRazedCityPopLimit = kResults.GetInt("UnitMaxHitPointChangePerRazedCityPopLimit");
 
+	m_iGoldenAgeResearchTotalCostModifier = kResults.GetInt("GoldenAgeResearchTotalCostModifier");
+	m_iGoldenAgeResearchCityCountCostModifier = kResults.GetInt("GoldenAgeResearchCityCountCostModifier");
+
 	return true;
 }
 
@@ -2514,6 +2526,9 @@ void CvPlayerTraits::InitPlayerTraits()
 
 			m_iUnitMaxHitPointChangePerRazedCityPop = trait->GetUnitMaxHitPointChangePerRazedCityPop();
 			m_iUnitMaxHitPointChangePerRazedCityPopLimit = trait->GetUnitMaxHitPointChangePerRazedCityPopLimit();
+
+			m_iGoldenAgeResearchTotalCostModifier = trait->GetGoldenAgeResearchTotalCostModifier();
+			m_iGoldenAgeResearchCityCountCostModifier = trait->GetGoldenAgeResearchCityCountCostModifier();
 
 			for(int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
 			{
@@ -4558,6 +4573,9 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 
 	kStream >> m_iUnitMaxHitPointChangePerRazedCityPop;
 	kStream >> m_iUnitMaxHitPointChangePerRazedCityPopLimit;
+
+	kStream >> m_iGoldenAgeResearchTotalCostModifier;
+	kStream >> m_iGoldenAgeResearchCityCountCostModifier;
 }
 
 /// Serialization write
@@ -4816,6 +4834,9 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 
 	kStream << m_iUnitMaxHitPointChangePerRazedCityPop;
 	kStream << m_iUnitMaxHitPointChangePerRazedCityPopLimit;
+
+	kStream << m_iGoldenAgeResearchTotalCostModifier;
+	kStream << m_iGoldenAgeResearchCityCountCostModifier;
 }
 
 // PRIVATE METHODS
@@ -5042,4 +5063,13 @@ int CvPlayerTraits::GetUnitMaxHitPointChangePerRazedCityPop() const
 int CvPlayerTraits::GetUnitMaxHitPointChangePerRazedCityPopLimit() const
 {
 	return m_iUnitMaxHitPointChangePerRazedCityPopLimit;
+}
+
+int CvPlayerTraits::GetGoldenAgeResearchTotalCostModifier() const
+{
+	return m_iGoldenAgeResearchTotalCostModifier;
+}
+int CvPlayerTraits::GetGoldenAgeResearchCityCountCostModifier() const
+{
+	return m_iGoldenAgeResearchCityCountCostModifier;
 }

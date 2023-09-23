@@ -32,3 +32,6 @@ alter table Traits add column `UnitMaxHitPointChangePerRazedCityPopLimit` int no
 
 alter table Traits add column `GreatWorksTourism` int not null default 0;
 alter table Traits add column `RiverCorruptionScoreChange` int not null default 0;
+
+alter table Traits add column `GoldenAgeResearchTotalCostModifier` int not null default 0;
+alter table Traits add column `GoldenAgeResearchCityCountCostModifier` int not null default 0;

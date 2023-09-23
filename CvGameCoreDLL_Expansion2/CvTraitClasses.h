@@ -294,6 +294,9 @@ public:
 	int GetUnitMaxHitPointChangePerRazedCityPop() const;
 	int GetUnitMaxHitPointChangePerRazedCityPopLimit() const;
 
+	int GetGoldenAgeResearchTotalCostModifier() const;
+	int GetGoldenAgeResearchCityCountCostModifier() const;
+
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
 protected:
@@ -525,6 +528,9 @@ protected:
 
 	int m_iUnitMaxHitPointChangePerRazedCityPop = 0;
 	int m_iUnitMaxHitPointChangePerRazedCityPopLimit = 0;
+
+	int m_iGoldenAgeResearchTotalCostModifier= 0;
+	int m_iGoldenAgeResearchCityCountCostModifier = 0;
 
 private:
 	CvTraitEntry(const CvTraitEntry&);
@@ -1215,6 +1221,9 @@ public:
 	int GetUnitMaxHitPointChangePerRazedCityPop() const;
 	int GetUnitMaxHitPointChangePerRazedCityPopLimit() const;
 
+	int GetGoldenAgeResearchTotalCostModifier() const;
+	int GetGoldenAgeResearchCityCountCostModifier() const;
+
 	// Serialization
 	void Read(FDataStream& kStream);
 	void Write(FDataStream& kStream);
@@ -1460,6 +1469,9 @@ private:
 
 	int m_iUnitMaxHitPointChangePerRazedCityPop = 0;
 	int m_iUnitMaxHitPointChangePerRazedCityPopLimit = 0;
+
+	int m_iGoldenAgeResearchTotalCostModifier= 0;
+	int m_iGoldenAgeResearchCityCountCostModifier = 0;
 };
 
 #endif //CIV5_TRAIT_CLASSES_H
