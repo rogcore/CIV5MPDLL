@@ -487,6 +487,10 @@ public:
 	int GetCorruptionLevelChange() const;
 #endif
 
+	int GetGlobalProductionNeededUnitModifier() const;
+	int GetGlobalProductionNeededBuildingModifier() const;
+	int GetGlobalProductionNeededProjectModifier() const;
+
 private:
 	int m_iBuildingClassType;
 	const CvBuildingClassInfo* m_pkBuildingClassInfo;
@@ -834,6 +838,10 @@ private:
 	int m_iCorruptionScoreChange = 0;
 	int m_iCorruptionLevelChange = 0;
 #endif
+
+	int m_iGlobalProductionNeededUnitModifier = 0;
+	int m_iGlobalProductionNeededBuildingModifier = 0;
+	int m_iGlobalProductionNeededProjectModifier = 0;
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

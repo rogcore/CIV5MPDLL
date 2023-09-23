@@ -2141,6 +2141,13 @@ public:
 	void ChangeCorruptionLevelPolicyCostModifier(CorruptionLevelTypes level, int change);
 #endif
 
+	int GetProductionNeededUnitModifier() const;
+	void ChangeProductionNeededUnitModifier(int change);
+	int GetProductionNeededBuildingModifier() const;
+	void ChangeProductionNeededBuildingModifier(int change);
+	int GetProductionNeededProjectModifier() const;
+	void ChangeProductionNeededProjectModifier(int change);
+
 protected:
 	class ConqueredByBoolField
 	{
@@ -2792,6 +2799,9 @@ protected:
 	std::vector<int> m_paiCorruptionLevelPolicyCostModifier;
 #endif
 
+	int m_iProductionNeededUnitModifier = 0;
+	int m_iProductionNeededBuildingModifier = 0;
+	int m_iProductionNeededProjectModifier = 0;
 };
 
 extern bool CancelActivePlayerEndTurn();

@@ -25,3 +25,7 @@ ALTER TABLE Buildings ADD 'TradeRouteSeaGoldBonusGlobal' INTEGER DEFAULT 0;
 ALTER TABLE Buildings ADD 'TradeRouteLandGoldBonusGlobal' INTEGER DEFAULT 0;
 ALTER TABLE Buildings ADD 'LandmarksTourismPercentGlobal' INTEGER DEFAULT 0;
 ALTER TABLE Buildings ADD 'GreatWorksTourismModifierGlobal' INTEGER DEFAULT 0;
+
+ALTER TABLE Buildings ADD 'GlobalProductionNeededUnitModifier' INTEGER DEFAULT 0;
+ALTER TABLE Buildings ADD 'GlobalProductionNeededBuildingModifier' INTEGER DEFAULT 0;
+ALTER TABLE Buildings ADD 'GlobalProductionNeededProjectModifier' INTEGER DEFAULT 0;

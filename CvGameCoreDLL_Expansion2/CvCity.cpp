@@ -7292,6 +7292,9 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			}
 		}
 
+		owningPlayer.ChangeProductionNeededUnitModifier(pBuildingInfo->GetGlobalProductionNeededUnitModifier() * iChange);
+		owningPlayer.ChangeProductionNeededBuildingModifier(pBuildingInfo->GetGlobalProductionNeededBuildingModifier() * iChange);
+		owningPlayer.ChangeProductionNeededProjectModifier(pBuildingInfo->GetGlobalProductionNeededProjectModifier() * iChange);
 
 #if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
 		if (MOD_BUILDING_IMPROVEMENT_RESOURCES)

@@ -632,6 +632,10 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iCorruptionLevelChange = kResults.GetInt("CorruptionLevelChange");
 #endif
 
+	m_iGlobalProductionNeededUnitModifier = kResults.GetInt("GlobalProductionNeededUnitModifier");
+	m_iGlobalProductionNeededBuildingModifier = kResults.GetInt("GlobalProductionNeededBuildingModifier");
+	m_iGlobalProductionNeededProjectModifier = kResults.GetInt("GlobalProductionNeededProjectModifier");
+
 	//References
 	const char* szTextVal;
 	szTextVal = kResults.GetText("BuildingClass");
@@ -2114,13 +2118,20 @@ int CvBuildingEntry::GetCorruptionLevelChange() const
 }
 #endif
 
+int CvBuildingEntry::GetGlobalProductionNeededUnitModifier() const {
+	return m_iGlobalProductionNeededUnitModifier;
+}
+int CvBuildingEntry::GetGlobalProductionNeededBuildingModifier() const {
+	return m_iGlobalProductionNeededBuildingModifier;
+}
+int CvBuildingEntry::GetGlobalProductionNeededProjectModifier() const {
+	return m_iGlobalProductionNeededProjectModifier;
+}
 
 int CvBuildingEntry::GetExtraAttacks() const
 {
 	return m_iExtraAttacks;
 }
-
-
 
 /// Happiness provided by this building
 int CvBuildingEntry::GetHappiness() const

@@ -9134,6 +9134,9 @@ int CvPlayer::getProductionNeeded(UnitTypes eUnit) const
 
 	iProductionNeeded += getUnitExtraCost(eUnitClass);
 
+	iProductionNeeded *= (100 + std::max(-50, GetProductionNeededUnitModifier()));
+	iProductionNeeded /= 100;
+
 	return std::max(1, iProductionNeeded);
 }
 
@@ -9225,6 +9228,9 @@ int CvPlayer::getProductionNeeded(BuildingTypes eBuilding) const
 		iProductionNeeded /= 100;
 	}
 
+	iProductionNeeded *= (100 + std::max(-50, GetProductionNeededBuildingModifier()));
+	iProductionNeeded /= 100;
+
 	return std::max(1, iProductionNeeded);
 }
 
@@ -9267,6 +9273,9 @@ int CvPlayer::getProductionNeeded(ProjectTypes eProject) const
 		iProductionNeeded *= std::max(0, ((GC.getGame().getHandicapInfo().getAIPerEraModifier() * GetCurrentEra()) + 100));
 		iProductionNeeded /= 100;
 	}
+
+	iProductionNeeded *= (100 + std::max(-50, GetProductionNeededProjectModifier()));
+	iProductionNeeded /= 100;
 
 	return std::max(1, iProductionNeeded);
 }
@@ -27990,6 +27999,10 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_paiCorruptionLevelPolicyCostModifier;
 #endif
 
+	kStream >> m_iProductionNeededUnitModifier;
+	kStream >> m_iProductionNeededBuildingModifier;
+	kStream >> m_iProductionNeededProjectModifier;
+
 	if(GetID() < MAX_MAJOR_CIVS)
 	{
 		if(!m_pDiplomacyRequests)
@@ -28602,6 +28615,10 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iCorruptionLevelReduceByOneRC;
 	kStream << m_paiCorruptionLevelPolicyCostModifier;
 #endif
+
+	kStream << m_iProductionNeededUnitModifier;
+	kStream << m_iProductionNeededBuildingModifier;
+	kStream << m_iProductionNeededProjectModifier;
 }
 
 //	--------------------------------------------------------------------------------
@@ -32175,4 +32192,28 @@ void CvPlayer::changeYieldModifierFromActiveSpies(YieldTypes eIndex, int iChange
 			GC.GetEngineUserInterface()->setDirty(CityInfo_DIRTY_BIT, true);
 		}
 	}
+}
+
+int CvPlayer::GetProductionNeededUnitModifier() const {
+	return m_iProductionNeededUnitModifier;
+}
+
+void CvPlayer::ChangeProductionNeededUnitModifier(int change) {
+	m_iProductionNeededUnitModifier += change;
+}
+
+int CvPlayer::GetProductionNeededBuildingModifier() const {
+	return m_iProductionNeededBuildingModifier;
+}
+
+void CvPlayer::ChangeProductionNeededBuildingModifier(int change) {
+	m_iProductionNeededBuildingModifier += change;
+}
+
+int CvPlayer::GetProductionNeededProjectModifier() const {
+	return m_iProductionNeededProjectModifier;
+}
+
+void CvPlayer::ChangeProductionNeededProjectModifier(int change) {
+	m_iProductionNeededProjectModifier += change;
 }
