@@ -1418,6 +1418,10 @@ int CvTraitEntry::GetGoldenAgeResearchCityCountCostModifier() const
 {
 	return m_iGoldenAgeResearchCityCountCostModifier;
 }
+int CvTraitEntry::GetGoldenAgeGrowThresholdModifier() const
+{
+	return m_iGoldenAgeGrowThresholdModifier;
+}
 
 /// Load XML data
 bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
@@ -2180,6 +2184,7 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 
 	m_iGoldenAgeResearchTotalCostModifier = kResults.GetInt("GoldenAgeResearchTotalCostModifier");
 	m_iGoldenAgeResearchCityCountCostModifier = kResults.GetInt("GoldenAgeResearchCityCountCostModifier");
+	m_iGoldenAgeGrowThresholdModifier = kResults.GetInt("GoldenAgeGrowThresholdModifier");
 
 	return true;
 }
@@ -2529,6 +2534,7 @@ void CvPlayerTraits::InitPlayerTraits()
 
 			m_iGoldenAgeResearchTotalCostModifier = trait->GetGoldenAgeResearchTotalCostModifier();
 			m_iGoldenAgeResearchCityCountCostModifier = trait->GetGoldenAgeResearchCityCountCostModifier();
+			m_iGoldenAgeGrowThresholdModifier = trait->GetGoldenAgeGrowThresholdModifier();
 
 			for(int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
 			{
@@ -4576,6 +4582,7 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 
 	kStream >> m_iGoldenAgeResearchTotalCostModifier;
 	kStream >> m_iGoldenAgeResearchCityCountCostModifier;
+	kStream >> m_iGoldenAgeGrowThresholdModifier;
 }
 
 /// Serialization write
@@ -4837,6 +4844,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 
 	kStream << m_iGoldenAgeResearchTotalCostModifier;
 	kStream << m_iGoldenAgeResearchCityCountCostModifier;
+	kStream << m_iGoldenAgeGrowThresholdModifier;
 }
 
 // PRIVATE METHODS
@@ -5072,4 +5080,8 @@ int CvPlayerTraits::GetGoldenAgeResearchTotalCostModifier() const
 int CvPlayerTraits::GetGoldenAgeResearchCityCountCostModifier() const
 {
 	return m_iGoldenAgeResearchCityCountCostModifier;
+}
+int CvPlayerTraits::GetGoldenAgeGrowThresholdModifier() const
+{
+	return m_iGoldenAgeGrowThresholdModifier;
 }

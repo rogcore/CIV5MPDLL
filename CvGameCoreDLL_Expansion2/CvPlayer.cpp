@@ -29073,6 +29073,11 @@ int CvPlayer::getGrowthThreshold(int iPopulation) const
 		iThreshold /= 100;
 	}
 
+	if (isGoldenAge()) {
+		iThreshold *= this->GetPlayerTraits()->GetGoldenAgeGrowThresholdModifier() + 100;
+		iThreshold /= 100;
+	}
+
 	return std::max(1, iThreshold);
 }
 
