@@ -9274,6 +9274,11 @@ int CvPlot::calculateImprovementYieldChange(ImprovementTypes eImprovement, Yield
 				{
 					iYield += pImprovement->GetAdjacentResourceYieldChanges(pAdjacentPlot->getResourceType(), eYield);
 				}
+
+				if (pAdjacentPlot->getTerrainType() != NO_TERRAIN)
+				{
+					iYield += pImprovement->GetAdjacentTerrainYieldChanges(pAdjacentPlot->getTerrainType(),eYield);
+				}
 			}
 		}
 	}
