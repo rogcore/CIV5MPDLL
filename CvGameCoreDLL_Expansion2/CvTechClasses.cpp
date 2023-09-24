@@ -1562,7 +1562,7 @@ CvTechXMLEntries* CvPlayerTechs::GetTechs() const
 //	----------------------------------------------------------------------------
 /// Return the research cost for a tech for this player.  This will be different from the team research cost as it will
 /// include the player's research adjustment
-int CvPlayerTechs::GetResearchCost(TechTypes eTech) const
+long long CvPlayerTechs::GetResearchCost(TechTypes eTech) const
 {
 	// Get the research cost for the team
 #if defined(MOD_BUGFIX_RESEARCH_NAN)
@@ -1576,13 +1576,11 @@ int CvPlayerTechs::GetResearchCost(TechTypes eTech) const
 	int iResearchMod = std::max(1, m_pPlayer->calculateResearchModifier(eTech));
 	iResearchCost = ((iResearchCost * 10000) / iResearchMod);
 
-	// FIXME
-
 	// Mod for City Count
 	int iMod = GC.getMap().getWorldInfo().GetNumCitiesTechCostMod();	// Default is 40, gets smaller on larger maps
 	iMod = iMod * m_pPlayer->GetMaxEffectiveCities(/*bIncludePuppets*/ true);
 	if (m_pPlayer->isGoldenAge())
-		iMod = (m_pPlayer->GetPlayerTraits()->GetGoldenAgeResearchCityCountCostModifier() + 100) / 100; // some UA may reduce the modifier from the city count.
+		iMod = iMod * (m_pPlayer->GetPlayerTraits()->GetGoldenAgeResearchCityCountCostModifier() + 100) / 100; // some UA may reduce the modifier from the city count.
 
 	iResearchCost = iResearchCost * (100 + iMod) / 100;
 
@@ -1597,7 +1595,7 @@ int CvPlayerTechs::GetResearchCost(TechTypes eTech) const
 		iResearchCost = (iResearchCost / 100);
 
 #if defined(MOD_BUGFIX_RESEARCH_NAN)
-	return (int) iResearchCost;
+	return iResearchCost;
 #else
 	return iResearchCost;
 #endif
@@ -2185,19 +2183,12 @@ void CvTeamTechs::SetResearchProgressTimes100(TechTypes eIndex, int iNewValue, P
 
 #if defined(MOD_BUGFIX_RESEARCH_NAN)
 		long long iResearchProgress = GetResearchProgressTimes100(eIndex);
-		long long iResearchCost = GetResearchCost(eIndex) * 100;
+		long long iResearchCost = GET_PLAYER(ePlayer).GetPlayerTechs()->GetResearchCost(eIndex) * 100;
 #else
 		int iResearchProgress = GetResearchProgressTimes100(eIndex);
 		int iResearchCost = GetResearchCost(eIndex) * 100;
 #endif
 
-		// Player modifiers to cost
-		int iResearchMod = std::max(1, GET_PLAYER(ePlayer).calculateResearchModifier(eIndex));
-		iResearchCost = (iResearchCost * 100) / iResearchMod;
-		int iNumCitiesMod = GC.getMap().getWorldInfo().GetNumCitiesTechCostMod();	// Default is 40, gets smaller on larger maps
-		iNumCitiesMod = iNumCitiesMod * GET_PLAYER(ePlayer).GetMaxEffectiveCities(/*bIncludePuppets*/ true);
-		iResearchCost = iResearchCost * (100 + iNumCitiesMod) / 100;
-		
 #if defined(MOD_BUGFIX_RESEARCH_NAN)
 		int iOverflow = (int) (iResearchProgress - iResearchCost);
 #else
