@@ -29,3 +29,10 @@ alter table Traits add column `InstantTourismBombWhenFirstConquerMajorCapital` i
 
 alter table Traits add column `UnitMaxHitPointChangePerRazedCityPop` int not null default 0;
 alter table Traits add column `UnitMaxHitPointChangePerRazedCityPopLimit` int not null default 0;
+
+alter table Traits add column `GreatWorksTourism` int not null default 0;
+alter table Traits add column `RiverCorruptionScoreChange` int not null default 0;
+
+alter table Traits add column `GoldenAgeResearchTotalCostModifier` int not null default 0;
+alter table Traits add column `GoldenAgeResearchCityCountCostModifier` int not null default 0;
+alter table Traits add column `GoldenAgeGrowThresholdModifier` int not null default 0;

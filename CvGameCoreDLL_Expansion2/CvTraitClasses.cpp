@@ -120,6 +120,8 @@ CvTraitEntry::CvTraitEntry() :
 	m_iTradeBuildingModifier(0),
 #endif
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iRiverCorruptionScoreChange(0),
+	m_iGreatWorksTourism(0),
 	m_iCiviliansFreePromotion(NO_PROMOTION),
 	m_iTradeRouteLandGoldBonus(0),
 	m_iTradeRouteSeaGoldBonus(0),
@@ -674,6 +676,14 @@ int CvTraitEntry::GetTradeBuildingModifier() const
 }
 
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+int CvTraitEntry::GetRiverCorruptionScoreChange() const
+{
+	return m_iRiverCorruptionScoreChange;
+}
+int CvTraitEntry::GetGreatWorksTourism() const
+{
+	return m_iGreatWorksTourism;
+}
 int CvTraitEntry::GetCiviliansFreePromotion() const
 {
 	return m_iCiviliansFreePromotion;
@@ -1400,6 +1410,19 @@ int CvTraitEntry::GetUnitMaxHitPointChangePerRazedCityPopLimit() const
 	return m_iUnitMaxHitPointChangePerRazedCityPopLimit;
 }
 
+int CvTraitEntry::GetGoldenAgeResearchTotalCostModifier() const
+{
+	return m_iGoldenAgeResearchTotalCostModifier;
+}
+int CvTraitEntry::GetGoldenAgeResearchCityCountCostModifier() const
+{
+	return m_iGoldenAgeResearchCityCountCostModifier;
+}
+int CvTraitEntry::GetGoldenAgeGrowThresholdModifier() const
+{
+	return m_iGoldenAgeGrowThresholdModifier;
+}
+
 /// Load XML data
 bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
@@ -1530,6 +1553,8 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 		m_iPrereqTech = GC.getInfoTypeForString(szTextVal, true);
 	}
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iRiverCorruptionScoreChange = kResults.GetInt("RiverCorruptionScoreChange");
+	m_iGreatWorksTourism = kResults.GetInt("GreatWorksTourism");
 	szTextVal = kResults.GetText("CiviliansFreePromotion");
 	if(szTextVal)
 	{
@@ -2157,6 +2182,10 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	m_iUnitMaxHitPointChangePerRazedCityPop = kResults.GetInt("UnitMaxHitPointChangePerRazedCityPop");
 	m_iUnitMaxHitPointChangePerRazedCityPopLimit = kResults.GetInt("UnitMaxHitPointChangePerRazedCityPopLimit");
 
+	m_iGoldenAgeResearchTotalCostModifier = kResults.GetInt("GoldenAgeResearchTotalCostModifier");
+	m_iGoldenAgeResearchCityCountCostModifier = kResults.GetInt("GoldenAgeResearchCityCountCostModifier");
+	m_iGoldenAgeGrowThresholdModifier = kResults.GetInt("GoldenAgeGrowThresholdModifier");
+
 	return true;
 }
 
@@ -2334,6 +2363,8 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_iTradeReligionModifier += trait->GetTradeReligionModifier();
 			m_iTradeBuildingModifier += trait->GetTradeBuildingModifier();
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+			m_iRiverCorruptionScoreChange += trait->GetRiverCorruptionScoreChange();
+			m_iGreatWorksTourism += trait->GetGreatWorksTourism();
 			if(trait->GetCiviliansFreePromotion() != NO_PROMOTION)
 			{
 				m_iCiviliansFreePromotion = trait->GetCiviliansFreePromotion();
@@ -2500,6 +2531,10 @@ void CvPlayerTraits::InitPlayerTraits()
 
 			m_iUnitMaxHitPointChangePerRazedCityPop = trait->GetUnitMaxHitPointChangePerRazedCityPop();
 			m_iUnitMaxHitPointChangePerRazedCityPopLimit = trait->GetUnitMaxHitPointChangePerRazedCityPopLimit();
+
+			m_iGoldenAgeResearchTotalCostModifier = trait->GetGoldenAgeResearchTotalCostModifier();
+			m_iGoldenAgeResearchCityCountCostModifier = trait->GetGoldenAgeResearchCityCountCostModifier();
+			m_iGoldenAgeGrowThresholdModifier = trait->GetGoldenAgeGrowThresholdModifier();
 
 			for(int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
 			{
@@ -2823,6 +2858,8 @@ void CvPlayerTraits::Reset()
 	m_iTradeReligionModifier = 0;
 	m_iTradeBuildingModifier = 0;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iRiverCorruptionScoreChange = 0;
+	m_iGreatWorksTourism = 0;
 	m_iCiviliansFreePromotion = NO_PROMOTION;
 	m_iTradeRouteLandGoldBonus = 0;
 	m_iTradeRouteSeaGoldBonus = 0;
@@ -4254,6 +4291,8 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 		m_iTradeBuildingModifier = 0;
 	}
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	kStream >> m_iRiverCorruptionScoreChange;
+	kStream >> m_iGreatWorksTourism;
 	kStream >> m_iCiviliansFreePromotion;
 	kStream >> m_iTradeRouteLandGoldBonus;
 	kStream >> m_iTradeRouteSeaGoldBonus;
@@ -4540,6 +4579,10 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 
 	kStream >> m_iUnitMaxHitPointChangePerRazedCityPop;
 	kStream >> m_iUnitMaxHitPointChangePerRazedCityPopLimit;
+
+	kStream >> m_iGoldenAgeResearchTotalCostModifier;
+	kStream >> m_iGoldenAgeResearchCityCountCostModifier;
+	kStream >> m_iGoldenAgeGrowThresholdModifier;
 }
 
 /// Serialization write
@@ -4632,6 +4675,8 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_iTradeReligionModifier;
 	kStream << m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	kStream << m_iRiverCorruptionScoreChange;
+	kStream << m_iGreatWorksTourism;
 	kStream << m_iCiviliansFreePromotion;
 	kStream << m_iTradeRouteLandGoldBonus;
 	kStream << m_iTradeRouteSeaGoldBonus;
@@ -4796,6 +4841,10 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 
 	kStream << m_iUnitMaxHitPointChangePerRazedCityPop;
 	kStream << m_iUnitMaxHitPointChangePerRazedCityPopLimit;
+
+	kStream << m_iGoldenAgeResearchTotalCostModifier;
+	kStream << m_iGoldenAgeResearchCityCountCostModifier;
+	kStream << m_iGoldenAgeGrowThresholdModifier;
 }
 
 // PRIVATE METHODS
@@ -5022,4 +5071,17 @@ int CvPlayerTraits::GetUnitMaxHitPointChangePerRazedCityPop() const
 int CvPlayerTraits::GetUnitMaxHitPointChangePerRazedCityPopLimit() const
 {
 	return m_iUnitMaxHitPointChangePerRazedCityPopLimit;
+}
+
+int CvPlayerTraits::GetGoldenAgeResearchTotalCostModifier() const
+{
+	return m_iGoldenAgeResearchTotalCostModifier;
+}
+int CvPlayerTraits::GetGoldenAgeResearchCityCountCostModifier() const
+{
+	return m_iGoldenAgeResearchCityCountCostModifier;
+}
+int CvPlayerTraits::GetGoldenAgeGrowThresholdModifier() const
+{
+	return m_iGoldenAgeGrowThresholdModifier;
 }

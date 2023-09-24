@@ -278,6 +278,8 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_paiHurryModifier(NULL),
 	m_pbBuildingClassNeededInCity(NULL),
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	m_iLandmarksTourismPercentGlobal(0),
+	m_iGreatWorksTourismModifierGlobal(0),
 	m_iTradeRouteSeaGoldBonusGlobal(0),
 	m_iTradeRouteLandGoldBonusGlobal(0),
 	m_bAnyWater(false),
@@ -486,6 +488,8 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_bAllowInstantYield = kResults.GetBool("AllowInstantYield");
 #endif
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	m_iLandmarksTourismPercentGlobal = kResults.GetInt("LandmarksTourismPercentGlobal");
+	m_iGreatWorksTourismModifierGlobal = kResults.GetInt("GreatWorksTourismModifierGlobal");
 	m_iTradeRouteSeaGoldBonusGlobal = kResults.GetInt("TradeRouteSeaGoldBonusGlobal");
 	m_iTradeRouteLandGoldBonusGlobal = kResults.GetInt("TradeRouteLandGoldBonusGlobal");
 	m_bAnyWater = kResults.GetBool("AnyWater");
@@ -627,6 +631,10 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iCorruptionScoreChange = kResults.GetInt("CorruptionScoreChange");
 	m_iCorruptionLevelChange = kResults.GetInt("CorruptionLevelChange");
 #endif
+
+	m_iGlobalProductionNeededUnitModifier = kResults.GetInt("GlobalProductionNeededUnitModifier");
+	m_iGlobalProductionNeededBuildingModifier = kResults.GetInt("GlobalProductionNeededBuildingModifier");
+	m_iGlobalProductionNeededProjectModifier = kResults.GetInt("GlobalProductionNeededProjectModifier");
 
 	//References
 	const char* szTextVal;
@@ -2110,13 +2118,20 @@ int CvBuildingEntry::GetCorruptionLevelChange() const
 }
 #endif
 
+int CvBuildingEntry::GetGlobalProductionNeededUnitModifier() const {
+	return m_iGlobalProductionNeededUnitModifier;
+}
+int CvBuildingEntry::GetGlobalProductionNeededBuildingModifier() const {
+	return m_iGlobalProductionNeededBuildingModifier;
+}
+int CvBuildingEntry::GetGlobalProductionNeededProjectModifier() const {
+	return m_iGlobalProductionNeededProjectModifier;
+}
 
 int CvBuildingEntry::GetExtraAttacks() const
 {
 	return m_iExtraAttacks;
 }
-
-
 
 /// Happiness provided by this building
 int CvBuildingEntry::GetHappiness() const
@@ -3402,6 +3417,16 @@ bool CvBuildingEntry::IsBuildingClassNeededInCity(int i) const
 }
 
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+int CvBuildingEntry::GetLandmarksTourismPercentGlobal() const
+{
+	return m_iLandmarksTourismPercentGlobal;
+}
+
+int CvBuildingEntry::GetGreatWorksTourismModifierGlobal() const
+{
+	return m_iGreatWorksTourismModifierGlobal;
+}
+
 int CvBuildingEntry::GetTradeRouteSeaGoldBonusGlobal() const
 {
 	return m_iTradeRouteSeaGoldBonusGlobal;

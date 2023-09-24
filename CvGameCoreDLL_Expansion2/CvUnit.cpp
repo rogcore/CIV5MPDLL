@@ -2260,13 +2260,6 @@ void CvUnit::kill(bool bDelay, PlayerTypes ePlayer /*= NO_PLAYER*/)
 	}
 #endif
 
-#if defined(MOD_UNIT_BOUND_IMPROVEMENT)
-	if(MOD_UNIT_BOUND_IMPROVEMENT && (GetBoundLandImprovement() != NO_IMPROVEMENT || GetBoundWaterImprovement() != NO_IMPROVEMENT))
-	{
-		pPlot->setImprovementType(NO_IMPROVEMENT);
-	}
-#endif
-
 	setXY(INVALID_PLOT_COORD, INVALID_PLOT_COORD, true);
 	if(pPlot)
 		pPlot->removeUnit(this, false);
@@ -2279,6 +2272,26 @@ void CvUnit::kill(bool bDelay, PlayerTypes ePlayer /*= NO_PLAYER*/)
 			GET_PLAYER(getOwner()).changeNumResourceUsed((ResourceTypes) iResourceLoop, -getUnitInfo().GetResourceQuantityRequirement(iResourceLoop));
 		}
 	}
+
+#if defined(MOD_UNIT_BOUND_IMPROVEMENT)
+	// Remove Bound Improvement
+	if(MOD_UNIT_BOUND_IMPROVEMENT && pPlot && (GetBoundLandImprovement() != NO_IMPROVEMENT || GetBoundWaterImprovement() != NO_IMPROVEMENT))
+	{
+		bool hasBoundUnit = false;
+		int iNumUnit = pPlot->getNumUnits();
+		for(int iUnitLoop = 0; iUnitLoop < iNumUnit; iUnitLoop++)
+		{
+			CvUnit* iUnit = pPlot->getUnitByIndex(iUnitLoop);
+			if(iUnit->GetBoundLandImprovement() != NO_IMPROVEMENT || iUnit->GetBoundWaterImprovement() != NO_IMPROVEMENT)
+			{
+				hasBoundUnit = true;
+				break;
+			}	
+		}
+		if(!hasBoundUnit)
+			pPlot->setImprovementType(NO_IMPROVEMENT);
+	}
+#endif
 
 	//////////////////////////////////////////////////////////////////////////
 	// WARNING: This next statement will delete 'this'
@@ -19185,7 +19198,9 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 											DLLUI->AddUnitMessage(0, GetIDInfo(), getOwner(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer/*, GC.getEraInfo(GC.getGame().getCurrentEra())->getAudioUnitVictoryScript(), MESSAGE_TYPE_INFO, NULL, (ColorTypes)GC.getInfoTypeForString("COLOR_GREEN"), pkTargetPlot->getX(), pkTargetPlot->getY()*/);
 											MILITARYLOG(getOwner(), strBuffer.c_str(), plot(), pLoopUnit->getOwner());
 
-											kPlayer.DoCombatStrengthChangeFromKill(this, pLoopUnit, iX, iY, 0);
+											//kill or capture a noncombat unit should not trigger it
+											if(pLoopUnit->IsCombatUnit())
+												kPlayer.DoCombatStrengthChangeFromKill(this, pLoopUnit, iX, iY, 0);
 #if defined(MOD_API_UNIFIED_YIELDS)
 											kPlayer.DoYieldsFromKill(this, pLoopUnit, iX, iY, 0);
 #else
@@ -19854,6 +19869,12 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 				}
 			}
 		}
+	}
+
+	//change Recon plot
+	if(IsRecon())
+	{
+		setReconPlot(pNewPlot);
 	}
 
 	// Units moving into and out of cities change garrison happiness

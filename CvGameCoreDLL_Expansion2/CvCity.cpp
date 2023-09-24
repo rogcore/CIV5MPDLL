@@ -4505,6 +4505,10 @@ void CvCity::addProductionExperience(CvUnit* pUnit, bool bConscript)
 				{
 					pUnit->setHasPromotion(ePromotion, true);
 				}
+				else if(::IsPromotionValidForUnitPromotions(ePromotion, *pUnit))
+				{
+					pUnit->setHasPromotion(ePromotion, true);
+				}
 			}
 		}
 	}
@@ -7288,6 +7292,9 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			}
 		}
 
+		owningPlayer.ChangeProductionNeededUnitModifier(pBuildingInfo->GetGlobalProductionNeededUnitModifier() * iChange);
+		owningPlayer.ChangeProductionNeededBuildingModifier(pBuildingInfo->GetGlobalProductionNeededBuildingModifier() * iChange);
+		owningPlayer.ChangeProductionNeededProjectModifier(pBuildingInfo->GetGlobalProductionNeededProjectModifier() * iChange);
 
 #if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
 		if (MOD_BUILDING_IMPROVEMENT_RESOURCES)
@@ -10856,7 +10863,7 @@ bool CvCity::DoRazingTurn()
 		}
 
 		// Counter has reached 0, disband the City
-		if(GetRazingTurns() <= 0 || getPopulation() <= 1)
+		if(GetRazingTurns() <= 0 || getPopulation() - iPopulationDrop < 1)
 		{
 			CvPlot* pkPlot = plot();
 
@@ -21470,6 +21477,17 @@ int CvCity::CalculateCorruptionScoreFromResource() const
 	return resourceInfo != nullptr ? resourceInfo->GetCorruptionScoreChange() : 0;
 }
 
+int CvCity::CalculateCorruptionScoreFromTrait() const
+{
+	CvPlayerAI& owner = GET_PLAYER(getOwner());
+	int TraitBounsTotal = 0;
+	if(plot())
+	{
+		TraitBounsTotal += plot()->isRiver() ? owner.GetPlayerTraits()->GetRiverCorruptionScoreChange() : 0;
+	}
+	return TraitBounsTotal;
+}
+
 int CvCity::CalculateTotalCorruptionScore() const
 {
 	CvPlayerAI& owner = GET_PLAYER(getOwner());
@@ -21479,6 +21497,7 @@ int CvCity::CalculateTotalCorruptionScore() const
 	score += CalculateCorruptionScoreFromDistance();
 	score += CalculateCorruptionScoreFromResource();
 	score += GetCorruptionScoreChangeFromBuilding();
+	score += CalculateCorruptionScoreFromTrait();
 	score = std::max(0, score);
 
 	// Score Modifier

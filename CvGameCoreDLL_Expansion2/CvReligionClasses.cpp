@@ -907,7 +907,7 @@ void CvGameReligions::FoundPantheon(PlayerTypes ePlayer, BeliefTypes eBelief)
 	CvPlayer& kPlayer = GET_PLAYER(ePlayer);
 
 	CvReligion newReligion(RELIGION_PANTHEON, ePlayer, NULL, true);
-	newReligion.m_Beliefs.AddBelief(eBelief);
+	newReligion.m_Beliefs.AddBelief(eBelief, ePlayer);
 
 	// Found it
 	m_CurrentReligions.push_back(newReligion);
@@ -1052,24 +1052,24 @@ void CvGameReligions::FoundReligion(PlayerTypes ePlayer, ReligionTypes eReligion
 	{
 		CvReligionBeliefs beliefs = GC.getGame().GetGameReligions()->GetReligion(RELIGION_PANTHEON, ePlayer)->m_Beliefs;
 		for (int iI = 0; iI < beliefs.GetNumBeliefs(); iI++) {
-			kReligion.m_Beliefs.AddBelief(beliefs.GetBelief(iI));
+			kReligion.m_Beliefs.AddBelief(beliefs.GetBelief(iI), ePlayer);
 		}
 	}
 #else
-		kReligion.m_Beliefs.AddBelief(eBelief);
+		kReligion.m_Beliefs.AddBelief(eBelief, ePlayer);
 #endif
 
-	kReligion.m_Beliefs.AddBelief(eBelief1);
-	kReligion.m_Beliefs.AddBelief(eBelief2);
+	kReligion.m_Beliefs.AddBelief(eBelief1, ePlayer);
+	kReligion.m_Beliefs.AddBelief(eBelief2, ePlayer);
 
 	if(eBelief3 != NO_BELIEF)
 	{
-		kReligion.m_Beliefs.AddBelief(eBelief3);
+		kReligion.m_Beliefs.AddBelief(eBelief3, ePlayer);
 	}
 
 	if(eBelief4 != NO_BELIEF)
 	{
-		kReligion.m_Beliefs.AddBelief(eBelief4);
+		kReligion.m_Beliefs.AddBelief(eBelief4, ePlayer);
 	}
 
 	if(szCustomName != NULL && strlen(szCustomName) <= sizeof(kReligion.m_szCustomName))
@@ -1250,26 +1250,26 @@ CvGameReligions::FOUNDING_RESULT CvGameReligions::CanFoundReligion(PlayerTypes e
 	if (HasCreatedPantheon(ePlayer)) {
 		CvReligionBeliefs beliefs = GC.getGame().GetGameReligions()->GetReligion(RELIGION_PANTHEON, kPlayer.GetID())->m_Beliefs;
 		for(int iI = 0; iI < beliefs.GetNumBeliefs(); iI++) {
-			kReligion.m_Beliefs.AddBelief(beliefs.GetBelief(iI));
+			kReligion.m_Beliefs.AddBelief(beliefs.GetBelief(iI), NO_PLAYER);
 		}
 	}
 #else
 	BeliefTypes eBelief = GC.getGame().GetGameReligions()->GetBeliefInPantheon(kPlayer.GetID());
 	if(eBelief != NO_BELIEF)
-		kReligion.m_Beliefs.AddBelief(eBelief);
+		kReligion.m_Beliefs.AddBelief(eBelief, NO_PLAYER);
 #endif
 
-	kReligion.m_Beliefs.AddBelief(eBelief1);
-	kReligion.m_Beliefs.AddBelief(eBelief2);
+	kReligion.m_Beliefs.AddBelief(eBelief1, NO_PLAYER);
+	kReligion.m_Beliefs.AddBelief(eBelief2, NO_PLAYER);
 
 	if(eBelief3 != NO_BELIEF)
 	{
-		kReligion.m_Beliefs.AddBelief(eBelief3);
+		kReligion.m_Beliefs.AddBelief(eBelief3, NO_PLAYER);
 	}
 
 	if(eBelief4 != NO_BELIEF)
 	{
-		kReligion.m_Beliefs.AddBelief(eBelief4);
+		kReligion.m_Beliefs.AddBelief(eBelief4, NO_PLAYER);
 	}
 
 	if(szCustomName != NULL && strlen(szCustomName) <= sizeof(kReligion.m_szCustomName))
@@ -1341,11 +1341,11 @@ void CvGameReligions::EnhanceReligion(PlayerTypes ePlayer, ReligionTypes eReligi
 		return;
 	}
 
-	it->m_Beliefs.AddBelief(eBelief1);
+	it->m_Beliefs.AddBelief(eBelief1, ePlayer);
 #if defined(MOD_API_RELIGION)
 	if(eBelief2 != NO_BELIEF)
 #endif
-		it->m_Beliefs.AddBelief(eBelief2);
+		it->m_Beliefs.AddBelief(eBelief2, ePlayer);
 
 #if defined(MOD_API_RELIGION)
 	if(eReligion != RELIGION_PANTHEON)
@@ -1540,7 +1540,7 @@ void CvGameReligions::AddReformationBelief(PlayerTypes ePlayer, ReligionTypes eR
 		return;
 	}
 
-	it->m_Beliefs.AddBelief(eBelief1);
+	it->m_Beliefs.AddBelief(eBelief1, ePlayer);
 
 #if defined(MOD_TRAITS_OTHER_PREREQS)
 	if (MOD_TRAITS_OTHER_PREREQS) {
@@ -6599,11 +6599,13 @@ int CvReligionAI::ScoreBeliefForPlayer(CvBeliefEntry* pEntry)
 	int iFlavorHappiness = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_HAPPINESS"));
 	int iFlavorCulture = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_CULTURE"));
 	int iFlavorGold = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_GOLD"));
+	int iFlavorProduction = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_PRODUCTION"));
 	int iFlavorGP = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_GREAT_PEOPLE"));
 	int iFlavorScience = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_SCIENCE"));
 	int iFlavorDiplomacy = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_DIPLOMACY"));
 	int iFlavorExpansion = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_EXPANSION"));
 	int iFlavorReligon = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_RELIGION"));
+	int iFlavorEspionage = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_ESPIONAGE"));
 
 	int iNumEnhancedReligions = pGameReligions->GetNumReligionsEnhanced();
 	int iReligionsEnhancedPercent = (100 * iNumEnhancedReligions) / GC.getMap().getWorldInfo().getMaxActiveReligions();
@@ -6725,6 +6727,7 @@ int CvReligionAI::ScoreBeliefForPlayer(CvBeliefEntry* pEntry)
 	iRtnValue += iFlavorDiplomacy * pEntry->GetFriendlyCityStateSpreadModifier() / 20;
 	iRtnValue += iFlavorDefense * pEntry->GetCombatModifierFriendlyCities() / 4;
 	iRtnValue += iFlavorOffense * pEntry->GetCombatModifierEnemyCities() / 4;
+	iRtnValue += (iFlavorProduction + iFlavorGold) * pEntry->GetGoldenAgeModifier() / 10;
 
 	// Chosen EARLY?
 	if (iReligionsEnhancedPercent < 33)
@@ -6860,7 +6863,10 @@ int CvReligionAI::ScoreBeliefForPlayer(CvBeliefEntry* pEntry)
 	{
 		iRtnValue += (pEntry->GetFaithBuildingTourism() * 20);
 	}
-
+	if (pEntry->GetExtraSpies() > 0)
+	{
+		iRtnValue += (pEntry->GetExtraSpies() * iFlavorEspionage / 5);
+	}
 	return iRtnValue;
 }
 

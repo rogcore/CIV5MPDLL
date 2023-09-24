@@ -422,6 +422,8 @@ public:
 	int GetHurryModifier(int i) const;
 	bool IsBuildingClassNeededInCity(int i) const;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	int GetLandmarksTourismPercentGlobal() const;
+	int GetGreatWorksTourismModifierGlobal() const;
 	int GetTradeRouteSeaGoldBonusGlobal() const;
 	int GetTradeRouteLandGoldBonusGlobal() const;
 	bool IsAnyWater() const;
@@ -484,6 +486,10 @@ public:
 	int GetCorruptionScoreChange() const;
 	int GetCorruptionLevelChange() const;
 #endif
+
+	int GetGlobalProductionNeededUnitModifier() const;
+	int GetGlobalProductionNeededBuildingModifier() const;
+	int GetGlobalProductionNeededProjectModifier() const;
 
 private:
 	int m_iBuildingClassType;
@@ -788,6 +794,8 @@ private:
 
 	bool* m_pbBuildingClassNeededInCity;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	int m_iLandmarksTourismPercentGlobal;
+	int m_iGreatWorksTourismModifierGlobal;
 	int m_iTradeRouteSeaGoldBonusGlobal;
 	int m_iTradeRouteLandGoldBonusGlobal;
 	bool m_bAnyWater;
@@ -830,6 +838,10 @@ private:
 	int m_iCorruptionScoreChange = 0;
 	int m_iCorruptionLevelChange = 0;
 #endif
+
+	int m_iGlobalProductionNeededUnitModifier = 0;
+	int m_iGlobalProductionNeededBuildingModifier = 0;
+	int m_iGlobalProductionNeededProjectModifier = 0;
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

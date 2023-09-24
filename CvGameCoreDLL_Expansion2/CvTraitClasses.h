@@ -140,6 +140,8 @@ public:
 	int GetTradeReligionModifier() const;
 	int GetTradeBuildingModifier() const;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int GetRiverCorruptionScoreChange() const;
+	int GetGreatWorksTourism() const;
 	int GetCiviliansFreePromotion() const;
 	int GetTradeRouteLandGoldBonus() const;
 	int GetTradeRouteSeaGoldBonus() const;
@@ -292,6 +294,11 @@ public:
 	int GetUnitMaxHitPointChangePerRazedCityPop() const;
 	int GetUnitMaxHitPointChangePerRazedCityPopLimit() const;
 
+	int GetGoldenAgeResearchTotalCostModifier() const;
+	int GetGoldenAgeResearchCityCountCostModifier() const;
+
+	int GetGoldenAgeGrowThresholdModifier() const;
+
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
 protected:
@@ -388,6 +395,8 @@ protected:
 	int m_iTradeReligionModifier;
 	int m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int m_iRiverCorruptionScoreChange;
+	int m_iGreatWorksTourism;
 	int m_iCiviliansFreePromotion;
 	int m_iTradeRouteLandGoldBonus;
 	int m_iTradeRouteSeaGoldBonus;
@@ -522,6 +531,10 @@ protected:
 	int m_iUnitMaxHitPointChangePerRazedCityPop = 0;
 	int m_iUnitMaxHitPointChangePerRazedCityPopLimit = 0;
 
+	int m_iGoldenAgeResearchTotalCostModifier= 0;
+	int m_iGoldenAgeResearchCityCountCostModifier = 0;
+
+	int m_iGoldenAgeGrowThresholdModifier = 0;
 private:
 	CvTraitEntry(const CvTraitEntry&);
 	CvTraitEntry& operator=(const CvTraitEntry&);
@@ -894,6 +907,15 @@ public:
 	}
 
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int GetRiverCorruptionScoreChange() const
+	{
+		return m_iRiverCorruptionScoreChange;
+	}
+	int GetGreatWorksTourism() const
+	{
+		return m_iGreatWorksTourism;
+	}
+
 	int GetCiviliansFreePromotion() const
 	{
 		return m_iCiviliansFreePromotion;
@@ -1202,6 +1224,11 @@ public:
 	int GetUnitMaxHitPointChangePerRazedCityPop() const;
 	int GetUnitMaxHitPointChangePerRazedCityPopLimit() const;
 
+	int GetGoldenAgeResearchTotalCostModifier() const;
+	int GetGoldenAgeResearchCityCountCostModifier() const;
+
+	int GetGoldenAgeGrowThresholdModifier() const;
+
 	// Serialization
 	void Read(FDataStream& kStream);
 	void Write(FDataStream& kStream);
@@ -1304,6 +1331,8 @@ private:
 	int m_iTradeReligionModifier;
 	int m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int m_iRiverCorruptionScoreChange;
+	int m_iGreatWorksTourism;
 	int m_iCiviliansFreePromotion;
 	int m_iTradeRouteLandGoldBonus;
 	int m_iTradeRouteSeaGoldBonus;
@@ -1445,6 +1474,11 @@ private:
 
 	int m_iUnitMaxHitPointChangePerRazedCityPop = 0;
 	int m_iUnitMaxHitPointChangePerRazedCityPopLimit = 0;
+
+	int m_iGoldenAgeResearchTotalCostModifier= 0;
+	int m_iGoldenAgeResearchCityCountCostModifier = 0;
+
+	int m_iGoldenAgeGrowThresholdModifier = 0;
 };
 
 #endif //CIV5_TRAIT_CLASSES_H

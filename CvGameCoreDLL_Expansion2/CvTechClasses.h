@@ -260,7 +260,7 @@ public:
 	int GetResearchTurnsLeftTimes100(TechTypes eTech, bool bOverflow) const;
 	int GetNumTechsCanBeResearched() const;
 	CvTechXMLEntries* GetTechs() const;
-	int GetResearchCost(TechTypes eTech) const;
+	long long GetResearchCost(TechTypes eTech) const;
 	int GetResearchProgress(TechTypes eTech) const;
 	int GetMedianTechResearch() const;
 
