@@ -467,6 +467,7 @@ CvUnit::CvUnit() :
 	, m_iCapitalDefenseFalloff(0)
 	, m_iCityAttackPlunderModifier(0)
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	, m_iExtraMoveTimesXX(0)
 	, m_iOriginalCapitalDamageFix(0)
 	, m_iMultipleInitExperence(0)
 	, m_iLostAllMovesAttackCity(0)
@@ -1416,6 +1417,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iCapitalDefenseFalloff = 0;
 	m_iCityAttackPlunderModifier = 0;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	m_iExtraMoveTimesXX = 0;
 	m_iOriginalCapitalDamageFix = 0;
 	m_iMultipleInitExperence = 0;
 	m_iLostAllMovesAttackCity = 0;
@@ -6555,6 +6557,15 @@ int CvUnit::GetCityAttackPlunderModifier() const
 
 //	--------------------------------------------------------------------------------
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeExtraMoveTimesXX(int iValue)
+{
+	m_iExtraMoveTimesXX += iValue;
+}
+const int CvUnit::GetExtraMoveTimesXX() const
+{
+	return m_iExtraMoveTimesXX;
+}
 //	--------------------------------------------------------------------------------
 void CvUnit::ChangeOriginalCapitalDamageFix(int iValue)
 {
@@ -13362,18 +13373,22 @@ int CvUnit::baseMoves(DomainTypes eIntoDomain /* = NO_DOMAIN */) const
 int CvUnit::maxMoves() const
 {
 	VALIDATE_OBJECT
+	int resMoves = 0;
 #if defined(MOD_PROMOTIONS_FLAGSHIP)
 	if(IsGreatGeneral() || (MOD_PROMOTIONS_FLAGSHIP && IsGreatAdmiral()))
 #else
 	if(IsGreatGeneral())
 #endif
 	{
-		return GetGreatGeneralStackMovement();
+		resMoves = GetGreatGeneralStackMovement();
 	}
 	else
 	{
-		return (baseMoves() * GC.getMOVE_DENOMINATOR());	// WARNING: Uses the current embark state of the unit!
+		resMoves = baseMoves() * GC.getMOVE_DENOMINATOR();	// WARNING: Uses the current embark state of the unit!
 	}
+	if (!isEmbarked())
+		resMoves += GetExtraMoveTimesXX();
+	return resMoves;
 }
 
 
@@ -25182,6 +25197,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeCapitalDefenseFalloff((thisPromotion.GetCapitalDefenseFalloff()) * iChange);
 		ChangeCityAttackPlunderModifier((thisPromotion.GetCityAttackPlunderModifier()) *  iChange);
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+		ChangeExtraMoveTimesXX((thisPromotion.GetExtraMoveTimesXX()) * iChange);
 		ChangeOriginalCapitalDamageFix((thisPromotion.GetOriginalCapitalDamageFix()) * iChange);
 		ChangeMultipleInitExperence((thisPromotion.GetMultipleInitExperence()) * iChange);
 		ChangeLostAllMovesAttackCity((thisPromotion.GetLostAllMovesAttackCity()) * iChange);
@@ -25732,6 +25748,7 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iCapitalDefenseFalloff;
 	kStream >> m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	kStream >> m_iExtraMoveTimesXX;
 	kStream >> m_iOriginalCapitalDamageFix;
 	kStream >> m_iMultipleInitExperence;
 	kStream >> m_iLostAllMovesAttackCity;
@@ -26110,6 +26127,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iCapitalDefenseFalloff;
 	kStream << m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	kStream << m_iExtraMoveTimesXX;
 	kStream << m_iOriginalCapitalDamageFix;
 	kStream << m_iMultipleInitExperence;
 	kStream << m_iLostAllMovesAttackCity;
