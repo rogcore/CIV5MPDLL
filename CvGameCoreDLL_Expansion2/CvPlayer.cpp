@@ -291,6 +291,7 @@ CvPlayer::CvPlayer() :
 	, m_iSettlerProductionEraModifier("CvPlayer::m_iSettlerProductionEraModifier", m_syncArchive)
 	, m_iSettlerProductionStartEra("CvPlayer::m_iSettlerProductionStartEra", m_syncArchive)
 #endif
+	, m_iNullifyInfluenceModifier("CvPlayer::m_iNullifyInfluenceModifier", m_syncArchive)
 	, m_iNumTradeRouteBonus("CvPlayer::m_iNumTradeRouteBonus", m_syncArchive)
 	, m_viTradeRouteDomainExtraRange("CvPlayer::m_viTradeRouteDomainExtraRange", m_syncArchive)
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
@@ -447,6 +448,14 @@ CvPlayer::CvPlayer() :
 	, m_aiDomainFreeExperiencePerGreatWorkGlobal("CvPlayer::m_aiDomainFreeExperiencePerGreatWorkGlobal", m_syncArchive)
 	, m_piDomainFreeExperience()
 	, m_piUnitTypePrmoteHealGlobal()
+#endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	, m_aiDomainTroopsTotal("CvPlayer::m_aiDomainTroopsTotal", m_syncArchive)
+	, m_aiDomainTroopsUsed("CvPlayer::m_aiDomainTroopsUsed", m_syncArchive)
+#endif
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	, m_aiImmigrationCounter("CvPlayer::m_aiImmigrationCounter", m_syncArchive)
 #endif
 	, m_aiPolicyModifiers("CvPlayer::m_aiPolicyModifiers", m_syncArchive)
 
@@ -1066,6 +1075,7 @@ void CvPlayer::uninit()
 	m_iSettlerProductionEraModifier = 0;
 	m_iSettlerProductionStartEra = NO_ERA;
 #endif
+	m_iNullifyInfluenceModifier = 0;
 	m_iNumTradeRouteBonus = 0;
 	m_viTradeRouteDomainExtraRange.clear();
 	m_viTradeRouteDomainExtraRange.resize(NUM_DOMAIN_TYPES, 0);
@@ -1212,6 +1222,14 @@ void CvPlayer::uninit()
 	m_iMaxEffectiveCities = 1;
 	m_iLastSliceMoved = 0;
 
+	
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	m_iNumCropsTotal = 0;
+	m_iNumCropsUsed = 0;
+	m_iNumArmeeTotal = 0;
+	m_iNumArmeeUsed = 0;
+#endif
+
 	m_bHasBetrayedMinorCiv = false;
 	m_bAlive = false;
 	m_bEverAlive = false;
@@ -1269,6 +1287,17 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 
 	m_piDomainFreeExperience.clear();
 	m_piUnitTypePrmoteHealGlobal.clear();
+#endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	m_aiDomainTroopsTotal.clear();
+	m_aiDomainTroopsTotal.resize(NUM_DOMAIN_TYPES, 0);
+	m_aiDomainTroopsUsed.clear();
+	m_aiDomainTroopsUsed.resize(NUM_DOMAIN_TYPES, 0);
+#endif
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	m_aiImmigrationCounter.clear();
+	m_aiImmigrationCounter.resize(MAX_MAJOR_CIVS, 0);
 #endif
 
 	m_ownedNaturalWonders.clear();
@@ -2452,6 +2481,21 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 			}
 		}
 	}
+#if defined(MOD_GLOBAL_UNIQUE_PROJECT_CAPTURE)
+	if(MOD_GLOBAL_UNIQUE_PROJECT_CAPTURE && getTeam() != NO_TEAM && getCapitalCity())
+	{
+		for(int iJ = 0; iJ < GC.getNumProjectInfos(); iJ++)
+		{
+			ProjectTypes eProject = (ProjectTypes)iJ;
+			CvProjectEntry* pProject = GC.getProjectInfo(eProject);
+			if (pProject != NULL && pOldCity->getProjectCount(eProject) > 0 
+				&& pProject->GetMaxGlobalInstances() == 1 && GET_TEAM(getTeam()).getProjectCount(eProject) == 0)
+			{
+				getCapitalCity()->CreateProject(eProject, true);
+			}
+		}
+	}
+#endif
 
 	int iNumBuildingInfos = GC.getNumBuildingInfos();
 	std::vector<int> paiNumRealBuilding(iNumBuildingInfos, 0);
@@ -3681,6 +3725,9 @@ int CvPlayer::getBuyPlotDistance() const
 int CvPlayer::getWorkPlotDistance() const
 {
 	int iDistance = GC.getMAXIMUM_WORK_PLOT_DISTANCE();
+
+	if(isMinorCiv())
+		iDistance -= GC.getMAXIMUM_WORK_PLOT_DISTANCE_MINOR_REDUCE();
 	
 #if defined(MOD_TRAITS_CITY_WORKING) || defined(MOD_BUILDINGS_CITY_WORKING) || defined(MOD_POLICIES_CITY_WORKING)
 	// Change distance based on traits, policies, wonders, etc
@@ -4996,51 +5043,44 @@ void CvPlayer::doTurn()
 	DoUpdateUprisings();
 	DoUpdateCityRevolts();
 
-	if(GetPlayerTraits()->IsEndOfMayaLongCount())
-	{
-		ChangeNumMayaBoosts(1);
-	}
-
 	bool bHasActiveDiploRequest = false;
-	if(isAlive())
+	if(isAlive() && isMajorCiv())
 	{
-		if(!isBarbarian())
+		GetTrade()->DoTurn();
+		GetMilitaryAI()->ResetCounters();
+		GetGrandStrategyAI()->DoTurn();
+#if defined(MOD_AI_MP_DIPLOMACY)
+		if (MOD_AI_MP_DIPLOMACY) {
+			// We only do AI to AI diplomacy here.
+			// See CvDiplomacyRequests::DoAIDiplomacyWithHumans() for AI to human diplomacy
+			GetDiplomacyAI()->DoTurn(NO_PLAYER, DIPLO_AI_PLAYERS);
+		} else {
+#endif
+		if(GC.getGame().isHotSeat() && !isHuman())
 		{
-			if(!isMinorCiv())
-			{
-				GetTrade()->DoTurn();
-				GetMilitaryAI()->ResetCounters();
-				GetGrandStrategyAI()->DoTurn();
+			// In Hotseat, AIs only do their diplomacy pass for other AIs on their turn
+			// Diplomacy toward a human is done at the beginning of the humans turn.
 #if defined(MOD_AI_MP_DIPLOMACY)
-				if (MOD_AI_MP_DIPLOMACY) {
-					// We only do AI to AI diplomacy here.
-					// See CvDiplomacyRequests::DoAIDiplomacyWithHumans() for AI to human diplomacy
-					GetDiplomacyAI()->DoTurn(NO_PLAYER, DIPLO_AI_PLAYERS);
-				} else {
-#endif
-				if(GC.getGame().isHotSeat() && !isHuman())
-				{
-					// In Hotseat, AIs only do their diplomacy pass for other AIs on their turn
-					// Diplomacy toward a human is done at the beginning of the humans turn.
-#if defined(MOD_AI_MP_DIPLOMACY)
-					GetDiplomacyAI()->DoTurn(NO_PLAYER, DIPLO_AI_PLAYERS);		// Do diplomacy for toward everyone
+			GetDiplomacyAI()->DoTurn(NO_PLAYER, DIPLO_AI_PLAYERS);		// Do diplomacy for toward everyone
 #else
-					GetDiplomacyAI()->DoTurn((PlayerTypes)CvDiplomacyAI::DIPLO_AI_PLAYERS);		// Do diplomacy for toward everyone
+			GetDiplomacyAI()->DoTurn((PlayerTypes)CvDiplomacyAI::DIPLO_AI_PLAYERS);		// Do diplomacy for toward everyone
 #endif
-				}
-				else
+		}
+		else
 #if defined(MOD_AI_MP_DIPLOMACY)
-					GetDiplomacyAI()->DoTurn(NO_PLAYER, DIPLO_ALL_PLAYERS);	// Do diplomacy for toward everyone
+			GetDiplomacyAI()->DoTurn(NO_PLAYER, DIPLO_ALL_PLAYERS);	// Do diplomacy for toward everyone
 #else
-					GetDiplomacyAI()->DoTurn((PlayerTypes)CvDiplomacyAI::DIPLO_ALL_PLAYERS);	// Do diplomacy for toward everyone
+			GetDiplomacyAI()->DoTurn((PlayerTypes)CvDiplomacyAI::DIPLO_ALL_PLAYERS);	// Do diplomacy for toward everyone
 #endif
 
-				if (!isHuman())
-					bHasActiveDiploRequest = CvDiplomacyRequests::HasActiveDiploRequestWithHuman(GetID());
+		if (!isHuman())
+			bHasActiveDiploRequest = CvDiplomacyRequests::HasActiveDiploRequestWithHuman(GetID());
 #if defined(MOD_AI_MP_DIPLOMACY)
-				}
+		}
 #endif
-			}
+		if(GetPlayerTraits()->IsEndOfMayaLongCount())
+		{
+			ChangeNumMayaBoosts(1);
 		}
 	}
 
@@ -5065,6 +5105,7 @@ void CvPlayer::doTurn()
 		bool bResult;
 		LuaSupport::CallHook(pkScriptSystem, "PlayerDoTurn", args.get(), bResult);
 	}
+	DoTestOverResourceNotificationAll();
 
 	m_kPlayerAchievements.StartTurn();
 }
@@ -9778,6 +9819,25 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	ChangeLiberatedInfluence(pBuildingInfo->GetLiberatedInfluence()* iChange);
 #endif
 
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	for (int iDomains = 0; iDomains < NUM_DOMAIN_TYPES; iDomains++)
+	{
+		DomainTypes eDomain = (DomainTypes)iDomains;
+		if (eDomain != NO_DOMAIN && pBuildingInfo->GetDomainTroops(iDomains) != 0)
+		{
+			ChangeDomainTroopsTotalTimes100(pBuildingInfo->GetDomainTroops(iDomains) * GetTroopsRateTimes100() * iChange);
+		}
+	}
+	if(pBuildingInfo->GetNumCrops() != 0)
+	{
+		ChangeNumCropsTotalTimes100(pBuildingInfo->GetNumCrops() * GetTroopsRateTimes100() * iChange);
+	}
+	if(pBuildingInfo->GetNumArmee() != 0)
+	{
+		ChangeNumArmeeTotalTimes100(pBuildingInfo->GetNumArmee() * GetTroopsRateTimes100() * iChange);
+	}
+#endif
+
 	if(pBuildingInfo->GetFreeBuildingClass() != NO_BUILDINGCLASS)
 	{
 		BuildingTypes eFreeBuilding = (BuildingTypes)getCivilizationInfo().getCivilizationBuildings(pBuildingInfo->GetFreeBuildingClass());
@@ -9862,6 +9922,7 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	changeSpaceProductionModifier(pBuildingInfo->GetGlobalSpaceProductionModifier() * iChange);
 
 	changeNumTradeRouteBonus(pBuildingInfo->GetNumTradeRouteBonus() * iChange);
+	changeNullifyInfluenceModifier(pBuildingInfo->NullifyInfluenceModifier() ? iChange : 0);
 
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
 	changeLandmarksTourismPercentGlobal(pBuildingInfo->GetLandmarksTourismPercentGlobal() * iChange);
@@ -13321,6 +13382,7 @@ void CvPlayer::ChangeUnhappinessFromUnits(int iChange)
 /// How much of our Happiness is being used up? (Population + Units)
 int CvPlayer::GetUnhappiness(CvCity* pAssumeCityAnnexed, CvCity* pAssumeCityPuppeted) const
 {
+	if(isObserver() || isBarbarian()) return 0;
 	int iUnhappiness = 0;
 
 	// City Count Unhappiness
@@ -16796,6 +16858,15 @@ void CvPlayer::setSettlerProductionStartEra(int iChange)
 
 #endif
 //	--------------------------------------------------------------------------------
+bool CvPlayer::isNullifyInfluenceModifier() const
+{
+	return m_iNullifyInfluenceModifier > 0;
+}
+void CvPlayer::changeNullifyInfluenceModifier(int iChange)
+{
+	m_iNullifyInfluenceModifier += iChange;
+}
+//	--------------------------------------------------------------------------------
 int CvPlayer::getNumTradeRouteBonus() const
 {
 	return m_iNumTradeRouteBonus > 0 ? m_iNumTradeRouteBonus : 0;
@@ -17556,6 +17627,152 @@ void CvPlayer::ChangeUnitTypePrmoteHealGlobal(UnitTypes eIndex, int iChange)
 #endif
 
 
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetDomainTroopsTotalTimes100(DomainTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
+	return m_aiDomainTroopsTotal[eIndex] + GC.getTROOP_NUM_BASE() * GetTroopsRateTimes100();
+}
+void CvPlayer::ChangeDomainTroopsTotalTimes100(int iChange, DomainTypes eIndex)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
+	m_aiDomainTroopsTotal.setAt(eIndex, m_aiDomainTroopsTotal[eIndex] + iChange);
+}
+void CvPlayer::SetDomainTroopsTotalTimes100(int iValue, DomainTypes eIndex)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
+	m_aiDomainTroopsTotal.setAt(eIndex, iValue);
+}
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetDomainTroopsUsed(DomainTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
+	return m_aiDomainTroopsUsed[eIndex];
+}
+void CvPlayer::ChangeDomainTroopsUsed(int iChange, DomainTypes eIndex)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
+	m_aiDomainTroopsUsed.setAt(eIndex, m_aiDomainTroopsUsed[eIndex] + iChange);
+}
+void CvPlayer::SetDomainTroopsUsed(int iValue, DomainTypes eIndex)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
+	m_aiDomainTroopsUsed.setAt(eIndex, iValue);
+}
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetTroopsRateTimes100() const
+{
+	if(GC.getGame().isOption(GAMEOPTION_SP_CORPS_MODE_HIGH))
+		return GC.getTROOP_RATE_TIMES100_HIGH();
+	if(GC.getGame().isOption(GAMEOPTION_SP_CORPS_MODE_LOW))
+		return GC.getTROOP_RATE_TIMES100_LOW();
+	return GC.getTROOP_RATE_TIMES100_DEFAULT();
+}
+int CvPlayer::GetDomainTroopsTotal(DomainTypes eIndex) const
+{
+	return  GetDomainTroopsTotalTimes100(eIndex) / 100;
+}
+bool CvPlayer::IsLackingTroops(DomainTypes eIndex) const
+{
+	if(!MOD_TROOPS_AND_CROPS_FOR_SP || GC.getGame().isOption(GAMEOPTION_SP_CORPS_MODE_DISABLE)) return false;
+	return GetDomainTroopsTotal(eIndex) - GetDomainTroopsUsed(eIndex) <= 0;
+}
+int CvPlayer::GetDomainTroopsActive(DomainTypes eIndex) const
+{
+	if(!MOD_TROOPS_AND_CROPS_FOR_SP || GC.getGame().isOption(GAMEOPTION_SP_CORPS_MODE_DISABLE)) return 0;
+	return GetDomainTroopsTotal(eIndex) - GetDomainTroopsUsed(eIndex);
+}
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetNumCropsTotalTimes100() const
+{
+	return m_iNumCropsTotal;
+}
+void CvPlayer::ChangeNumCropsTotalTimes100(int iChange)
+{
+	m_iNumCropsTotal += iChange;
+}
+int CvPlayer::GetNumCropsUsed() const
+{
+	return m_iNumCropsUsed;
+}
+void CvPlayer::ChangeNumCropsUsed(int iChange)
+{
+	m_iNumCropsUsed += iChange;
+}
+int CvPlayer::GetNumCropsTotal() const
+{
+	return m_iNumCropsTotal / 100;
+}
+bool CvPlayer::IsCanEstablishCrops() const
+{
+	if(!MOD_TROOPS_AND_CROPS_FOR_SP || GC.getGame().isOption(GAMEOPTION_SP_CORPS_MODE_DISABLE)) return false;
+	return GetNumCropsTotal() - GetNumCropsUsed() > 0;
+}
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetNumArmeeTotalTimes100() const
+{
+	return m_iNumArmeeTotal;
+}
+void CvPlayer::ChangeNumArmeeTotalTimes100(int iChange)
+{
+	m_iNumArmeeTotal += iChange;
+}
+int CvPlayer::GetNumArmeeUsed() const
+{
+	return m_iNumArmeeUsed;
+}
+void CvPlayer::ChangeNumArmeeUsed(int iChange)
+{
+	m_iNumArmeeUsed += iChange;
+}
+int CvPlayer::GetNumArmeeTotal() const
+{
+	return m_iNumArmeeTotal / 100;
+}
+bool CvPlayer::IsCanEstablishArmee() const
+{
+	if(!MOD_TROOPS_AND_CROPS_FOR_SP || GC.getGame().isOption(GAMEOPTION_SP_CORPS_MODE_DISABLE)) return false;
+	return GetNumArmeeTotal() - GetNumArmeeUsed() > 0;
+}
+//	--------------------------------------------------------------------------------
+#endif
+
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+int CvPlayer::GetImmigrationCounter(int iIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(iIndex >= 0, "iIndex expected to be >= 0");
+	CvAssertMsg(iIndex < MAX_MAJOR_CIVS, "iIndex expected to be < MAX_MAJOR_CIVS");
+	return m_aiImmigrationCounter[iIndex];
+}
+void CvPlayer::ChangeImmigrationCounter(int iIndex, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(iIndex >= 0, "iIndex expected to be >= 0");
+	CvAssertMsg(iIndex < MAX_MAJOR_CIVS, "iIndex expected to be < MAX_MAJOR_CIVS");
+	m_aiImmigrationCounter.setAt(iIndex, m_aiImmigrationCounter[iIndex] + iChange);
+}
+void CvPlayer::SetImmigrationCounter(int iIndex, int iValue)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(iIndex >= 0, "iIndex expected to be >= 0");
+	CvAssertMsg(iIndex < MAX_MAJOR_CIVS, "iIndex expected to be < MAX_MAJOR_CIVS");
+	m_aiImmigrationCounter.setAt(iIndex, iValue);
+}
+#endif
 
 #if defined(MOD_ROG_CORE)
 int CvPlayer::getWorldWonderCityYieldRateModifier(YieldTypes eIndex) const
@@ -17814,9 +18031,13 @@ void CvPlayer::setOverflowResearchTimes100(int iNewValue)
 
 
 //	--------------------------------------------------------------------------------
-void CvPlayer::changeOverflowResearchTimes100(int iChange)
+//	--------------------------------------------------------------------------------
+void CvPlayer::changeOverflowResearchTimes100(long long iChange)
 {
-	setOverflowResearchTimes100(getOverflowResearchTimes100() + iChange);
+	// Don't allow the overflow to get out of hand
+	long long llOverflowResearch = getOverflowResearchTimes100();
+	llOverflowResearch += iChange;
+	setOverflowResearchTimes100((int)std::min((long long)MAX_INT, llOverflowResearch));
 }
 
 //	--------------------------------------------------------------------------------
@@ -22122,26 +22343,59 @@ void CvPlayer::UpdateResourcesSiphoned()
 
 //	--------------------------------------------------------------------------------
 /// Are we over our resource limit? If so, give out a notification
-void CvPlayer::DoTestOverResourceNotification(ResourceTypes eIndex)
+void CvPlayer::DoTestOverResourceNotification(ResourceTypes eIndex, bool bIsDoTurn)
 {
-	if(getNumResourceAvailable(eIndex, true) < 0)
+	if(!isHuman()) return;
+	int iNumResource = getNumResourceAvailable(eIndex, true);
+	if(iNumResource < 0)
 	{
-		const CvResourceInfo* pkResourceInfo = GC.getResourceInfo(eIndex);
-		if(pkResourceInfo != NULL && pkResourceInfo->getResourceUsage() == RESOURCEUSAGE_STRATEGIC)
+		CvResourceInfo* pkResourceInfo = GC.getResourceInfo(eIndex);
+		int iNotificationTurn = pkResourceInfo->getNotificationTurn();
+		if(pkResourceInfo != NULL && (pkResourceInfo->getResourceUsage() == RESOURCEUSAGE_STRATEGIC || iNotificationTurn > 0))
 		{
-			CvNotifications* pNotifications = GetNotifications();
-			if(pNotifications)
+			//Special for SP: Block the Manpower, Consumer & Electricity Notification at StartTurn
+			if (GC.getGame().getElapsedGameTurns() < iNotificationTurn || (pkResourceInfo->isNoDefaultNotification() && !bIsDoTurn)) return;
+			CvString strText;
+			for (uint uiYield = 0; uiYield < NUM_YIELD_TYPES; uiYield++)
 			{
-				Localization::String strText = Localization::Lookup("TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT");
-				strText << pkResourceInfo->GetTextKey();
+				YieldTypes eYield = (YieldTypes)uiYield;
+				int iYieldModifier =  CalculateGlobalYieldModifierFromResource(pkResourceInfo, iNumResource, eYield);
+				if(iYieldModifier != 0)
+				{
+					strText += GetLocalizedText("TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_DEBUFF", GC.getYieldInfo(eYield)->getIconString(), GC.getYieldInfo(eYield)->GetDescription(), iYieldModifier);
+				}
+			}
+			int iUnhappinessMod = CalculateUnhappinessModFromResource(pkResourceInfo, iNumResource);
+			if(iUnhappinessMod > 0)
+			{
+				strText += GetLocalizedText("TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_UNHAPPINESS", iUnhappinessMod);
+			}
+			if(!pkResourceInfo->isNoDefaultNotification())
+				strText += GetLocalizedText("TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_COMBAT");
+			CvNotifications* pNotifications = GetNotifications();
+			if(pNotifications && strText.length() > 0)
+			{
+				strText = GetLocalizedText("TXT_KEY_NOTIFICATION_RESOURCE_LIMIT_GLOBAL_1",pkResourceInfo->GetTextKey()) + strText;
 				Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_SUMMARY_OVER_RESOURCE_LIMIT");
+				strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_SUMMARY_OVER_RESOURCE_LIMIT");
 				strSummary << pkResourceInfo->GetTextKey();
-				pNotifications->Add(NOTIFICATION_DEMAND_RESOURCE, strText.toUTF8(), strSummary.toUTF8(), -1, -1, eIndex);
+				pNotifications->Add(NOTIFICATION_DEMAND_RESOURCE, strText, strSummary.toUTF8(), -1, -1, eIndex);
 			}
 		}
 	}
 }
 
+//	--------------------------------------------------------------------------------
+// Test All Resources to create turn Notification
+void CvPlayer::DoTestOverResourceNotificationAll()
+{
+	if(!isHuman()) return;
+	for(int i = 0; i < GC.getNumResourceInfos(); i++)
+	{
+		ResourceTypes eResource = (ResourceTypes)i;
+		DoTestOverResourceNotification(eResource, true);
+	}
+}
 //	--------------------------------------------------------------------------------
 /// Is our collection of Strategic Resources modified?
 int CvPlayer::GetStrategicResourceMod() const
@@ -24466,7 +24720,6 @@ void CvPlayer::doResearch()
 
 	AI_PERF_FORMAT("AI-perf.csv", ("CvPlayer::doResearch, Turn %03d, %s", GC.getGame().getElapsedGameTurns(), getCivilizationShortDescription()) );
 	bool bForceResearchChoice;
-	int iOverflowResearch;
 
 	if(GetPlayerTechs()->IsResearch())
 	{
@@ -24489,24 +24742,25 @@ void CvPlayer::doResearch()
 		}
 
 		TechTypes eCurrentTech = GetPlayerTechs()->GetCurrentResearch();
+		int iScienceTimes100 = GetScienceTimes100();
+		// iResearchModifier >= 100
+		int iResearchModifier = calculateResearchModifier(eCurrentTech);
 		if(eCurrentTech == NO_TECH)
 		{
-			int iOverflow = (GetScienceTimes100()) / std::max(1, calculateResearchModifier(eCurrentTech));
-			changeOverflowResearchTimes100(iOverflow);
+			int iOverflow = iScienceTimes100 / std::max(1, iResearchModifier);
+			changeOverflowResearch(iOverflow);
 		}
 		else
 		{
-			iOverflowResearch = (getOverflowResearchTimes100()/100) * calculateResearchModifier(eCurrentTech);
+			long long iOverflowResearch = getOverflowResearchTimes100();
+			iOverflowResearch = iOverflowResearch * iResearchModifier / 100;
 			setOverflowResearch(0);
 			if(GET_TEAM(getTeam()).GetTeamTechs())
 			{
-				int iBeakersTowardsTechTimes100 = GetScienceTimes100() + iOverflowResearch;
-#if defined(MOD_BUGFIX_RESEARCH_OVERFLOW)
-				GET_TEAM(getTeam()).GetTeamTechs()->ChangeResearchProgressTimes100(eCurrentTech, iBeakersTowardsTechTimes100, GetID(), iOverflowResearch, calculateResearchModifier(eCurrentTech));
-#else
-				GET_TEAM(getTeam()).GetTeamTechs()->ChangeResearchProgressTimes100(eCurrentTech, iBeakersTowardsTechTimes100, GetID());
-#endif
-				UpdateResearchAgreements(GetScienceTimes100() / 100);
+				long long iBeakersTowardsTechTimes100 = iScienceTimes100;
+				iBeakersTowardsTechTimes100 += iOverflowResearch;
+				GET_TEAM(getTeam()).GetTeamTechs()->ChangeResearchProgressTimes100(eCurrentTech, iBeakersTowardsTechTimes100, GetID(), iOverflowResearch, iResearchModifier);
+				UpdateResearchAgreements(iScienceTimes100 / 100);
 			}
 		}
 
@@ -25938,6 +26192,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 
 	changeSharedIdeologyTourismModifier(pPolicy->GetSharedIdeologyTourismModifier() * iChange);
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	changeNullifyInfluenceModifier(pPolicy->IsNullifyInfluenceModifier() ? iChange : 0);
 	changeDifferentIdeologyTourismModifier(pPolicy->GetDifferentIdeologyTourismModifier() * iChange);
 	changeHappinessPerPolicy(pPolicy->GetHappinessPerPolicy() * iChange);
 	changeNumTradeRouteBonus(pPolicy->GetNumTradeRouteBonus() * iChange);
@@ -27450,6 +27705,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iSettlerProductionEraModifier;
 	kStream >> m_iSettlerProductionStartEra;
 #endif
+	kStream >> m_iNullifyInfluenceModifier;
 	kStream >> m_iNumTradeRouteBonus;
 	kStream >> m_viTradeRouteDomainExtraRange;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
@@ -28003,6 +28259,18 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iProductionNeededBuildingModifier;
 	kStream >> m_iProductionNeededProjectModifier;
 
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	kStream >> m_aiDomainTroopsTotal;
+	kStream >> m_aiDomainTroopsUsed;
+	kStream >> m_iNumCropsTotal;
+	kStream >> m_iNumCropsUsed;
+	kStream >> m_iNumArmeeTotal;
+	kStream >> m_iNumArmeeUsed;
+#endif
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	kStream >> m_aiImmigrationCounter;
+#endif
+
 	if(GetID() < MAX_MAJOR_CIVS)
 	{
 		if(!m_pDiplomacyRequests)
@@ -28165,6 +28433,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iSettlerProductionEraModifier;
 	kStream << m_iSettlerProductionStartEra;
 #endif
+	kStream << m_iNullifyInfluenceModifier;
 	kStream << m_iNumTradeRouteBonus;
 	kStream << m_viTradeRouteDomainExtraRange;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
@@ -28619,6 +28888,18 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iProductionNeededUnitModifier;
 	kStream << m_iProductionNeededBuildingModifier;
 	kStream << m_iProductionNeededProjectModifier;
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	kStream << m_aiDomainTroopsTotal;
+	kStream << m_aiDomainTroopsUsed;
+	kStream << m_iNumCropsTotal;
+	kStream << m_iNumCropsUsed;
+	kStream << m_iNumArmeeTotal;
+	kStream << m_iNumArmeeUsed;
+#endif
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	kStream << m_aiImmigrationCounter;
+#endif
 }
 
 //	--------------------------------------------------------------------------------
@@ -31706,18 +31987,33 @@ bool CvPlayer::CheckAndUpdateWarCasualtiesCounter()
 	if (iChange != 0)
 	{
 		pCity->changePopulation(iChange);
-	}
-
-	if (this->isHuman())
-	{
-		CvNotifications *pNotifications = this->GetNotifications();
-		if (pNotifications)
+		if (this->isHuman())
 		{
-			Localization::String strMessage = Localization::Lookup("TXT_KEY_NOTIFICATION_WAR_CASUALTIES_MESSAGE");
-			strMessage << pCity->getNameKey();
-			strMessage << -iChange;
-			Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_WAR_CASUALTIES_SUMMARY");
-			pNotifications->Add(NOTIFICATION_STARVING, strMessage.toUTF8(), strSummary.toUTF8(), pCity->getX(), pCity->getY(), -1);
+			CvNotifications *pNotifications = this->GetNotifications();
+			if (pNotifications)
+			{
+				Localization::String strMessage = Localization::Lookup("TXT_KEY_NOTIFICATION_WAR_CASUALTIES_MESSAGE");
+				strMessage << pCity->getNameKey();
+				strMessage << -iChange;
+				Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_WAR_CASUALTIES_SUMMARY");
+				pNotifications->Add(NOTIFICATION_STARVING, strMessage.toUTF8(), strSummary.toUTF8(), pCity->getX(), pCity->getY(), -1);
+			}
+		}
+	}
+	else
+	{
+		pCity->setFood(0);
+		pCity->ChangeResistanceTurns(2);
+		if (this->isHuman())
+		{
+			CvNotifications *pNotifications = this->GetNotifications();
+			if (pNotifications)
+			{
+				Localization::String strMessage = Localization::Lookup("TXT_KEY_NOTIFICATION_WAR_CASUALTIES_MESSAGE2");
+				strMessage << pCity->getNameKey();
+				Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_WAR_CASUALTIES_SUMMARY");
+				pNotifications->Add(NOTIFICATION_STARVING, strMessage.toUTF8(), strSummary.toUTF8(), pCity->getX(), pCity->getY(), -1);
+			}
 		}
 	}
 

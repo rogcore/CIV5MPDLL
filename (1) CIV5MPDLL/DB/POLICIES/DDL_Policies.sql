@@ -1,14 +1,14 @@
 alter table Policies add column `MinorBullyInfluenceLossModifier` int not null default 0;
 
 create table Policy_MinorsTradeRouteYieldRate (
-    PolicyType text not null,
-    YieldType text not null,
+    PolicyType text default '',
+    YieldType text default '',
     Rate integer not null
 );
 
 create table Policy_InternalTradeRouteDestYieldRate (
-    PolicyType text not null,
-    YieldType text not null,
+    PolicyType text default '',
+    YieldType text default '',
     Rate integer not null
 );
 
@@ -59,3 +59,5 @@ ALTER TABLE Policies ADD 'NumTradeRouteBonus' INTEGER DEFAULT 0;
 ALTER TABLE Policies ADD 'HappinessPerPolicy' INTEGER DEFAULT 0;
 ALTER TABLE Policies ADD 'DifferentIdeologyTourismModifier' INTEGER DEFAULT 0;
 ALTER TABLE Policies ADD 'ReligionProductionModifier' INTEGER DEFAULT 0;
+
+ALTER TABLE Policies ADD 'NullifyInfluenceModifier' BOOLEAN DEFAULT 0;

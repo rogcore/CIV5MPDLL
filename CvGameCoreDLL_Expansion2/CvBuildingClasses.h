@@ -407,6 +407,12 @@ public:
 	int GetUnitTypePrmoteHealGlobal(int i) const;
 #endif
 
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	int GetDomainTroops(int i) const;
+	int GetNumCrops() const;
+	int GetNumArmee() const;
+#endif
+
 	int GetDomainProductionModifier(int i) const;
 	int GetLockedBuildingClasses(int i) const;
 	int GetPrereqAndTechs(int i) const;
@@ -571,7 +577,7 @@ private:
 
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
 	int* m_piInstantYield;
-	bool m_bAllowInstantYield;
+	int m_iInstantYieldCount;
 #endif
 
 #if defined(MOD_ROG_CORE)
@@ -777,6 +783,12 @@ private:
 	int* m_piDomainFreeExperiencePerGreatWorkGlobal;
 	std::map<int, int> m_piDomainFreeExperienceGlobal;
 	std::map<int, int> m_piUnitTypePrmoteHealGlobal;
+#endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	int* m_piDomainTroops;
+	int  m_iNumCrops;
+	int  m_iNumArmee;
 #endif
 
 

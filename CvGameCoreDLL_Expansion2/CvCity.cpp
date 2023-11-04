@@ -3139,6 +3139,16 @@ bool CvCity::canTrain(UnitTypes eUnit, bool bContinue, bool bTestVisible, bool b
 					return false;
 			}
 		}
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+		//when lacking Troops, can't built combat unit
+		if(GET_PLAYER(getOwner()).IsLackingTroops() && (pkUnitEntry->GetCombat() > 0 || pkUnitEntry->GetRangedCombat() > 0) && !pkUnitEntry->IsNoTroops())
+		{
+			GC.getGame().BuildCannotPerformActionHelpText(toolTipSink, "TXT_KEY_NO_ACTION_LACKING_TROOPS");
+			if(toolTipSink == NULL)
+					return false;
+		}
+#endif
 	}
 
 	if(!plot()->canTrain(eUnit, bContinue, bTestVisible))
@@ -7154,7 +7164,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		changeTradeRouteDomainGoldBonus(DOMAIN_SEA, pBuildingInfo->GetTradeRouteSeaGoldBonus() * iChange);
 
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
-		if (MOD_GLOBAL_BUILDING_INSTANT_YIELD && (iChange > 0) && pBuildingInfo->IsAllowInstantYield())
+		if (iChange > 0 && pBuildingInfo->IsAllowInstantYield())
 		{
 			doBuildingInstantYield(pBuildingInfo->GetInstantYieldArray());
 		}
@@ -16182,13 +16192,13 @@ bool CvCity::CreateBuilding(BuildingTypes eBuildingType)
 
 
 //	--------------------------------------------------------------------------------
-bool CvCity::CreateProject(ProjectTypes eProjectType)
+bool CvCity::CreateProject(ProjectTypes eProjectType, bool bIsCapture)
 {
 	VALIDATE_OBJECT
 
 	CvPlayer& thisPlayer = GET_PLAYER(getOwner());
 	CvTeam& thisTeam = GET_TEAM(getTeam());
-	thisTeam.changeProjectCount(eProjectType, 1);
+	thisTeam.changeProjectCount(eProjectType, 1, bIsCapture);
 
 	changeProjectCount(eProjectType, 1);
 

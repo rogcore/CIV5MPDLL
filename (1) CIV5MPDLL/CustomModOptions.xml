@@ -1080,7 +1080,7 @@
     <!-- ALTER TABLE UnitPromotions ADD 'FeatureInvisible2' TEXT DEFAULT NULL; -->
     <Row Class="6" Name="PROMOTION_FEATURE_INVISIBLE" Value="0"/>
 
-    <!-- INSERT INTO Defines(Name, Value) VALUES('GOLDEN_AGE_POINT_MULTIPLE_IN_GA', 2); -->
+    <!-- INSERT INTO Defines(Name, Value) VALUES('GOLDEN_AGE_POINT_MULTIPLE_IN_GA', 50); -->
     <Row Class="6" Name="GLOBAL_TRIGGER_NEW_GOLDEN_AGE_IN_GA" Value="0"/>
     <!-- INSERT INTO Defines(Name, Value) VALUES('UNIT_MOVES_AFTER_DISEMBARK', 60); --> 
     <Row Class="6" Name="GLOBAL_UNIT_MOVES_AFTER_DISEMBARK" Value="0"/>
@@ -1090,13 +1090,8 @@
     <!-- table changes: -->
     <!-- see NewTableChanges.sql DDL_Policies.sql -->
     <Row Class="6" Name="POLICY_NEW_EFFECT_FOR_SP" Value="1"/>
-    <!-- table changes: -->
-    <!-- ALTER TABLE UnitPromotions ADD 'MultipleInitExperence' INTEGER DEFAULT 0; -->
-    <!-- ALTER TABLE UnitPromotions ADD 'CarrierEXPGivenModifier' INTEGER DEFAULT 0; -->
-    <!-- ALTER TABLE UnitPromotions ADD 'UnitAttackFaithBonus' INTEGER DEFAULT 0; -->
-    <!-- ALTER TABLE UnitPromotions ADD 'CityAttackFaithBonus' INTEGER DEFAULT 0; -->
-    <!-- ALTER TABLE UnitPromotions ADD 'RemovePromotionUpgrade' TEXT DEFAULT NULL; -->
-    <!-- ALTER TABLE UnitPromotions ADD 'LostAllMovesAttackCity'  INTEGER DEFAULT 0; -->
+     <!-- table changes: -->
+    <!-- see NewTableChanges.sql -->
     <Row Class="6" Name="PROMOTION_NEW_EFFECT_FOR_SP" Value="1"/>
     <!-- table changes: -->
     <!-- see Belief_Table_Changes.sql -->
@@ -1111,13 +1106,18 @@
     <!-- see DDL_Traits.sql -->
     <Row Class="6" Name="TRAIT_NEW_EFFECT_FOR_SP" Value="1"/>
 
-    <Row Class="6" Name="UNIT_COST_DONOT_INCTEASE_WITH_TURN" Value="1"/> 
+    <!-- table changes: -->
+    <!-- see TroopsAndCrops.sql -->
+    <Row Class="6" Name="TROOPS_AND_CROPS_FOR_SP" Value="0"/>
+
+    <Row Class="6" Name="INTERNATIONAL_IMMIGRATION_FOR_SP" Value="0"/>
+
+    <Row Class="6" Name="UNIT_COST_DONOT_INCTEASE_WITH_TURN" Value="0"/> 
 
     <Row Class="6" Name="CHANGE_RESOURCE_LINK_AFTER_ALTER_PLOT" Value="1"/>
 
     <!-- table changes: -->
     <!-- see Building_InstantYield.xml -->
-    <!-- ALTER TABLE Buildings ADD COLUMN 'AllowInstantYield' BOOLEAN DEFAULT 0;-->
     <Row Class="6" Name="GLOBAL_BUILDING_INSTANT_YIELD" Value="1"/>
 
     <Row Class="6" Name="POLICY_FREE_PROMOTION_FOR_PROMOTION" Value="1"/>
@@ -1168,6 +1168,8 @@
     <Row Class="6" Name="IMPROVEMENTS_UNIT_XP_PER_TURN" Value="0"/>
 
     <Row Class="6" Name="GLOBAL_CORRUPTION" Value="0"/>
+
+    <Row Class="6" Name="GLOBAL_UNIQUE_PROJECT_CAPTURE" Value="0"/>
   </CustomModOptions>
 
   <CustomModPostDefines>

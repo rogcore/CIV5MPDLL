@@ -633,14 +633,7 @@ void CvBuilderTaskingAI::UpdateRoutePlots(void)
 
 int CorrectWeight(int iWeight)
 {
-	if(iWeight < -1000)
-	{
-		return MAX_INT;
-	}
-	else
-	{
-		return iWeight;
-	}
+	return min(iWeight,0x7FFF);
 }
 
 /// Use the flavor settings to determine what the worker should do
@@ -988,7 +981,7 @@ void CvBuilderTaskingAI::AddImprovingResourcesDirectives(CvUnit* pUnit, CvPlot* 
 		iWeight = CorrectWeight(iWeight);
 
 		UpdateProjectedPlotYields(pPlot, eBuild);
-		int iScore = ScorePlot();
+		int iScore = ScorePlot(eImprovement, eExistingPlotImprovement);
 		if(iScore > 0)
 		{
 			iWeight *= iScore;
@@ -1011,6 +1004,7 @@ void CvBuilderTaskingAI::AddImprovingResourcesDirectives(CvUnit* pUnit, CvPlot* 
 			}
 		}
 
+		// if we're going backward, bail out!
 		if(iWeight <= 0)
 		{
 			continue;
@@ -1226,7 +1220,7 @@ void CvBuilderTaskingAI::AddImprovingPlotsDirectives(CvUnit* pUnit, CvPlot* pPlo
 		}
 
 		UpdateProjectedPlotYields(pPlot, eBuild);
-		int iScore = ScorePlot();
+		int iScore = ScorePlot(eImprovement, eExistingImprovement);
 
 		// if we're going backward, bail out!
 		if (iScore <= 0)
@@ -1247,58 +1241,6 @@ void CvBuilderTaskingAI::AddImprovingPlotsDirectives(CvUnit* pUnit, CvPlot* pPlo
 			iWeight = GC.getBUILDER_TASKING_BASELINE_REPAIR();
 		}
 
-#if defined(MOD_API_UNIFIED_YIELDS)
-		else
-		{
-			for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
-			{
-				YieldTypes eYield = (YieldTypes)iI;
-				if (pImprovement->GetYieldChange(iI) > 0)
-				{
-					iWeight = GC.getBUILDER_TASKING_BASELINE_ADDS_CULTURE() * GC.getImprovementInfo(eImprovement)->GetYieldChange(iI);
-					int iAdjacentCulture = pImprovement->GetYieldAdjacentSameType(eYield);
-
-					if (iAdjacentCulture > 0)
-					{
-						iScore *= (1 + pPlot->ComputeYieldFromAdjacentImprovement(*pImprovement, eImprovement, eYield));
-					}
-				}
-			}
-		}
-#else
-		else if (pImprovement->GetYieldChange(YIELD_CULTURE) > 0)
-		{
-			iWeight = GC.getBUILDER_TASKING_BASELINE_ADDS_CULTURE() * GC.getImprovementInfo(eImprovement)->GetYieldChange(YIELD_CULTURE);
-			int iAdjacentCulture = pImprovement->GetCultureAdjacentSameType();
-
-			if (iAdjacentCulture > 0)
-			{
-				iScore *= (1 + pPlot->ComputeCultureFromAdjacentImprovement(*pImprovement, eImprovement));
-			}
-		}
-#endif
-		if (eBuild != m_eRepairBuild) {
-#if defined(MOD_API_VP_ADJACENT_YIELD_BOOST)
-
-			for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
-			{
-				YieldTypes eYield = (YieldTypes)iI;
-				if (pImprovement->GetYieldChange(iI) > 0)
-				{
-					for (int iJ = 0; iJ < GC.getNumImprovementInfos(); iJ++)
-					{
-						ImprovementTypes eThisImprovement = (ImprovementTypes)iJ;
-
-						if (eThisImprovement != NO_IMPROVEMENT)
-						{
-							iScore *= (1 + pPlot->ComputeYieldFromOtherAdjacentImprovement(*pImprovement, eYield));
-						}
-					}
-				}
-			}
-			
-#endif
-		}
 		min(iScore, 0x7FFF);
 
 		iWeight = GetBuildCostWeight(iWeight, pPlot, eBuild);
@@ -2251,31 +2193,26 @@ bool CvBuilderTaskingAI::DoesBuildHelpRush(CvUnit* pUnit, CvPlot* pPlot, BuildTy
 	return true;
 }
 
-int CvBuilderTaskingAI::ScorePlot()
+int CvBuilderTaskingAI::ScorePlot(ImprovementTypes eImprovement, ImprovementTypes eExistingImprovement)
 {
-	if(!m_pTargetPlot)
-	{
-		return -1;
-	}
+	if(!m_pTargetPlot) return -1;
 
 	CvCity* pCity = m_pTargetPlot->getWorkingCity();
-	if(!pCity)
-	{
-		return -1;
-	}
+	if(!pCity) return -1;
 
 	CvCityStrategyAI* pCityStrategy = pCity->GetCityStrategyAI();
-	if(!pCityStrategy)
-	{
-		return -1;
-	}
+	if(!pCityStrategy) return -1;
+
+	CvImprovementEntry* pImprovement = GC.getImprovementInfo(eImprovement);
+	if(!pImprovement) return -1;
 
 	int iScore = 0;
 	bool bAnyNegativeMultiplier = false;
 	YieldTypes eFocusYield = pCityStrategy->GetFocusYield();
 	for(uint ui = 0; ui < NUM_YIELD_TYPES; ui++)
 	{
-		int iMultiplier = pCityStrategy->GetYieldDeltaTimes100((YieldTypes)ui);
+		YieldTypes eYield = (YieldTypes) ui;
+		int iMultiplier = pCityStrategy->GetYieldDeltaTimes100(eYield);
 		int iAbsMultiplier = abs(iMultiplier);
 		int iYieldDelta = m_aiProjectedPlotYields[ui] - m_aiCurrentPlotYields[ui];
 
@@ -2303,6 +2240,10 @@ int CvBuilderTaskingAI::ScorePlot()
 				iScore += iYieldDelta * iAbsMultiplier;
 			}
 		}
+
+#if defined(MOD_API_VP_ADJACENT_YIELD_BOOST)
+		iScore += (100 * m_pTargetPlot->ComputeYieldToOtherAdjacentImprovement(*pImprovement, eYield));
+#endif
 	}
 
 	if(!bAnyNegativeMultiplier && eFocusYield != NO_YIELD)
@@ -2312,6 +2253,14 @@ int CvBuilderTaskingAI::ScorePlot()
 		{
 			iScore += m_aiProjectedPlotYields[eFocusYield] * 100;
 		}
+	}
+
+	//special define in XML
+	iScore += pImprovement->GetExtraScore();
+	if(eExistingImprovement != NO_IMPROVEMENT && GC.getImprovementInfo(eExistingImprovement))
+	{
+		iScore -= GC.getImprovementInfo(eExistingImprovement)->GetExtraScore();
+		iScore -= 25;
 	}
 
 	if (pCity->isCapital()) // this is our capital and needs emphasis

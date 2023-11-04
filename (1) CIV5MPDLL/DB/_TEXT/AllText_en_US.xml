@@ -5,8 +5,7 @@
 		<Row Tag="TXT_KEY_AIR_PATROL_BOMBED_GROUND_TARGETS">
 			<Text>Your {@1_UnitName} met no resistance and attacked enemy air and ground air defense units!</Text>
 		</Row>
-
-			<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK">
+		<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK">
 			<Text>Our {2_Unit} was knocked back by the enemy's {1_Unit}!</Text>
 		</Row>
 		<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK_S">
@@ -263,6 +262,9 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_WAR_CASUALTIES_MESSAGE">
 			<Text>Casualties in the battle has caused {2_loss} [ICON_CITIZEN] Citizen lost in your city: [COLOR_NEGATIVE_TEXT]{@1_CityName}[ENDCOLOR]!</Text>
 		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_WAR_CASUALTIES_MESSAGE2">
+			<Text>Casualties in the battle has caused a Blackout and all current stacked [ICON_FOOD] Food lost in your city: [COLOR_NEGATIVE_TEXT]{@1_CityName}[ENDCOLOR]!</Text>
+		</Row>
 		<Row Tag="TXT_KEY_NOTIFICATION_WAR_CASUALTIES_SUMMARY">
 			<Text>Casualties in Battle!</Text>
 		</Row>
@@ -408,6 +410,9 @@
 		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_ANNEX_PUPPET_LEVEL_PREVIEW">
 			<Text>If you annex this city, the estimated city hall level is: {1_level}</Text>
 		</Row>
+		<Row Tag="TXT_KEY_FOUNDED_CITY_LEVEL_PREVIEW">
+			<Text>If you found a city city here, the Corruption score will be: {1_score} ({2_level})</Text>
+		</Row>
 		<Row Tag="TXT_KEY_TOURISM_FROM_CITY_RATE">
 			<Text>{1_Num}[ICON_TOURISM]Tourism from Buildings, Terrian ...:</Text>
 		</Row>
@@ -515,6 +520,34 @@
 		</Row>
 		<Row Tag="TXT_KEY_CO_PLAYER_TOURISM_DIFFERENT_IDEOLOGY">
       		<Text>+{1_Num}% Bonus for different ideologies from policies[NEWLINE]</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_NO_ACTION_LACKING_TROOPS">
+      		<Text>[NEWLINE]Lacking Troops</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_RESOURCE_LIMIT_GLOBAL_1">
+      		<Text>You are currently using more {1_Resource:textkey} than you have!, you are affected by the following:</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_COMBAT">
+      		<Text>[NEWLINE][ICON_BULLET]All units which require it will [COLOR_NEGATIVE_TEXT]fight much less effectively[ENDCOLOR]</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_DEBUFF">
+      		<Text>[NEWLINE][ICON_BULLET][COLOR_NEGATIVE_TEXT]{3_Num}%[ENDCOLOR] {1_IconString} {2_Description} across the country</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_UNHAPPINESS">
+      		<Text>[NEWLINE][ICON_BULLET][COLOR_NEGATIVE_TEXT]+{1_Num}%[ENDCOLOR] [ICON_HAPPINESS_4] Unhappiness across the country</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CO_PLAYER_TOURISM_IGNOR_TECH_BONUS">
+			<Text>Ignoring Tech bouns[NEWLINE]</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_CHAIN_REACTION_ATTACKER">
+			<Text>Your {1_UnitName} Cause [COLOR_POSITIVE_TEXT] {2_Percent}% [ENDCOLOR] Damage to all enemy milltary units within your sight regardless of distance</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_CHAIN_REACTION_DEFENDER">
+			<Text>Enemy {1_UnitName} Cause [COLOR_NEGATIVE_TEXT] {2_Percent}% [ENDCOLOR] Damage to all your milltary units within their sight regardless of distance</Text>
+		</Row>
+		<Row Tag="TXT_KEY_MISC_CAPTURE_PROJECT">
+			<Text>{1_PlyrName} already knew the secrets of {@2_PrjctName}!</Text>
 		</Row>
 	</Language_en_US>
 

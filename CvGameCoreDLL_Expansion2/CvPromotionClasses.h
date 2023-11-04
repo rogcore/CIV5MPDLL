@@ -258,6 +258,9 @@ public:
 	int GetCapitalDefenseFalloff() const;
 	int GetCityAttackPlunderModifier() const;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	int GetInsightEnemyDamageModifier() const;
+	int GetHeightModPerX() const;
+	int GetHeightModLimited() const;
 	int GetExtraMoveTimesXX() const;
 	int GetOriginalCapitalDamageFix() const;
 	int GetMultipleInitExperence() const;
@@ -269,6 +272,10 @@ public:
 	int GetAttackChanceFromAttackDamageFormula() const;
 	int GetMovementFromAttackDamageFormula() const;
 	int GetHealPercentFromAttackDamageFormula() const;
+#endif
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	bool IsCrops() const;
+	bool IsArmee() const;
 #endif
 	int GetReligiousStrengthLossRivalTerritory() const;
 	
@@ -596,6 +603,9 @@ protected:
 	int m_iCapitalDefenseFalloff;
 	int m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	int m_iInsightEnemyDamageModifier;
+	int m_iHeightModPerX;
+	int m_iHeightModLimited;
 	int m_iExtraMoveTimesXX;
 	int m_iOriginalCapitalDamageFix;
 	int m_iMultipleInitExperence;
@@ -607,6 +617,10 @@ protected:
 	int m_eAttackChanceFromAttackDamageFormula;
 	int m_eMovementFromAttackDamageFormula;
 	int m_eHealPercentFromAttackDamageFormula;
+#endif
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	bool m_bCrops;
+	bool m_bArmee;
 #endif
 	int m_iReligiousStrengthLossRivalTerritory;
 	int m_iTradeMissionInfluenceModifier;

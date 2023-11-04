@@ -87,11 +87,11 @@ INSERT INTO Defines(Name, Value) VALUES('VERY_UNHAPPY_MAX_CRIME_PENALTY', 100);
 INSERT INTO Defines(Name, Value) VALUES('AI_CITIZEN_VALUE_HEALTH', 7);
 
 CREATE TABLE IF NOT EXISTS UnitPromotions_PromotionModifiers (
-    `PromotionType` TEXT NOT NULL,
-    `OtherPromotionType` TEXT NOT NULL,
-    `Modifier` integer default 0 NOT NULL,
-    `Attack` integer default 0 NOT NULL,
-    `Defense` integer default 0 NOT NULL
+    `PromotionType` TEXT DEFAULT '',
+    `OtherPromotionType` TEXT DEFAULT '',
+    `Modifier` INTEGER DEFAULT 0 NOT NULL,
+    `Attack` INTEGER DEFAULT 0 NOT NULL,
+    `Defense` INTEGER DEFAULT 0 NOT NULL
 );
 
 ALTER TABLE UnitPromotions ADD 'NumSpyDefenseMod' INTEGER DEFAULT 0;
@@ -167,7 +167,7 @@ ALTER TABLE UnitPromotions ADD COLUMN 'AdjacentEnemySapMovement' INTEGER DEFAULT
 ALTER TABLE UnitPromotions ADD COLUMN 'AdjacentFriendlySapMovement' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD COLUMN 'AdjacentSapExperience' INTEGER DEFAULT 0;
 
-ALTER TABLE UnitPromotions  ADD COLUMN 'ShowInUnitPanel' INTEGER DEFAULT 1;
+ALTER TABLE UnitPromotions ADD COLUMN 'ShowInUnitPanel' INTEGER DEFAULT 1;
 ALTER TABLE UnitPromotions ADD COLUMN 'ShowInTooltip' INTEGER DEFAULT 1;
 ALTER TABLE UnitPromotions ADD COLUMN 'ShowInPedia' INTEGER DEFAULT 1;
 ALTER TABLE UnitPromotions ADD COLUMN 'PillageReplenishMoves' INTEGER DEFAULT 0;
@@ -202,3 +202,9 @@ ALTER TABLE Policies ADD COLUMN 'AlwaysWeLoveKindDayInGoldenAge' BOOLEAN DEFAULT
 ALTER TABLE Traits ADD COLUMN 'NoResistance'  BOOLEAN DEFAULT 0;
 ALTER TABLE Traits ADD COLUMN 'GoldenAgeOnWar' BOOLEAN DEFAULT 0;
 ALTER TABLE Traits ADD COLUMN 'BuyOwnedTiles' BOOLEAN DEFAULT 0;
+
+ALTER TABLE UnitPromotions ADD COLUMN 'HeightModPerX' INTEGER DEFAULT 0;
+ALTER TABLE UnitPromotions ADD COLUMN 'HeightModLimited' INTEGER DEFAULT 0;
+ALTER TABLE UnitPromotions ADD COLUMN 'InsightEnemyDamageModifier' INTEGER DEFAULT 0;
+
+ALTER TABLE Improvements ADD ExtraScore INTEGER DEFAULT 0;

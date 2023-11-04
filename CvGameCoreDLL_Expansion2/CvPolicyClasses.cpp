@@ -65,6 +65,7 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_iFreeExperience(0),
 	m_iWorkerSpeedModifier(0),
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	m_bNullifyInfluenceModifier(false),
 	m_iDifferentIdeologyTourismModifier(0),
 	m_iHappinessPerPolicy(0),
 	m_iNumTradeRouteBonus(0),
@@ -356,6 +357,7 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iFreeExperience = kResults.GetInt("FreeExperience");
 	m_iWorkerSpeedModifier = kResults.GetInt("WorkerSpeedModifier");
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	m_bNullifyInfluenceModifier = kResults.GetBool("NullifyInfluenceModifier");
 	m_iDifferentIdeologyTourismModifier = kResults.GetInt("DifferentIdeologyTourismModifier");
 	m_iHappinessPerPolicy = kResults.GetInt("HappinessPerPolicy");
 	m_iNumTradeRouteBonus = kResults.GetInt("NumTradeRouteBonus");
@@ -1544,6 +1546,11 @@ int CvPolicyEntry::GetWorkerSpeedModifier() const
 	return m_iWorkerSpeedModifier;
 }
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+///
+bool CvPolicyEntry::IsNullifyInfluenceModifier() const
+{
+	return m_bNullifyInfluenceModifier;
+}
 ///Different Ideology Tourism Modifier
 int CvPolicyEntry::GetDifferentIdeologyTourismModifier() const
 {
@@ -3876,20 +3883,23 @@ int CvPlayerPolicies::GetNextPolicyCost()
 	// Base cost that doesn't get exponent-ed
 	iCost += /*25*/ GC.getBASE_POLICY_COST();
 
-	// Mod for City Count
 	int iMod = GC.getMap().getWorldInfo().GetNumCitiesPolicyCostMod();	// Default is 40, gets smaller on larger maps
-	int iPolicyModDiscount = m_pPlayer->GetNumCitiesPolicyCostDiscount();
-	if(iPolicyModDiscount != 0)
+	if(iMod != 0)
 	{
-		iMod = iMod * (100 + iPolicyModDiscount);
+		// Mod for City Count
+		int iPolicyModDiscount = m_pPlayer->GetNumCitiesPolicyCostDiscount();
+		if(iPolicyModDiscount != 0)
+		{
+			iMod = iMod * (100 + iPolicyModDiscount);
+			iMod /= 100;
+		}
+
+		int iNumCities = m_pPlayer->GetMaxEffectiveCities();
+
+		iMod = (iCost * (iNumCities - 1) * iMod);
 		iMod /= 100;
+		iCost += iMod;
 	}
-
-	int iNumCities = m_pPlayer->GetMaxEffectiveCities();
-
-	iMod = (iCost * (iNumCities - 1) * iMod);
-	iMod /= 100;
-	iCost += iMod;
 
 	// Policy Cost Mod
 	iCost *= (100 + m_pPlayer->getPolicyCostModifier());

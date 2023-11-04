@@ -566,6 +566,10 @@ protected:
 	static int lGetSameTileHeal(lua_State* L);
 	static int lGetAdjacentTileHeal(lua_State* L);
 
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	static int lGetTotalHeightMod(lua_State* L);
+#endif
+
 	static int lGetExtraCombatPercent(lua_State* L);
 	static int lGetFriendlyLandsModifier(lua_State* L);
 	static int lGetFriendlyLandsAttackModifier(lua_State* L);
@@ -738,6 +742,13 @@ protected:
 
 #ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
 	LUAAPIEXTN(IsImmuneNegtivePromotions, bool);
+#endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	LUAAPIEXTN(IsNoTroops, bool);
+#endif
+#ifdef MOD_GLOBAL_CORRUPTION
+	static int lGetPlotCorruptionScoreReport(lua_State* L);
 #endif
 };
 

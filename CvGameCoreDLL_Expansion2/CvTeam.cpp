@@ -246,6 +246,7 @@ void CvTeam::uninit()
 		m_abOpenBorders[i] = false;
 		m_abDefensivePact[i] = false;
 		m_abResearchAgreement[i] = false;
+		m_aiResearchAgreementStartTurn[i] = -1;
 		m_abTradeAgreement[i] = false;
 		m_abForcePeace[i] = false;
 	}
@@ -1365,7 +1366,7 @@ void CvTeam::DoDeclareWar(TeamTypes eTeam, bool bDefensivePact, bool bMinorAllyP
 				{
 					ePlayer = (PlayerTypes) iI;
 
-					if(GET_PLAYER(ePlayer).isAlive() && GET_PLAYER(ePlayer).GetNotifications())
+					if((GET_PLAYER(ePlayer).isAlive() || GET_PLAYER(ePlayer).isObserver()) && GET_PLAYER(ePlayer).GetNotifications())
 					{
 						// If this declaration is a minor following a major's declaration, don't send out these individual notifications
 						if(!bMinorAllyPact)
@@ -1388,7 +1389,7 @@ void CvTeam::DoDeclareWar(TeamTypes eTeam, bool bDefensivePact, bool bMinorAllyP
 								GET_PLAYER(ePlayer).GetNotifications()->Add(NOTIFICATION_WAR_ACTIVE_PLAYER, locString.toUTF8(), locString.toUTF8(), -1, -1, this->getLeaderID());
 							}
 							// Players that are on neither team, but know both parties
-							else if(GET_TEAM(GET_PLAYER(ePlayer).getTeam()).isHasMet(GetID()) && GET_TEAM(GET_PLAYER(ePlayer).getTeam()).isHasMet(eTeam))
+							else if(GET_TEAM(GET_PLAYER(ePlayer).getTeam()).isHasMet(GetID()) && GET_TEAM(GET_PLAYER(ePlayer).getTeam()).isHasMet(eTeam) || GET_PLAYER(ePlayer).isObserver())
 							{
 								locString = Localization::Lookup("TXT_KEY_MISC_SOMEONE_DECLARED_WAR");
 								locString << getName().GetCString() << GET_TEAM(eTeam).getName().GetCString();
@@ -1827,7 +1828,7 @@ void CvTeam::DoMakePeace(TeamTypes eTeam, bool bBumpUnits, bool bSuppressNotific
 			{
 				ePlayer = (PlayerTypes) iI;
 
-				if(GET_PLAYER(ePlayer).isAlive())
+				if(GET_PLAYER(ePlayer).isAlive() || GET_PLAYER(ePlayer).isObserver())
 				{
 					if(GET_PLAYER(ePlayer).getTeam() == GetID())
 					{
@@ -1847,7 +1848,7 @@ void CvTeam::DoMakePeace(TeamTypes eTeam, bool bBumpUnits, bool bSuppressNotific
 							GET_PLAYER(ePlayer).GetNotifications()->Add(NOTIFICATION_PEACE_ACTIVE_PLAYER, locString.toUTF8(), locString.toUTF8(), -1, -1, this->getLeaderID());
 						}
 					}
-					else if(GET_TEAM(GET_PLAYER(ePlayer).getTeam()).isHasMet(GetID()) && GET_TEAM(GET_PLAYER(ePlayer).getTeam()).isHasMet(eTeam))
+					else if(GET_TEAM(GET_PLAYER(ePlayer).getTeam()).isHasMet(GetID()) && GET_TEAM(GET_PLAYER(ePlayer).getTeam()).isHasMet(eTeam) || GET_PLAYER(ePlayer).isObserver())
 					{
 						if(GET_PLAYER(ePlayer).GetNotifications())
 						{
@@ -4403,6 +4404,7 @@ void CvTeam::SetHasResearchAgreement(TeamTypes eIndex, bool bNewValue)
 	if(IsHasResearchAgreement(eIndex) != bNewValue)
 	{
 		m_abResearchAgreement[eIndex] = bNewValue;
+		m_aiResearchAgreementStartTurn[eIndex] = GC.getGame().getGameTurn();
 
 		if((GetID() == GC.getGame().getActiveTeam()) || (eIndex == GC.getGame().getActiveTeam()))
 		{
@@ -4421,6 +4423,13 @@ void CvTeam::SetHasResearchAgreement(TeamTypes eIndex, bool bNewValue)
 }
 
 
+//	--------------------------------------------------------------------------------
+int CvTeam::GetResearchAgreementStartTurn(TeamTypes eIndex) const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < MAX_TEAMS, "eIndex is expected to be within maximum bounds (invalid Index)");
+	return m_aiResearchAgreementStartTurn[eIndex];
+}
 //	--------------------------------------------------------------------------------
 bool CvTeam::IsHasTradeAgreement(TeamTypes eIndex) const
 {
@@ -4690,7 +4699,7 @@ void CvTeam::finalizeProjectArtTypes()
 
 
 //	--------------------------------------------------------------------------------
-void CvTeam::changeProjectCount(ProjectTypes eIndex, int iChange)
+void CvTeam::changeProjectCount(ProjectTypes eIndex, int iChange, bool bIsCapture)
 {
 	bool bChangeProduction;
 	int iOldProjectCount;
@@ -4797,6 +4806,7 @@ void CvTeam::changeProjectCount(ProjectTypes eIndex, int iChange)
 				CvString strUnknownCompletesProject = GetLocalizedText("TXT_KEY_MISC_WONDER_COMPLETED_UNKNOWN", pkProject->GetTextKey());
 
 				const PlayerTypes eTeamLeader = getLeaderID();
+				if(bIsCapture) strSomeoneCompletesProject = GetLocalizedText("TXT_KEY_MISC_CAPTURE_PROJECT", getName().GetCString(), pkProject->GetTextKey());
 				GC.getGame().addReplayMessage(REPLAY_MESSAGE_MAJOR_EVENT, eTeamLeader, strSomeoneCompletesProject);
 
 				CvPlayerAI& playerWhoLeadsTeam = GET_PLAYER(eTeamLeader);
@@ -4807,11 +4817,13 @@ void CvTeam::changeProjectCount(ProjectTypes eIndex, int iChange)
 				{
 					const PlayerTypes ePlayer = static_cast<PlayerTypes>(iI);
 					CvPlayerAI& kPlayer = GET_PLAYER(ePlayer);
+					TeamTypes eTeam = kPlayer.getTeam();
 
-					if(kPlayer.isAlive())
+					if(eTeam != NO_TEAM && (kPlayer.isAlive() || kPlayer.isObserver()))
 					{
-						if(isHasMet(kPlayer.getTeam()))
+						if(GET_TEAM(eTeam).isHasMet(GetID()))
 						{
+							if(bIsCapture) strSomeoneCompletedProject =  GetLocalizedText("TXT_KEY_MISC_CAPTURE_PROJECT", getName().GetCString(), pkProject->GetTextKey());
 							if(ePlayer == GC.getGame().getActivePlayer())
 							{
 								DLLUI->AddCityMessage(0, pLeadersCapital->GetIDInfo(), ePlayer, false, GC.getEVENT_MESSAGE_TIME(), strSomeoneCompletedProject);
@@ -4819,7 +4831,7 @@ void CvTeam::changeProjectCount(ProjectTypes eIndex, int iChange)
 							CvNotifications* pNotifications = kPlayer.GetNotifications();
 							pNotifications->Add(NOTIFICATION_PROJECT_COMPLETED, strSomeoneCompletedProject, strSomeoneCompletedProject, pLeadersCapital->getX(), pLeadersCapital->getY(), eIndex, playerWhoLeadsTeam.GetID());
 						}
-						else
+						else if(!bIsCapture)
 						{
 							if(ePlayer == GC.getGame().getActivePlayer())
 							{
@@ -7556,6 +7568,9 @@ void CvTeam::Read(FDataStream& kStream)
 	ArrayWrapper<bool> kResearchAgreementWrapper(MAX_TEAMS, &m_abResearchAgreement[0]);
 	kStream >> kResearchAgreementWrapper;
 
+	ArrayWrapper<int> kResearchAgreementStartTurn(MAX_TEAMS, &m_aiResearchAgreementStartTurn[0]);
+	kStream >> kResearchAgreementStartTurn;
+
 	ArrayWrapper<bool> kTradeAgreementWrapper(MAX_TEAMS, &m_abTradeAgreement[0]);
 	kStream >> kTradeAgreementWrapper;
 
@@ -7717,6 +7732,7 @@ void CvTeam::Write(FDataStream& kStream) const
 	kStream << ArrayWrapperConst<bool>(MAX_TEAMS, &m_abOpenBorders[0]);
 	kStream << ArrayWrapperConst<bool>(MAX_TEAMS, &m_abDefensivePact[0]);
 	kStream << ArrayWrapperConst<bool>(MAX_TEAMS, &m_abResearchAgreement[0]);
+	kStream << ArrayWrapperConst<int>(MAX_TEAMS, &m_aiResearchAgreementStartTurn[0]);
 	kStream << ArrayWrapperConst<bool>(MAX_TEAMS, &m_abTradeAgreement[0]);
 	kStream << ArrayWrapperConst<bool>(MAX_TEAMS, &m_abForcePeace[0]);
 

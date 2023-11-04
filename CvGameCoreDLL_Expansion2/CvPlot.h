@@ -383,12 +383,6 @@ public:
 	void setUpgradeProgress(int iNewValue);
 	void changeUpgradeProgress(int iChange);
 
-#if defined(MOD_API_UNIFIED_YIELDS)
-	int ComputeYieldFromAdjacentImprovement(CvImprovementEntry& kImprovement, ImprovementTypes eValue, YieldTypes eYield) const;
-#else
-	int ComputeCultureFromAdjacentImprovement(CvImprovementEntry& kImprovement, ImprovementTypes eValue) const;
-#endif
-
 #if defined(MOD_GLOBAL_STACKING_RULES)
 	int getAdditionalUnitsFromImprovement() const;
 	void calculateAdditionalUnitsFromImprovement();
@@ -883,6 +877,7 @@ public:
 #endif
 #if defined(MOD_API_VP_ADJACENT_YIELD_BOOST)
 	int CvPlot::ComputeYieldFromOtherAdjacentImprovement(CvImprovementEntry& kImprovement, YieldTypes eYield) const;
+	int CvPlot::ComputeYieldToOtherAdjacentImprovement(CvImprovementEntry& kImprovement, YieldTypes eYield) const;
 #endif
 
 #if defined(MOD_ROG_CORE)
@@ -902,6 +897,11 @@ public:
 	void ClearUnitPromotions(bool bOnlyFriendUnit = false);
 #endif
 
+#ifdef MOD_GLOBAL_CORRUPTION
+	int CalculateCorruptionScoreFromDistance(const CvCity& capitalCity) const;
+	int CalculateCorruptionScoreFromResource() const;
+	int CalculateCorruptionScoreFromTrait(PlayerTypes ePlayer) const;
+#endif
 protected:
 	class PlotBoolField
 	{

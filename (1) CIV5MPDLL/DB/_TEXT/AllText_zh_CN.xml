@@ -264,6 +264,9 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_WAR_CASUALTIES_MESSAGE">
 			<Text>战争给你的文明带来了巨大的伤亡！[COLOR_NEGATIVE_TEXT]{@1_CityName}[ENDCOLOR]失去{2_loss}个单位的[ICON_CITIZEN]人口！</Text>
 		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_WAR_CASUALTIES_MESSAGE2">
+			<Text>战争给你的文明带来了巨大的伤亡！[COLOR_NEGATIVE_TEXT]{@1_CityName}[ENDCOLOR]失去所有[ICON_FOOD]粮食积累并[ICON_RESISTANCE]瘫痪2回合！</Text>
+		</Row>
 		<Row Tag="TXT_KEY_NOTIFICATION_WAR_CASUALTIES_SUMMARY">
 			<Text>惨重的战争伤亡！</Text>
 		</Row>
@@ -409,6 +412,9 @@
 		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_ANNEX_PUPPET_LEVEL_PREVIEW">
 			<Text>如果你吞并该城市，预计市政厅等级为：{1_level}</Text>
 		</Row>
+		<Row Tag="TXT_KEY_FOUNDED_CITY_LEVEL_PREVIEW">
+			<Text>如果你在此建立城市，预计腐败分数为：{1_score} ({2_level})</Text>
+		</Row>
 		<Row Tag="TXT_KEY_TOURISM_FROM_CITY_RATE">
 			<Text>{1_Num}[ICON_TOURISM]魅力 来自建筑、地形等:</Text>
 		</Row>
@@ -520,6 +526,34 @@
 		</Row>
 		<Row Tag="TXT_KEY_CO_PLAYER_TOURISM_DIFFERENT_IDEOLOGY">
       		<Text>+{1_Num}%奖励 由于政策对不同意识形态加成[NEWLINE]</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_NO_ACTION_LACKING_TROOPS">
+      		<Text>[NEWLINE]兵力不足</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_RESOURCE_LIMIT_GLOBAL_1">
+      		<Text>由于{1_Resource:textkey}[COLOR_NEGATIVE_TEXT]不足[ENDCOLOR]，你受到以下影响:</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_COMBAT">
+      		<Text>[NEWLINE][ICON_BULLET]所有需要该资源的单位[COLOR_NEGATIVE_TEXT]战斗力将大大下降[ENDCOLOR]</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_DEBUFF">
+      		<Text>[NEWLINE][ICON_BULLET]全国{1_IconString}{2_Description}[COLOR_NEGATIVE_TEXT]{3_Num}%[ENDCOLOR]</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_UNHAPPINESS">
+      		<Text>[NEWLINE][ICON_BULLET]全国[ICON_HAPPINESS_4]不满[COLOR_NEGATIVE_TEXT]+{1_Num}%[ENDCOLOR]</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CO_PLAYER_TOURISM_IGNOR_TECH_BONUS">
+			<Text>无视科技加成[NEWLINE]</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_CHAIN_REACTION_ATTACKER">
+			<Text>你的{1_UnitName}对敌方所有可见地块上的军事单位造成[COLOR_POSITIVE_TEXT]{2_Percent}%[ENDCOLOR]链式反应伤害</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_CHAIN_REACTION_DEFENDER">
+			<Text>敌方的{1_UnitName}对你所有其可见地块上的军事单位造成[COLOR_NEGATIVE_TEXT]{2_Percent}%[ENDCOLOR]链式反应伤害</Text>
+		</Row>
+		<Row Tag="TXT_KEY_MISC_CAPTURE_PROJECT">
+			<Text>{1_PlyrName}已知悉{@2_PrjctName}的秘密!</Text>
 		</Row>
 	</Language_zh_CN>
 

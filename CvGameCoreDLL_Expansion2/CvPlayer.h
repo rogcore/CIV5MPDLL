@@ -943,6 +943,9 @@ public:
 	int getSettlerProductionStartEra() const;
 	void setSettlerProductionStartEra(int iChange);
 #endif
+	bool isNullifyInfluenceModifier() const;
+	void changeNullifyInfluenceModifier(int iChange);
+
 	int getNumTradeRouteBonus() const;
 	void changeNumTradeRouteBonus(int iChange);
 
@@ -1114,7 +1117,7 @@ public:
 	void changeOverflowResearch(int iChange);
 	int getOverflowResearchTimes100() const;
 	void setOverflowResearchTimes100(int iNewValue);
-	void changeOverflowResearchTimes100(int iChange);
+	void changeOverflowResearchTimes100(long long iChange);
 
 	int getExpModifier() const;
 	void changeExpModifier(int iChange);
@@ -1452,7 +1455,8 @@ public:
 	
 	void UpdateResourcesSiphoned();
 
-	void DoTestOverResourceNotification(ResourceTypes eIndex);
+	void DoTestOverResourceNotification(ResourceTypes eIndex, bool bIsDoTurn = false);
+	void DoTestOverResourceNotificationAll();
 
 	int GetStrategicResourceMod() const;
 	void ChangeStrategicResourceMod(int iChange);
@@ -2148,6 +2152,41 @@ public:
 	int GetProductionNeededProjectModifier() const;
 	void ChangeProductionNeededProjectModifier(int change);
 
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	int GetDomainTroopsTotalTimes100(DomainTypes eDomain = DOMAIN_SEA) const;
+	void ChangeDomainTroopsTotalTimes100(int iChange, DomainTypes eDomain = DOMAIN_SEA);
+	void SetDomainTroopsTotalTimes100(int iValue, DomainTypes eDomain = DOMAIN_SEA);
+
+	int GetDomainTroopsUsed(DomainTypes eDomain = DOMAIN_SEA) const;
+	void ChangeDomainTroopsUsed(int iChange, DomainTypes eDomain = DOMAIN_SEA);
+	void SetDomainTroopsUsed(int iValue, DomainTypes eDomain = DOMAIN_SEA);
+
+	int GetTroopsRateTimes100() const;
+	int GetDomainTroopsTotal(DomainTypes eDomain = DOMAIN_SEA) const;
+	bool IsLackingTroops(DomainTypes eDomain = DOMAIN_SEA) const;
+	int GetDomainTroopsActive(DomainTypes eDomain = DOMAIN_SEA) const;
+
+	int GetNumCropsTotalTimes100() const;
+	void ChangeNumCropsTotalTimes100(int change);
+	int GetNumCropsUsed() const;
+	void ChangeNumCropsUsed(int change);
+	int GetNumCropsTotal() const;
+	bool IsCanEstablishCrops() const;
+
+	int GetNumArmeeTotalTimes100() const;
+	void ChangeNumArmeeTotalTimes100(int change);
+	int GetNumArmeeUsed() const;
+	void ChangeNumArmeeUsed(int change);
+	int GetNumArmeeTotal() const;
+	bool IsCanEstablishArmee() const;
+#endif
+
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	int GetImmigrationCounter(int iIndex) const;
+	void ChangeImmigrationCounter(int iIndex, int iChange);
+	void SetImmigrationCounter(int iIndex, int iValue);
+#endif
+
 protected:
 	class ConqueredByBoolField
 	{
@@ -2338,6 +2377,7 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iSettlerProductionEraModifier;
 	FAutoVariable<int, CvPlayer> m_iSettlerProductionStartEra;
 #endif
+	FAutoVariable<int, CvPlayer> m_iNullifyInfluenceModifier;
 	FAutoVariable<int, CvPlayer> m_iNumTradeRouteBonus;
 	FAutoVariable<std::vector<int>, CvPlayer> m_viTradeRouteDomainExtraRange;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
@@ -2802,6 +2842,20 @@ protected:
 	int m_iProductionNeededUnitModifier = 0;
 	int m_iProductionNeededBuildingModifier = 0;
 	int m_iProductionNeededProjectModifier = 0;
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiDomainTroopsTotal;
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiDomainTroopsUsed;
+
+	int m_iNumCropsTotal = 0;
+	int m_iNumCropsUsed = 0;
+	int m_iNumArmeeTotal = 0;
+	int m_iNumArmeeUsed = 0;
+#endif
+
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiImmigrationCounter;
+#endif
 };
 
 extern bool CancelActivePlayerEndTurn();

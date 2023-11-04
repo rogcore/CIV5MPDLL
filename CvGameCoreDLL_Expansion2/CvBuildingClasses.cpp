@@ -176,7 +176,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
 	m_piInstantYield(NULL),
-	m_bAllowInstantYield(false),
+	m_iInstantYieldCount(0),
 #endif
 	m_piYieldFromInternal(NULL),
 	m_piYieldFromProcessModifier(NULL),
@@ -267,6 +267,12 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piDomainFreeExperienceGlobal(),
 	m_piUnitTypePrmoteHealGlobal(),
 	m_paiSpecificGreatPersonRateModifier(NULL),
+#endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	m_piDomainTroops(NULL),
+	m_iNumCrops(0),
+	m_iNumArmee(0),
 #endif
 
 
@@ -360,6 +366,10 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	SAFE_DELETE_ARRAY(m_piDomainFreeExperiencePerGreatWorkGlobal);
 	m_piDomainFreeExperienceGlobal.clear();
 	m_piUnitTypePrmoteHealGlobal.clear();
+#endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	SAFE_DELETE_ARRAY(m_piDomainTroops);
 #endif
 
 	SAFE_DELETE_ARRAY(m_piDomainProductionModifier);
@@ -484,9 +494,6 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iNukeInterceptionChance = kResults.GetInt("NukeInterceptionChance");
 	m_iExtraAttacks = kResults.GetInt("ExtraAttacks");
 
-#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
-	m_bAllowInstantYield = kResults.GetBool("AllowInstantYield");
-#endif
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
 	m_iLandmarksTourismPercentGlobal = kResults.GetInt("LandmarksTourismPercentGlobal");
 	m_iGreatWorksTourismModifierGlobal = kResults.GetInt("GreatWorksTourismModifierGlobal");
@@ -618,6 +625,11 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iExtraLeagueVotes = kResults.GetInt("ExtraLeagueVotes");
 	m_iPreferredDisplayPosition = kResults.GetInt("DisplayPosition");
 	m_iPortraitIndex = kResults.GetInt("PortraitIndex");
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	m_iNumCrops = kResults.GetInt("NumCrops");
+	m_iNumArmee = kResults.GetInt("NumArmee");
+#endif
 
 	m_bArtInfoCulturalVariation = kResults.GetBool("ArtInfoCulturalVariation");
 	m_bArtInfoEraVariation = kResults.GetBool("ArtInfoEraVariation");
@@ -773,6 +785,9 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	kUtility.PopulateArrayByValue(m_paiSpecificGreatPersonRateModifier, "Specialists", "Building_SpecificGreatPersonRateModifier", "SpecialistType", "BuildingType", szBuildingType, "Modifier");
 #endif
 
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	kUtility.PopulateArrayByValue(m_piDomainTroops, "Domains", "Building_DomainTroops", "DomainType", "BuildingType", szBuildingType, "NumTroop", 0, NUM_DOMAIN_TYPES);
+#endif
 
 	kUtility.PopulateArrayByValue(m_piPrereqNumOfBuildingClass, "BuildingClasses", "Building_PrereqBuildingClasses", "BuildingClassType", "BuildingType", szBuildingType, "NumBuildingNeeded");
 	kUtility.PopulateArrayByExistence(m_pbBuildingClassNeededInCity, "BuildingClasses", "Building_ClassesNeededInCity", "BuildingClassType", "BuildingType", szBuildingType);
@@ -788,6 +803,18 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
 	kUtility.SetYields(m_piInstantYield, "Building_InstantYield", "BuildingType", szBuildingType);
+	{
+		//Building has InstantYield ?
+		std::string strKey("Building_InstantYield_MaxRow");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select count(*) from Building_InstantYield where BuildingType = ?");
+		}
+		pResults->Bind(1, szBuildingType);
+		pResults->Step();
+		m_iInstantYieldCount = pResults->GetInt(0);
+	}
 #endif
 
 	kUtility.SetYields(m_piYieldFromProcessModifier, "Building_YieldFromProcessModifier", "BuildingType", szBuildingType);
@@ -2414,6 +2441,17 @@ int CvBuildingEntry::GetPortraitIndex() const
 	return m_iPortraitIndex;
 }
 
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+int CvBuildingEntry::GetNumCrops() const
+{
+	return m_iNumCrops;
+}
+int CvBuildingEntry::GetNumArmee() const
+{
+	return m_iNumArmee;
+}
+#endif
+
 /// Is the presence of this building shared with team allies?
 bool CvBuildingEntry::IsTeamShare() const
 {
@@ -3094,6 +3132,15 @@ int CvBuildingEntry::GetUnitTypePrmoteHealGlobal(int i) const
 }
 #endif
 
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+int CvBuildingEntry::GetDomainTroops(int i) const
+{
+	CvAssertMsg(i < NUM_DOMAIN_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piDomainTroops ? m_piDomainTroops[i] : -1;
+}
+#endif
+
 /// Production modifier in this domain
 int CvBuildingEntry::GetDomainProductionModifier(int i) const
 {
@@ -3215,7 +3262,7 @@ int* CvBuildingEntry::GetInstantYieldArray() const
 /// Array of instant yields
 bool CvBuildingEntry::IsAllowInstantYield() const
 {
-	return m_bAllowInstantYield;
+	return m_iInstantYieldCount > 0;
 }
 #endif
 
@@ -4407,14 +4454,14 @@ void CvCityBuildings::SetNumRealBuildingTimed(BuildingTypes eIndex, int iNewValu
 					for (int iI = 0; iI < MAX_MAJOR_CIVS; iI++)
 					{
 						CvPlayerAI &thisPlayer = GET_PLAYER((PlayerTypes)iI);
-						if (thisPlayer.isAlive())
+						if (thisPlayer.isAlive() || thisPlayer.isObserver())
 						{
 							// Owner already got his messaging
 							if (iI != m_pCity->getOwner())
 							{
 								// If the builder is met, and the city is revealed
 								// Special case for DLC_06 Scenario: Always show the more informative notification
-								if ((m_pCity->plot()->isRevealed(thisPlayer.getTeam()) && GET_TEAM(thisPlayer.getTeam()).isHasMet(m_pCity->getTeam())) || gDLL->IsModActivated(CIV5_DLC_06_SCENARIO_MODID))
+								if ((m_pCity->plot()->isRevealed(thisPlayer.getTeam()) && GET_TEAM(thisPlayer.getTeam()).isHasMet(m_pCity->getTeam())) || gDLL->IsModActivated(CIV5_DLC_06_SCENARIO_MODID) || thisPlayer.isObserver())
 								{
 									CvNotifications *pNotifications = thisPlayer.GetNotifications();
 									if (pNotifications)

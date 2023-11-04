@@ -639,6 +639,10 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(GetSameTileHeal);
 	Method(GetAdjacentTileHeal);
 
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	Method(GetTotalHeightMod);
+#endif
+
 	Method(GetExtraCombatPercent);
 	Method(GetFriendlyLandsModifier);
 	Method(GetFriendlyLandsAttackModifier);
@@ -814,6 +818,13 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 #endif
 #ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
 	Method(IsImmuneNegtivePromotions);
+#endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	Method(IsNoTroops);
+#endif
+#ifdef MOD_GLOBAL_CORRUPTION
+	Method(GetPlotCorruptionScoreReport);
 #endif
 }
 //------------------------------------------------------------------------------
@@ -5073,6 +5084,19 @@ int CvLuaUnit::lGetAdjacentTileHeal(lua_State* L)
 	return 1;
 }
 //------------------------------------------------------------------------------
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+int CvLuaUnit::lGetTotalHeightMod(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	CvPlot* TargetPlot = CvLuaPlot::GetInstance(L, 2, false);
+	int iResult = 0;
+	if(TargetPlot != NULL)
+		iResult = pkUnit->GetTotalHeightMod(*TargetPlot);
+	lua_pushinteger(L, iResult);
+	return 1;
+}
+#endif
+//------------------------------------------------------------------------------
 //int getExtraCombatPercent();
 int CvLuaUnit::lGetExtraCombatPercent(lua_State* L)
 {
@@ -6199,4 +6223,18 @@ LUAAPIIMPL(Unit, ClearSamePlotPromotions)
 
 #ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
 LUAAPIIMPL(Unit, IsImmuneNegtivePromotions)
+#endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+LUAAPIIMPL(Unit, IsNoTroops)
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+int CvLuaUnit::lGetPlotCorruptionScoreReport(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	CvString corruptionScoreReport = pkUnit->GetPlotCorruptionScoreReport();
+	lua_pushstring(L, corruptionScoreReport.c_str());
+	return 1;
+}
 #endif

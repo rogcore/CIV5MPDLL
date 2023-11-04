@@ -327,6 +327,7 @@ public:
 	int GetTotalNumResearchAgreements() const;
 	bool IsHasResearchAgreement(TeamTypes eIndex) const;
 	void SetHasResearchAgreement(TeamTypes eIndex, bool bNewValue);
+	int GetResearchAgreementStartTurn(TeamTypes eIndex) const;
 	void CancelResearchAgreement(TeamTypes eIndex);
 
 	bool IsHasTradeAgreement(TeamTypes eIndex) const;
@@ -352,7 +353,7 @@ public:
 	void setProjectArtType(ProjectTypes eIndex, int number, int value);
 	bool isProjectMaxedOut(ProjectTypes eIndex, int iExtra = 0) const;
 	bool isProjectAndArtMaxedOut(ProjectTypes eIndex) const;
-	void changeProjectCount(ProjectTypes eIndex, int iChange);
+	void changeProjectCount(ProjectTypes eIndex, int iChange, bool bIsCapture = false);
 	void finalizeProjectArtTypes();
 
 	int getProjectMaking(ProjectTypes eIndex) const;
@@ -532,6 +533,7 @@ protected:
 	Firaxis::Array< bool, REALLY_MAX_TEAMS > m_abOpenBorders;
 	Firaxis::Array< bool, REALLY_MAX_TEAMS > m_abDefensivePact;
 	Firaxis::Array< bool, REALLY_MAX_TEAMS > m_abResearchAgreement;
+	Firaxis::Array< int, REALLY_MAX_TEAMS > m_aiResearchAgreementStartTurn;
 	Firaxis::Array< bool, REALLY_MAX_TEAMS > m_abTradeAgreement;
 	Firaxis::Array< bool, REALLY_MAX_TEAMS > m_abForcePeace;
 	Firaxis::Array< int, REALLY_MAX_PLAYERS > m_aiTurnTeamMet;

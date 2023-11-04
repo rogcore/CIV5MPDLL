@@ -443,6 +443,26 @@ int WorldBuilderMapLoaderRunPostProcessScript(lua_State* L)
 	return CvWorldBuilderMapLoader::RunPostProcessScript(L);
 }
 //------------------------------------------------------------------------------
+void SetAllPlotsVisible(TeamTypes eTeam)
+{
+	// Set the observer teams to be able to see all the plots 
+	if (eTeam != NO_TEAM)
+	{
+		const int iNumInvisibleInfos = NUM_INVISIBLE_TYPES;
+		for (int plotID = 0; plotID < GC.getMap().numPlots(); plotID++)
+		{
+			CvPlot* pLoopPlot = GC.getMap().plotByIndexUnchecked(plotID);
+			pLoopPlot->changeVisibilityCount(eTeam, pLoopPlot->getVisibilityCount(eTeam) + 1, NO_INVISIBLE, true, false);
+			for (int iJ = 0; iJ < iNumInvisibleInfos; iJ++)
+			{
+				pLoopPlot->changeInvisibleVisibilityCount(eTeam, ((InvisibleTypes)iJ), pLoopPlot->getInvisibleVisibilityCount(eTeam, ((InvisibleTypes)iJ)) + 1);
+			}
+
+			pLoopPlot->setRevealed(eTeam, true);
+		}
+	}
+}
+//------------------------------------------------------------------------------
 bool CvGame::InitMap(CvGameInitialItemsOverrides& kGameInitialItemsOverrides)
 {
 	CvMap& kMap = GC.getMap();
@@ -533,25 +553,7 @@ bool CvGame::InitMap(CvGameInitialItemsOverrides& kGameInitialItemsOverrides)
 		if (CvPreGame::slotStatus((PlayerTypes)iI) == SS_OBSERVER)
 		{
 			CvPlayer& kPlayer = GET_PLAYER((PlayerTypes)iI);
-			TeamTypes eTeam = kPlayer.getTeam();
-
-			if (eTeam != NO_TEAM)
-			{
-				const int iNumInvisibleInfos = NUM_INVISIBLE_TYPES;
-				for(int plotID = 0; plotID < GC.getMap().numPlots(); plotID++)
-				{
-					CvPlot* pLoopPlot = GC.getMap().plotByIndexUnchecked(plotID);
-
-					pLoopPlot->changeVisibilityCount(eTeam, 1, NO_INVISIBLE, true, false);
-
-					for(int iJ = 0; iJ < iNumInvisibleInfos; iJ++)
-					{
-						pLoopPlot->changeInvisibleVisibilityCount(eTeam, ((InvisibleTypes)iJ), 1);
-					}
-
-					pLoopPlot->setRevealed(eTeam, true, false);
-				}
-			}
+			SetAllPlotsVisible(kPlayer.getTeam());
 		}
 	}
 
@@ -4371,6 +4373,7 @@ void CvGame::ActivateObserverSlot()
 //			CvPreGame::setActivePlayer((PlayerTypes)iI);
 			setActivePlayer((PlayerTypes)iI, false /*bForceHotSeat*/, true /*bAutoplaySwitch*/);
 
+			SetAllPlotsVisible(GET_PLAYER(getActivePlayer()).getTeam());
 			break;
 		}
 	}
@@ -4750,6 +4753,10 @@ bool CvGame::CanOpenCityScreen(PlayerTypes eOpener, CvCity* pCity)
 	{
 		return true;
 	}
+	else if (GET_PLAYER(eOpener).isObserver())
+	{
+		return true;
+	}
 
 	return false;
 }
@@ -5029,6 +5036,7 @@ void CvGame::setAIAutoPlay(int iNewValue, PlayerTypes eReturnAsPlayer)
 				GET_PLAYER(getActivePlayer()).killUnits();
 				GET_PLAYER(getActivePlayer()).killCities();
 				CvPreGame::setSlotStatus(getActivePlayer(), SS_OBSERVER);
+				SetAllPlotsVisible(GET_PLAYER(getActivePlayer()).getTeam());
 			}
 		}
 	}
@@ -7857,6 +7865,11 @@ UnitTypes CvGame::GetRandomSpawnUnitType(PlayerTypes ePlayer, bool bIncludeUUs, 
 			if(!bValid)
 				continue;
 
+#if defined(MOD_GLOBAL_EXCLUDE_FROM_GIFTS)
+			// Exclude if this unit is invalid for Minor Gifts
+			if(MOD_GLOBAL_EXCLUDE_FROM_GIFTS && pkUnitInfo->IsNoMinorGifts()) continue;
+#endif
+
 			// Avoid Recon units
 			if(pkUnitInfo->GetDefaultUnitAIType() == UNITAI_EXPLORE)
 				continue;
@@ -7990,6 +8003,11 @@ UnitTypes CvGame::GetCompetitiveSpawnUnitType(PlayerTypes ePlayer, bool bInclude
 			}
 		}
 
+#if defined(MOD_GLOBAL_EXCLUDE_FROM_GIFTS)
+		// Exclude if this unit is invalid for Minor Gifts
+		if(MOD_GLOBAL_EXCLUDE_FROM_GIFTS && pkUnitInfo->IsNoMinorGifts()) continue;
+#endif
+
 		// Avoid Recon units
 		if(pkUnitInfo->GetDefaultUnitAIType() == UNITAI_EXPLORE)
 			continue;
@@ -8117,14 +8135,6 @@ UnitTypes CvGame::GetRandomUniqueUnitType(bool bIncludeCivsInGame, bool bInclude
 			continue;
 		}
 
-#if defined(MOD_GLOBAL_EXCLUDE_FROM_GIFTS)
-		if (MOD_GLOBAL_EXCLUDE_FROM_GIFTS) {
-			if (pkUnitInfo->IsNoMinorGifts()) {
-				continue;
-			}
-		}
-#endif
-
 		bool bValid = (pkUnitInfo->GetCombat() > 0);
 
 		// Unit has combat strength, make sure it isn't only defensive (and with no ranged combat ability)
@@ -8162,6 +8172,11 @@ UnitTypes CvGame::GetRandomUniqueUnitType(bool bIncludeCivsInGame, bool bInclude
 		// We only want unique units
 		if(eLoopUnit == pkUnitClassInfo->getDefaultUnitIndex())
 			continue;
+		
+#if defined(MOD_GLOBAL_EXCLUDE_FROM_GIFTS)
+		// Exclude if this unit is invalid for Minor Gifts
+		if(MOD_GLOBAL_EXCLUDE_FROM_GIFTS && pkUnitInfo->IsNoMinorGifts()) continue;
+#endif
 
 		// Is it a unique unit from a civ that is in our game?
 		if (!bIncludeCivsInGame)

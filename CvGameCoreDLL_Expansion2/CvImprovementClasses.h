@@ -56,11 +56,6 @@ public:
 
 	int GetGoldMaintenance() const;
 	int GetCultureBombRadius() const;
-#if defined(MOD_API_UNIFIED_YIELDS)
-	int GetYieldAdjacentSameType(YieldTypes eYield) const;
-#else
-	int GetCultureAdjacentSameType() const;
-#endif
 
 #if defined(MOD_GLOBAL_STACKING_RULES)
 	int GetAdditionalUnits() const;
@@ -102,12 +97,8 @@ public:
 	int GetNewFeature() const;
 
 	int GetCreateResource(CvPlot* pPlot) const;
-	int* GetCreateResourceList() const;
-	int* GetCreateTerrainList() const;
-	bool* GetCreateTerrainOnlyList() const;
-	int* GetCreateFeatureList() const;
-	bool* GetCreateFeatureOnlyList() const;
 #endif
+	int GetExtraScore() const;
 
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
 	bool IsClearNegativePromotions() const;
@@ -195,8 +186,6 @@ public:
 	int* GetFreshWaterYieldChangeArray();				// For Moose - CvWidgetData XXX
 	int GetAdjacentCityYieldChange(int i) const;
 	int* GetAdjacentCityYieldChangeArray();
-	int GetAdjacentMountainYieldChange(int i) const;
-	int* GetAdjacentMountainYieldChangeArray();
 
 	bool GetTerrainMakesValid(int i) const;
 	bool GetFeatureMakesValid(int i) const;
@@ -210,20 +199,19 @@ public:
 	int GetAdjacentImprovementYieldChanges(int i, int j) const;
 #endif
 
-#if defined(MOD_ROG_CORE)
+	bool IsAdjacentResourceYieldChanges() const;
 	int GetAdjacentResourceYieldChanges(int i, int j) const;
-	int* GetAdjacentResourceYieldChangesArray(int i);
 
+	bool IsAdjacentTerrainYieldChanges() const;
 	int GetAdjacentTerrainYieldChanges(int i, int j) const;
-	int* GetAdjacentTerrainYieldChangesArray(int i);
+	int GetAdjacentTerrainYieldChanges(const CvPlot& pPlot, YieldTypes eYield) const;
 
+	bool IsAdjacentFeatureYieldChanges() const;	
 	int GetAdjacentFeatureYieldChanges(int i, int j) const;
-	int* GetAdjacentFeatureYieldChangesArray(int i);
 
+#if defined(MOD_ROG_CORE)
 	int GetFeatureYieldChanges(int i, int j) const;
-	int* GetFeatureYieldChangesArray(int i);
 #endif
-
 	int GetTechYieldChanges(int i, int j) const;
 	int* GetTechYieldChangesArray(int i);
 	int GetTechNoFreshWaterYieldChanges(int i, int j) const;
@@ -283,7 +271,6 @@ protected:
 
 	int m_iGoldMaintenance;
 	int m_iCultureBombRadius;
-	int m_iCultureAdjacentSameType;
 
 #if defined(MOD_GLOBAL_STACKING_RULES)
 	int m_iAdditionalUnits;
@@ -329,6 +316,7 @@ protected:
 	int* m_iCreateFeatureList;
 	bool* m_iCreateFeatureOnlyList;
 #endif
+	int m_iExtraScore;
 
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
 	bool m_bClearNegativePromotions;
@@ -402,25 +390,23 @@ protected:
 	int* m_piHillsYieldChange;
 	int* m_piFreshWaterChange;
 	int* m_piAdjacentCityYieldChange;
-	int* m_piAdjacentMountainYieldChange;
 	int* m_piFlavorValue;
 
 	bool* m_pbTerrainMakesValid;
 	bool* m_pbFeatureMakesValid;
 	bool* m_pbImprovementMakesValid;
 
-#if defined(MOD_API_UNIFIED_YIELDS)
-	int* m_piAdjacentSameTypeYield;
-#endif
-
 #if defined(MOD_API_VP_ADJACENT_YIELD_BOOST)
 	int** m_ppiAdjacentImprovementYieldChanges;
 #endif
 
-#if defined(MOD_ROG_CORE)
+	int m_iAdjacentTerrainYieldChangesCount;
+	int m_iAdjacentResourceYieldChangesCount;
+	int m_iAdjacentFeatureYieldChangesCount;
 	int** m_ppiAdjacentTerrainYieldChanges;
 	int** m_ppiAdjacentResourceYieldChanges;
 	int** m_ppiAdjacentFeatureYieldChanges;
+#if defined(MOD_ROG_CORE)
 	int** m_ppiFeatureYieldChanges;
 #endif
 

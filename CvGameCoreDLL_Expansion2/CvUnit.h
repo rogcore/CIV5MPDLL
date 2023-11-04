@@ -611,6 +611,11 @@ public:
 	int GetBoundLandImprovement() const;
 	int GetBoundWaterImprovement() const;
 #endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	bool IsNoTroops() const;
+#endif
+
 	int maxXPValue() const;
 
 	int firstStrikes() const;
@@ -1820,6 +1825,15 @@ public:
 	int GetCityAttackPlunderModifier() const;
 
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	const int GetInsightEnemyDamageModifier() const;
+	void ChangeInsightEnemyDamageModifier(int iValue);
+
+	const int GetHeightModPerX() const;
+	void ChangeHeightModPerX(int iValue);
+	const int GetHeightModLimited() const;
+	void ChangeHeightModLimited(int iValue);
+	const int GetTotalHeightMod(CvPlot& TargetPlot) const;
+
 	const int GetExtraMoveTimesXX() const;
 	void ChangeExtraMoveTimesXX(int iValue);
 
@@ -1852,6 +1866,15 @@ public:
 
 	void setHealPercentFromAttackDamageFormula(int iValue);
 	const int GetHealPercentFromAttackDamageFormula() const;
+#endif
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	const int GetCrops() const;
+	void ChangeCrops(int iValue);
+	const bool IsCrops() const;
+
+	const int GetArmee() const;
+	void ChangeArmee(int iValue);
+	const bool IsArmee() const;
 #endif
 
 	void ChangeReligiousStrengthLossRivalTerritory(int iValue);
@@ -1981,6 +2004,10 @@ public:
 	int GetCollateralXP() const;
 	void ChangeCollateralXP(int iChange);
 	void SetCollateralXP(int iValue);
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	CvString GetPlotCorruptionScoreReport() const;
 #endif
 
 protected:
@@ -2434,6 +2461,9 @@ protected:
 	int m_iCapitalDefenseFalloff;
 	int m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	int m_iInsightEnemyDamageModifier;
+	int m_iHeightModPerX;
+	int m_iHeightModLimited;
 	int m_iExtraMoveTimesXX;
 	int m_iOriginalCapitalDamageFix;
 	int m_iMultipleInitExperence;
@@ -2445,6 +2475,10 @@ protected:
 	int m_eAttackChanceFromAttackDamageFormula;
 	int m_eMovementFromAttackDamageFormula;
 	int m_eHealPercentFromAttackDamageFormula;
+#endif
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	int m_iCrops;
+	int m_iArmee;
 #endif
 	int m_iReligiousStrengthLossRivalTerritory;
 	int m_iTradeMissionInfluenceModifier;
