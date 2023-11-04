@@ -2187,12 +2187,13 @@ void CvTeamTechs::SetResearchProgressTimes100(TechTypes eIndex, int iNewValue, P
 				int iMaxOverflow = GetMaxResearchOverflow(eIndex, ePlayer);
 				iOverflow = iOverflow > iMaxOverflow ? iMaxOverflow : iOverflow;
 			}
-			GET_PLAYER(ePlayer).changeOverflowResearchTimes100(iOverflow);
+			auto& kPlayer = GET_PLAYER(ePlayer);
+			kPlayer.changeOverflowResearchTimes100(iOverflow);
 			m_pTeam->setHasTech(eIndex, true, ePlayer, true, true);
 			SetNoTradeTech(eIndex, true);
 
 			// Mark city specialization dirty
-			GET_PLAYER(ePlayer).GetCitySpecializationAI()->SetSpecializationsDirty(SPECIALIZATION_UPDATE_RESEARCH_COMPLETE);
+			kPlayer.GetCitySpecializationAI()->SetSpecializationsDirty(SPECIALIZATION_UPDATE_RESEARCH_COMPLETE);
 
 			// Culture bonus for Player researching a Tech
 			PlayerTypes eLoopPlayer;

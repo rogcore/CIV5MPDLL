@@ -5842,6 +5842,14 @@ void CvTeam::setHasTech(TechTypes eIndex, bool bNewValue, PlayerTypes ePlayer, b
 				if (kPlayer.GetPlayerTechs()->IsResearchingTech(eIndex))
 				{
 					kPlayer.popResearch(eIndex);
+#ifdef MOD_GLOBAL_UNLIMITED_ONE_TURN_TECH
+					if (MOD_GLOBAL_UNLIMITED_ONE_TURN_TECH && kPlayer.GetPlayerTechs()->GetCurrentResearch() != NO_TECH) {
+						int iResearchModifier = kPlayer.calculateResearchModifier(kPlayer.GetPlayerTechs()->GetCurrentResearch());
+						long long iOverflowResearch = kPlayer.getOverflowResearchTimes100() * iResearchModifier / 100;
+						kPlayer.setOverflowResearchTimes100(0);
+						GetTeamTechs()->ChangeResearchProgressTimes100(kPlayer.GetPlayerTechs()->GetCurrentResearch(), iOverflowResearch , eLoopPlayer);
+					}
+#endif
 				}
 
 				// notify the player they now have the tech, if they want to make immediate changes
