@@ -5843,11 +5843,16 @@ void CvTeam::setHasTech(TechTypes eIndex, bool bNewValue, PlayerTypes ePlayer, b
 				{
 					kPlayer.popResearch(eIndex);
 #ifdef MOD_GLOBAL_UNLIMITED_ONE_TURN_TECH
-					if (MOD_GLOBAL_UNLIMITED_ONE_TURN_TECH && kPlayer.GetPlayerTechs()->GetCurrentResearch() != NO_TECH) {
-						int iResearchModifier = kPlayer.calculateResearchModifier(kPlayer.GetPlayerTechs()->GetCurrentResearch());
-						long long iOverflowResearch = kPlayer.getOverflowResearchTimes100() * iResearchModifier / 100;
-						kPlayer.setOverflowResearchTimes100(0);
-						GetTeamTechs()->ChangeResearchProgressTimes100(kPlayer.GetPlayerTechs()->GetCurrentResearch(), iOverflowResearch , eLoopPlayer);
+					if (MOD_GLOBAL_UNLIMITED_ONE_TURN_TECH) {
+						if (!kPlayer.isHuman()) {
+							kPlayer.AI_chooseResearch();
+						}
+						if (kPlayer.GetPlayerTechs()->GetCurrentResearch() != NO_TECH) {
+							int iResearchModifier = kPlayer.calculateResearchModifier(kPlayer.GetPlayerTechs()->GetCurrentResearch());
+							long long iOverflowResearch = kPlayer.getOverflowResearchTimes100() * iResearchModifier / 100;
+							kPlayer.setOverflowResearchTimes100(0);
+							GetTeamTechs()->ChangeResearchProgressTimes100(kPlayer.GetPlayerTechs()->GetCurrentResearch(), iOverflowResearch , eLoopPlayer);
+						}
 					}
 #endif
 				}
