@@ -2,6 +2,12 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_zh_CN>
+                                 <Row Tag="TXT_KEY_NO_ACTION_BUILDING_LOCAL_FEATURE">
+			<Text>[NEWLINE]需要国內拥有{1_FeatureName:textkey}。</Text>
+		</Row>
+                               <Row Tag="TXT_KEY_NO_ACTION_BUILDING_LOCAL_FEATURE">
+			<Text>[NEWLINE]需要城市附近有{1_FeatureName:textkey}。</Text>
+		</Row>
 		<Row Tag="TXT_KEY_AIR_PATROL_BOMBED_GROUND_TARGETS">
 			<Text>你的{@1_UnitName}没有遇到抵抗，并且攻击了敌人的空军和地面防空单位！</Text>
 		</Row>

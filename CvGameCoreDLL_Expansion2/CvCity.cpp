@@ -3259,6 +3259,19 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 		return false;
 	}
 
+#if defined(MOD_ROG_CORE)
+
+	if (!IsBuildingEmpireResourceValid(eBuilding, toolTipSink))
+	{
+		return false;
+	}
+
+	if (!IsBuildingFeatureValid(eBuilding, toolTipSink))
+	{
+		return false;
+	}
+#endif
+
 	// Holy city requirement
 	if (pkBuildingInfo->IsRequiresHolyCity() && !GetCityReligions()->IsHolyCityAnyReligion())
 	{
@@ -3712,6 +3725,45 @@ void CvCity::ChangePlotExtraYield(PlotTypes ePlot, YieldTypes eYield, int iChang
 }
 #endif
 
+
+
+#if defined(MOD_ROG_CORE)
+bool CvCity::IsHasFeatureLocal(FeatureTypes eFeature) const
+{
+	VALIDATE_OBJECT
+		CvAssertMsg(eFeature > -1 && eFeature < GC.getNumFeatureInfos(), "Invalid resource index.");
+
+	// See if we have the resource linked to this city, but not connected yet
+	bool bFoundFeature = false;
+
+	// Loop through all plots near this City to see if we can find eResource - tests are ordered to optimize performance
+	for (int iCityPlotLoop = 0; iCityPlotLoop < GetNumWorkablePlots(); iCityPlotLoop++)
+	{
+		CvPlot* pLoopPlot = iterateRingPlots(getX(), getY(), iCityPlotLoop);
+
+		// Invalid plot
+		if (pLoopPlot == NULL)
+			continue;
+
+		// Doesn't have the resource (ignore team first to save time)
+		if (pLoopPlot->getFeatureType() != eFeature)
+			continue;
+
+		// Not owned by this player
+		if (pLoopPlot->getOwner() != getOwner())
+			continue;
+
+		if (pLoopPlot->getWorkingCity() != this)
+			//if (pLoopPlot->getOwningCityID() != GetID())
+			continue;
+
+		bFoundFeature = true;
+		break;
+	}
+
+	return bFoundFeature;
+}
+#endif
 //	--------------------------------------------------------------------------------
 /// Does this City have eResource nearby?
 bool CvCity::IsHasResourceLocal(ResourceTypes eResource, bool bTestVisible) const
@@ -3940,6 +3992,132 @@ bool CvCity::IsBuildingLocalResourceValid(BuildingTypes eBuilding, bool bTestVis
 	return false;
 }
 
+
+#if defined(MOD_ROG_CORE)
+
+
+bool CvCity::IsBuildingEmpireResourceValid(BuildingTypes eBuilding, CvString* toolTipSink) const
+{
+	VALIDATE_OBJECT
+		CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(eBuilding);
+	if (pkBuildingInfo == NULL)
+		return false;
+
+	// ANDs: City must have ALL of these nearby
+	for (int iResourceLoop = 0; iResourceLoop < GC.getNumResourceInfos(); iResourceLoop++)
+	{
+		ResourceTypes eResource = (ResourceTypes)pkBuildingInfo->GetEmpireResourceAnd(iResourceLoop);
+
+		// Doesn't require a feature in this AND slot
+		if (eResource == NO_FEATURE)
+			continue;
+
+		CvResourceInfo* pkResource = GC.getResourceInfo(eResource);
+		if (pkResource == NULL)
+			continue;
+
+		//!IsHasFeatureLocal(eResource)
+		// City doesn't have feature locally - return false immediately
+
+		if (GET_PLAYER(getOwner()).getNumResourceAvailable(eResource, 1) <= 0)
+		{
+			GC.getGame().BuildCannotPerformActionHelpText(toolTipSink, "TXT_KEY_NO_ACTION_BUILDING_EMPIRE_RESOURCE", pkResource->GetTextKey());
+			return false;
+		}
+	}
+
+	int iOrResources = 0;
+
+	// ORs: City must have ONE of these nearby
+	for (int iResourceLoop = 0; iResourceLoop < GC.getNumResourceInfos(); iResourceLoop++)
+	{
+		ResourceTypes eResource = (ResourceTypes)pkBuildingInfo->GetEmpireResourceAnd(iResourceLoop);
+
+		// Doesn't require a feature in this AND slot
+		if (eResource == NO_FEATURE)
+			continue;
+
+		CvResourceInfo* pkResource = GC.getResourceInfo(eResource);
+		if (pkResource == NULL)
+			continue;
+
+		// City has feature locally - return true immediately
+		if (GET_PLAYER(getOwner()).getNumResourceAvailable(eResource, 1) > 0)
+			return true;
+
+		// If we get here it means we passed the AND tests but not one of the OR tests
+		GC.getGame().BuildCannotPerformActionHelpText(toolTipSink, "TXT_KEY_NO_ACTION_BUILDING_EMPIRE_RESOURCE", pkResource->GetTextKey());
+
+		// Increment counter for OR we don't have
+		iOrResources++;
+	}
+
+	// No OR resource requirements (and passed the AND test above)
+	return iOrResources == 0;
+}
+
+
+bool CvCity::IsBuildingFeatureValid(BuildingTypes eBuilding, CvString* toolTipSink) const
+{
+	VALIDATE_OBJECT
+		CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(eBuilding);
+	if (pkBuildingInfo == NULL)
+		return false;
+
+	// ANDs: City must have ALL of these nearby
+	for (int iFeatureLoop = 0; iFeatureLoop < GC.getNumFeatureInfos(); iFeatureLoop++)
+	{
+		FeatureTypes eFeature = (FeatureTypes)pkBuildingInfo->GetFeatureAnd(iFeatureLoop);
+
+		// Doesn't require a feature in this AND slot
+		if (eFeature == NO_FEATURE)
+			continue;
+
+		CvFeatureInfo* pkFeature = GC.getFeatureInfo(eFeature);
+		if (pkFeature == NULL)
+			continue;
+
+		// City doesn't have feature locally - return false immediately
+		if (!IsHasFeatureLocal(eFeature))
+		{
+			GC.getGame().BuildCannotPerformActionHelpText(toolTipSink, "TXT_KEY_NO_ACTION_BUILDING_LOCAL_FEATURE", pkFeature->GetTextKey());
+			return false;
+		}
+	}
+
+	int iOrFeatures = 0;
+
+	// ORs: City must have ONE of these nearby
+	for (int iFeatureLoop = 0; iFeatureLoop < GC.getNumFeatureInfos(); iFeatureLoop++)
+	{
+		FeatureTypes eFeature = (FeatureTypes)pkBuildingInfo->GetFeatureOr(iFeatureLoop);
+
+		// Doesn't require a feature in this AND slot
+		if (eFeature == NO_FEATURE)
+			continue;
+
+		CvFeatureInfo* pkFeature = GC.getFeatureInfo(eFeature);
+		if (pkFeature == NULL)
+			continue;
+
+		// City has feature locally - return true immediately
+		if (IsHasFeatureLocal(eFeature))
+			return true;
+
+		// If we get here it means we passed the AND tests but not one of the OR tests
+		GC.getGame().BuildCannotPerformActionHelpText(toolTipSink, "TXT_KEY_NO_ACTION_BUILDING_LOCAL_FEATURE", pkFeature->GetTextKey());
+
+		// Increment counter for OR we don't have
+		iOrFeatures++;
+	}
+
+	// No OR resource requirements (and passed the AND test above)
+	return iOrFeatures == 0;
+}
+
+
+
+#endif
 
 //	--------------------------------------------------------------------------------
 /// What Resource does this City want so that it goes into WLTKD?
