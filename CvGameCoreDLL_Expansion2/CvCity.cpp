@@ -4009,7 +4009,7 @@ bool CvCity::IsBuildingEmpireResourceValid(BuildingTypes eBuilding, CvString* to
 		ResourceTypes eResource = (ResourceTypes)pkBuildingInfo->GetEmpireResourceAnd(iResourceLoop);
 
 		// Doesn't require a feature in this AND slot
-		if (eResource == NO_FEATURE)
+		if (eResource == NO_RESOURCE)
 			continue;
 
 		CvResourceInfo* pkResource = GC.getResourceInfo(eResource);
@@ -4034,7 +4034,7 @@ bool CvCity::IsBuildingEmpireResourceValid(BuildingTypes eBuilding, CvString* to
 		ResourceTypes eResource = (ResourceTypes)pkBuildingInfo->GetEmpireResourceAnd(iResourceLoop);
 
 		// Doesn't require a feature in this AND slot
-		if (eResource == NO_FEATURE)
+		if (eResource == NO_RESOURCE)
 			continue;
 
 		CvResourceInfo* pkResource = GC.getResourceInfo(eResource);
