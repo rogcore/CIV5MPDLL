@@ -248,6 +248,11 @@ public:
 
 	bool IsBuildingLocalResourceValid(BuildingTypes eBuilding, bool bTestVisible, CvString* toolTipSink = NULL) const;
 
+#if defined(MOD_ROG_CORE)
+	bool IsHasFeatureLocal(FeatureTypes eFeature) const;
+	bool IsBuildingFeatureValid(BuildingTypes eBuilding, CvString* toolTipSink = NULL) const;
+	bool IsBuildingEmpireResourceValid(BuildingTypes eBuilding, CvString* toolTipSink = NULL) const;
+#endif
 	// Resource Demanded
 
 	ResourceTypes GetResourceDemanded(bool bHideUnknown = true) const;

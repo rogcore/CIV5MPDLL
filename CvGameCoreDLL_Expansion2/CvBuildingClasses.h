@@ -425,6 +425,10 @@ public:
 	int GetFlavorValue(int i) const;
 	int GetLocalResourceAnd(int i) const;
 	int GetLocalResourceOr(int i) const;
+	int GetEmpireResourceAnd(int i) const;
+	int GetEmpireResourceOr(int i) const;
+	int GetFeatureOr(int i) const;
+	int GetFeatureAnd(int i) const;
 	int GetHurryModifier(int i) const;
 	bool IsBuildingClassNeededInCity(int i) const;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
@@ -797,6 +801,10 @@ private:
 	int* m_piFlavorValue;
 	int* m_piLocalResourceAnds;
 	int* m_piLocalResourceOrs;
+	int* m_piEmpireResourceAnds;
+	int* m_piEmpireResourceOrs;
+	int* m_piLocalFeatureOrs;
+	int* m_piLocalFeatureAnds;
 	int* m_paiHurryModifier;
 
 #ifdef MOD_API_BUILDING_ENABLE_PURCHASE_UNITS

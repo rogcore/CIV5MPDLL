@@ -281,6 +281,12 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piFlavorValue(NULL),
 	m_piLocalResourceAnds(NULL),
 	m_piLocalResourceOrs(NULL),
+
+	m_piEmpireResourceAnds(NULL),
+	m_piEmpireResourceOrs(NULL),
+    m_piLocalFeatureOrs(NULL),
+	m_piLocalFeatureAnds(NULL),
+
 	m_paiHurryModifier(NULL),
 	m_pbBuildingClassNeededInCity(NULL),
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
@@ -377,6 +383,12 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	SAFE_DELETE_ARRAY(m_piFlavorValue);
 	SAFE_DELETE_ARRAY(m_piLocalResourceAnds);
 	SAFE_DELETE_ARRAY(m_piLocalResourceOrs);
+
+	SAFE_DELETE_ARRAY(m_piEmpireResourceAnds);
+	SAFE_DELETE_ARRAY(m_piEmpireResourceOrs);
+	SAFE_DELETE_ARRAY(m_piLocalFeatureOrs);
+	SAFE_DELETE_ARRAY(m_piLocalFeatureAnds);
+
 	SAFE_DELETE_ARRAY(m_paiHurryModifier);
 	SAFE_DELETE_ARRAY(m_pbBuildingClassNeededInCity);
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
@@ -801,6 +813,10 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	kUtility.PopulateArrayByExistence(m_piLocalResourceAnds, "Resources", "Building_LocalResourceAnds", "ResourceType", "BuildingType", szBuildingType);
 	kUtility.PopulateArrayByExistence(m_piLocalResourceOrs, "Resources", "Building_LocalResourceOrs", "ResourceType", "BuildingType", szBuildingType);
 
+	kUtility.PopulateArrayByExistence(m_piEmpireResourceAnds, "Resources", "Building_EmpireResourceAnds", "ResourceType", "BuildingType", szBuildingType);
+	kUtility.PopulateArrayByExistence(m_piEmpireResourceOrs, "Resources", "Building_EmpireResourceOrs", "ResourceType", "BuildingType", szBuildingType);
+	kUtility.PopulateArrayByExistence(m_piLocalFeatureOrs, "Features", "Building_LocalFeatureOrs", "FeatureType", "BuildingType", szBuildingType);
+	kUtility.PopulateArrayByExistence(m_piLocalFeatureAnds, "Features", "Building_LocalFeatureAnds", "FeatureType", "BuildingType", szBuildingType);
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
 	kUtility.SetYields(m_piInstantYield, "Building_InstantYield", "BuildingType", szBuildingType);
 	{
@@ -3236,6 +3252,42 @@ int CvBuildingEntry::GetLocalResourceOr(int i) const
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_piLocalResourceOrs ? m_piLocalResourceOrs[i] : -1;
 }
+
+
+
+
+/// Prerequisite Feature with AND
+int CvBuildingEntry::GetEmpireResourceAnd(int i) const
+{
+	CvAssertMsg(i < GC.getNumResourceInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piEmpireResourceAnds ? m_piEmpireResourceAnds[i] : -1;
+}
+
+/// Prerequisite resources with OR
+int CvBuildingEntry::GetEmpireResourceOr(int i) const
+{
+	CvAssertMsg(i < GC.getNumResourceInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piEmpireResourceOrs ? m_piEmpireResourceOrs[i] : -1;
+}
+
+
+/// Prerequisite Feature with AND
+int CvBuildingEntry::GetFeatureAnd(int i) const
+{
+	CvAssertMsg(i < GC.getNumFeatureInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piLocalFeatureAnds ? m_piLocalFeatureAnds[i] : -1;
+}
+/// Prerequisite Feature with OR
+int CvBuildingEntry::GetFeatureOr(int i) const
+{
+	CvAssertMsg(i < GC.getNumFeatureInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piLocalFeatureOrs ? m_piLocalFeatureOrs[i] : -1;
+}
+
 
 /// Modifier to Hurry cost
 int CvBuildingEntry::GetHurryModifier(int i) const
