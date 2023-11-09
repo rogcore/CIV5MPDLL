@@ -9158,7 +9158,7 @@ int CvPlayer::getProductionNeeded(UnitTypes eUnit) const
 
 	iProductionNeeded += getUnitExtraCost(eUnitClass);
 
-	iProductionNeeded *= (100 + std::max(-50, GetProductionNeededUnitModifier()));
+	iProductionNeeded *= (100 + std::max(-30, GetProductionNeededUnitModifier()));
 	iProductionNeeded /= 100;
 
 	return std::max(1, iProductionNeeded);
@@ -9252,7 +9252,7 @@ int CvPlayer::getProductionNeeded(BuildingTypes eBuilding) const
 		iProductionNeeded /= 100;
 	}
 
-	iProductionNeeded *= (100 + std::max(-50, GetProductionNeededBuildingModifier()));
+	iProductionNeeded *= (100 + std::max(-30, GetProductionNeededBuildingModifier()));
 	iProductionNeeded /= 100;
 
 	return std::max(1, iProductionNeeded);
@@ -9298,7 +9298,7 @@ int CvPlayer::getProductionNeeded(ProjectTypes eProject) const
 		iProductionNeeded /= 100;
 	}
 
-	iProductionNeeded *= (100 + std::max(-50, GetProductionNeededProjectModifier()));
+	iProductionNeeded *= (100 + std::max(-30, GetProductionNeededProjectModifier()));
 	iProductionNeeded /= 100;
 
 	return std::max(1, iProductionNeeded);
