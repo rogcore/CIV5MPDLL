@@ -168,9 +168,9 @@ public:
 #endif
 
 #if defined(MOD_ROG_CORE)
-	UnitClassTypes GetCombatBonusFromNearbyUnitClass() const;
-	int GetNearbyUnitClassBonusRange() const;
-	int GetNearbyUnitClassBonus() const;
+	PromotionTypes GetCombatBonusFromNearbyUnitPromotion() const;
+	int GetNearbyUnitPromotionBonusRange() const;
+	int GetNearbyUnitPromotionBonus() const;
 #endif
 
 
@@ -682,9 +682,9 @@ protected:
 #endif
 
 #if defined(MOD_ROG_CORE)
-	int m_iNearbyUnitClassBonus;
-	int m_iNearbyUnitClassBonusRange;
-	UnitClassTypes m_iCombatBonusFromNearbyUnitClass;
+	int m_iNearbyUnitPromotionBonus;
+	int m_iNearbyUnitPromotionBonusRange;
+	PromotionTypes m_iCombatBonusFromNearbyUnitPromotion;
 
 	int m_iAOEDamageOnKill;
 	int m_iMoraleBreakChance;

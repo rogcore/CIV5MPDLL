@@ -442,7 +442,7 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 		Method(GetForcedDamageValue);
 		Method(GetChangeDamageValue);
 
-		Method(GetNearbyUnitClassModifierFromUnitClass);
+		Method(GetNearbyUnitPromotionModifierFromUnitPromotion);
 	}
 #endif
 
@@ -5542,10 +5542,10 @@ int CvLuaUnit::lIsNearSapper(lua_State* L)
 
 #if defined(MOD_ROG_CORE)
 //bool GetNearbyUnitClassModifierFromUnitClass();
-int CvLuaUnit::lGetNearbyUnitClassModifierFromUnitClass(lua_State* L)
+int CvLuaUnit::lGetNearbyUnitPromotionModifierFromUnitPromotion(lua_State* L)
 {
 	CvUnit* pkUnit = GetInstance(L);
-	const int bResult = pkUnit->GetNearbyUnitClassModifierFromUnitClass();
+	const int bResult = pkUnit->GetNearbyUnitPromotionModifierFromUnitPromotion();
 	lua_pushinteger(L, bResult);
 	return 1;
 }

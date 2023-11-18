@@ -312,9 +312,9 @@ CvUnit::CvUnit() :
 #endif
 
 #if defined(MOD_ROG_CORE)
-		, m_iCombatBonusFromNearbyUnitClass("CvUnit::m_iCombatBonusFromNearbyUnitClass", m_syncArchive)
-		, m_iNearbyUnitClassBonusRange("CvUnit::m_iNearbyUnitClassBonusRange", m_syncArchive)
-		, m_iNearbyUnitClassBonus("CvUnit::m_iNearbyUnitClassBonus", m_syncArchive)
+		, m_iCombatBonusFromNearbyUnitPromotion("CvUnit::m_iCombatBonusFromNearbyUnitPromotion", m_syncArchive)
+		, m_iNearbyUnitPromotionBonusRange("CvUnit::m_iNearbyUnitPromotionBonusRange", m_syncArchive)
+		, m_iNearbyUnitPromotionBonus("CvUnit::m_iNearbyUnitPromotionBonus", m_syncArchive)
 #endif
 		, m_iStrongerDamaged("CvUnit::m_iStrongerDamaged", m_syncArchive)
 		, m_iFightWellDamaged("CvUnit::m_iFightWellDamaged", m_syncArchive)
@@ -1278,9 +1278,10 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 #endif
 
 #if defined(MOD_ROG_CORE)
-	m_iNearbyUnitClassBonus = 0;
-	m_iNearbyUnitClassBonusRange = 0;
-	m_iCombatBonusFromNearbyUnitClass = NO_UNITCLASS;
+	m_iNearbyUnitPromotionBonus = 0;
+	m_iNearbyUnitPromotionBonusRange = 0;
+
+	m_iCombatBonusFromNearbyUnitPromotion = NO_PROMOTION;
 #endif
 
 #if defined(MOD_ROG_CORE)
@@ -14181,7 +14182,7 @@ int CvUnit::GetGenericMaxStrengthModifier(const CvUnit* pOtherUnit, const CvPlot
 
 #if defined(MOD_ROG_CORE)
 	// UnitClass with combat bonus  nearby
-	int iNearbyUnitClassModifier = GetNearbyUnitClassModifierFromUnitClass();
+	int iNearbyUnitClassModifier = GetNearbyUnitPromotionModifierFromUnitPromotion();
 	if (iNearbyUnitClassModifier != 0)
 	{
 		iModifier += iNearbyUnitClassModifier;
@@ -15283,7 +15284,7 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 
 #if defined(MOD_ROG_CORE)
 	// UnitClass with combat bonus  nearby
-	int iNearbyUnitClassModifier = GetNearbyUnitClassModifierFromUnitClass();
+	int iNearbyUnitClassModifier = GetNearbyUnitPromotionModifierFromUnitPromotion();
 	if (iNearbyUnitClassModifier != 0)
 	{
 		iModifier += iNearbyUnitClassModifier;
@@ -17479,34 +17480,34 @@ int CvUnit::GetStrengthModifierFromExtraHappiness() const
 #endif
 
 #if defined(MOD_ROG_CORE)
-int CvUnit::getNearbyUnitClassBonus() const
+int CvUnit::getNearbyUnitPromotionBonus() const
 {
-	return m_iNearbyUnitClassBonus;
+	return m_iNearbyUnitPromotionBonus;
 }
 
-void CvUnit::SetNearbyUnitClassBonus(int iCombatBonus)
+void CvUnit::SetNearbyUnitPromotionBonus(int iCombatBonus)
 {
-	m_iNearbyUnitClassBonus = iCombatBonus;
+	m_iNearbyUnitPromotionBonus = iCombatBonus;
 }
 
-int CvUnit::getNearbyUnitClassBonusRange() const
+int CvUnit::getNearbyUnitPromotionBonusRange() const
 {
-	return m_iNearbyUnitClassBonusRange;
+	return m_iNearbyUnitPromotionBonusRange;
 }
 
-void CvUnit::SetNearbyUnitClassBonusRange(int iBonusRange)
+void CvUnit::SetNearbyUnitPromotionBonusRange(int iBonusRange)
 {
-	m_iNearbyUnitClassBonusRange = iBonusRange;
+	m_iNearbyUnitPromotionBonusRange = iBonusRange;
 }
 
-UnitClassTypes CvUnit::getCombatBonusFromNearbyUnitClass() const
+PromotionTypes CvUnit::getCombatBonusFromNearbyUnitPromotion() const
 {
-	return (UnitClassTypes)m_iCombatBonusFromNearbyUnitClass;
+	return (PromotionTypes)m_iCombatBonusFromNearbyUnitPromotion;
 }
 
-void CvUnit::SetCombatBonusFromNearbyUnitClass(UnitClassTypes eUnitClass)
+void CvUnit::SetCombatBonusFromNearbyUnitPromotion(PromotionTypes ePromotion)
 {
-	m_iCombatBonusFromNearbyUnitClass = eUnitClass;
+	m_iCombatBonusFromNearbyUnitPromotion = ePromotion;
 }
 #endif
 
@@ -22991,26 +22992,26 @@ int CvUnit::GetNearbyImprovementModifier()const
 
 
 #if defined(MOD_ROG_CORE)
-int CvUnit::GetNearbyUnitClassModifierFromUnitClass() const
+int CvUnit::GetNearbyUnitPromotionModifierFromUnitPromotion() const
 {
-	return GetNearbyUnitClassModifier(getCombatBonusFromNearbyUnitClass(), getNearbyUnitClassBonusRange(), getNearbyUnitClassBonus());
+	return GetNearbyUnitPromotionModifier(getCombatBonusFromNearbyUnitPromotion(), getNearbyUnitPromotionBonusRange(), getNearbyUnitPromotionBonus());
 }
 
-int CvUnit::GetNearbyUnitClassModifier(UnitClassTypes eUnitClass, int iUnitClassRange, int iUnitClassModifier) const
+int CvUnit::GetNearbyUnitPromotionModifier(PromotionTypes ePromotion, int iUnitPromotionRange, int iUnitPromotionModifier) const
 {
-	if (iUnitClassModifier != 0)
+	if (iUnitPromotionModifier != 0)
 	{
 
 
 		CvPlot* pLoopPlot;
 		//CvPlot* pLoopPlot = NULL;
 		// 
-		// Look around this Unit to see if there's a nearby UnitClass that will give us the modifier
-		for (int iX = -iUnitClassRange; iX <= iUnitClassRange; iX++)
+		// Look around this Unit to see if there's a nearby Unit Promotion that will give us the modifier
+		for (int iX = -iUnitPromotionRange; iX <= iUnitPromotionRange; iX++)
 		{
-			for (int iY = -iUnitClassRange; iY <= iUnitClassRange; iY++)
+			for (int iY = -iUnitPromotionRange; iY <= iUnitPromotionRange; iY++)
 			{
-				pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iX, iY, iUnitClassRange);
+				pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iX, iY, iUnitPromotionRange);
 				if (pLoopPlot != NULL && pLoopPlot->getNumUnits() != 0)
 				{
 					for (int iK = 0; iK < pLoopPlot->getNumUnits(); iK++)
@@ -23018,11 +23019,11 @@ int CvUnit::GetNearbyUnitClassModifier(UnitClassTypes eUnitClass, int iUnitClass
 						CvUnit* pLoopUnit = pLoopPlot->getUnitByIndex(iK);
 						if (pLoopUnit != NULL)
 						{
-							if (pLoopUnit->getUnitClassType() == eUnitClass)
+							if ( pLoopUnit->isHasPromotion(ePromotion) && (pLoopUnit != this))
 							{
 								if (GET_PLAYER(pLoopUnit->getOwner()).getTeam() == GET_PLAYER(getOwner()).getTeam())
 								{
-									return iUnitClassModifier;
+									return iUnitPromotionModifier;
 								}
 							}
 						}
@@ -25238,10 +25239,10 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 
 #if defined(MOD_ROG_CORE)
 		if (MOD_ROG_CORE) {
-			if (thisPromotion.GetNearbyUnitClassBonus() > 0) {
-				SetNearbyUnitClassBonus(thisPromotion.GetNearbyUnitClassBonus());
-				SetNearbyUnitClassBonusRange(thisPromotion.GetNearbyUnitClassBonusRange());
-				SetCombatBonusFromNearbyUnitClass(thisPromotion.GetCombatBonusFromNearbyUnitClass());
+			if (thisPromotion.GetNearbyUnitPromotionBonus() > 0) {
+				SetNearbyUnitPromotionBonus(thisPromotion.GetNearbyUnitPromotionBonus());
+				SetNearbyUnitPromotionBonusRange(thisPromotion.GetNearbyUnitPromotionBonusRange());
+				SetCombatBonusFromNearbyUnitPromotion(thisPromotion.GetCombatBonusFromNearbyUnitPromotion());
 			}
 		}
 #endif
