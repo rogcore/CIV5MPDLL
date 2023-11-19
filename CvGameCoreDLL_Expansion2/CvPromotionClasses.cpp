@@ -126,9 +126,9 @@ CvPromotionEntry::CvPromotionEntry():
 
 
 #if defined(MOD_ROG_CORE)
-	m_iNearbyUnitClassBonus(0),
-	m_iNearbyUnitClassBonusRange(0),
-	m_iCombatBonusFromNearbyUnitClass(NO_UNITCLASS),
+	m_iNearbyUnitPromotionBonus(0),
+	m_iNearbyUnitPromotionBonusRange(0),
+	m_iCombatBonusFromNearbyUnitPromotion(NO_PROMOTION),
 	m_iAOEDamageOnKill(0),
 	m_iMoraleBreakChance(0),
 	m_iDamageAoEFortified(0),
@@ -472,11 +472,11 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 
 #if defined(MOD_ROG_CORE)
 	if (MOD_ROG_CORE) {
-		m_iNearbyUnitClassBonus = kResults.GetInt("NearbyUnitClassBonus");
-		m_iNearbyUnitClassBonusRange = kResults.GetInt("NearbyUnitClassBonusRange");
-		const char* szTextVal = kResults.GetText("CombatBonusFromNearbyUnitClass");
+		m_iNearbyUnitPromotionBonus = kResults.GetInt("NearbyUnitPromotionBonus");
+		m_iNearbyUnitPromotionBonusRange = kResults.GetInt("NearbyUnitPromotionBonusRange");
+		const char* szTextVal = kResults.GetText("CombatBonusFromNearbyUnitPromotion");
 		if (szTextVal) {
-			m_iCombatBonusFromNearbyUnitClass = (UnitClassTypes)GC.getInfoTypeForString(szTextVal, true);
+			m_iCombatBonusFromNearbyUnitPromotion = (PromotionTypes)GC.getInfoTypeForString(szTextVal, true);
 		}
 	}
 #endif
@@ -2119,19 +2119,19 @@ int CvPromotionEntry::GetNearNumEnemyDefenseMod() const
 
 #if defined(MOD_ROG_CORE)
 /// Get the UnitClass we want to receive the bonus from.
-UnitClassTypes CvPromotionEntry::GetCombatBonusFromNearbyUnitClass() const
+PromotionTypes CvPromotionEntry::GetCombatBonusFromNearbyUnitPromotion() const
 {
-	return m_iCombatBonusFromNearbyUnitClass;
+	return m_iCombatBonusFromNearbyUnitPromotion;
 }
-/// Distance from this UnitClass
-int CvPromotionEntry::GetNearbyUnitClassBonusRange() const
+/// Distance from this Unit Promotion
+int CvPromotionEntry::GetNearbyUnitPromotionBonusRange() const
 {
-	return m_iNearbyUnitClassBonusRange;
+	return m_iNearbyUnitPromotionBonusRange;
 }
-/// Bonus from this UnitClass
-int CvPromotionEntry::GetNearbyUnitClassBonus() const
+/// Bonus from this Unit Promotion
+int CvPromotionEntry::GetNearbyUnitPromotionBonus() const
 {
-	return m_iNearbyUnitClassBonus;
+	return m_iNearbyUnitPromotionBonus;
 }
 #endif
 

@@ -35,9 +35,9 @@ ALTER TABLE UnitPromotions ADD COLUMN 'AttackAbove50HealthMod' INTEGER DEFAULT 0
 ALTER TABLE UnitPromotions ADD COLUMN 'AttackBelowEqual50HealthMod' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD COLUMN 'StrongerDamaged' BOOLEAN DEFAULT 0;  
 ALTER TABLE UnitPromotions ADD COLUMN 'FightWellDamaged' BOOLEAN DEFAULT 0; 
-ALTER TABLE UnitPromotions ADD COLUMN 'NearbyUnitClassBonus' INTEGER DEFAULT 0;
-ALTER TABLE UnitPromotions ADD COLUMN 'NearbyUnitClassBonusRange' INTEGER DEFAULT 0;
-ALTER TABLE UnitPromotions ADD COLUMN 'CombatBonusFromNearbyUnitClass' INTEGER DEFAULT -1;
+ALTER TABLE UnitPromotions ADD COLUMN 'NearbyUnitPromotionBonus' INTEGER DEFAULT 0;
+ALTER TABLE UnitPromotions ADD COLUMN 'NearbyUnitPromotionBonusRange' INTEGER DEFAULT 0;
+ALTER TABLE UnitPromotions ADD COLUMN 'CombatBonusFromNearbyUnitPromotion' INTEGER DEFAULT -1;
 ALTER TABLE UnitPromotions ADD COLUMN 'GoldenAgeMod' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD COLUMN 'RangedSupportFireMod' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD COLUMN 'MeleeDefenseMod' INTEGER DEFAULT 0;

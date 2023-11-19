@@ -425,7 +425,7 @@ protected:
 	static int lGoldenAgeMod(lua_State* L);
 	static int lGetForcedDamageValue(lua_State* L);
 	static int lGetChangeDamageValue(lua_State* L);
-	static int lGetNearbyUnitClassModifierFromUnitClass(lua_State* L);
+	static int lGetNearbyUnitPromotionModifierFromUnitPromotion(lua_State* L);
 #endif
 
 #if defined(MOD_ROG_CORE)

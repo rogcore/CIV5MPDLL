@@ -681,12 +681,13 @@ public:
 #endif
 
 #if defined(MOD_ROG_CORE)
-	int getNearbyUnitClassBonus() const;
-	void SetNearbyUnitClassBonus(int iCombatBonus);
-	int getNearbyUnitClassBonusRange() const;
-	void SetNearbyUnitClassBonusRange(int iBonusRange);
-	UnitClassTypes getCombatBonusFromNearbyUnitClass() const;
-	void SetCombatBonusFromNearbyUnitClass(UnitClassTypes eUnitClass);
+	int getNearbyUnitPromotionBonus() const;
+	void SetNearbyUnitPromotionBonus(int iCombatBonus);
+	int getNearbyUnitPromotionBonusRange() const;
+	void SetNearbyUnitPromotionBonusRange(int iBonusRange);
+
+	PromotionTypes getCombatBonusFromNearbyUnitPromotion() const;
+	void SetCombatBonusFromNearbyUnitPromotion(PromotionTypes ePromotion);
 #endif
 
 	bool canIntercept() const;
@@ -1260,8 +1261,8 @@ public:
 #endif
 
 #if defined(MOD_ROG_CORE)
-	int GetNearbyUnitClassModifierFromUnitClass() const;
-	int GetNearbyUnitClassModifier(UnitClassTypes eUnitClass, int iUnitClassRange, int iUnitClassModifierconst) const;
+	int GetNearbyUnitPromotionModifierFromUnitPromotion() const;
+	int GetNearbyUnitPromotionModifier(PromotionTypes ePromotion, int iUnitPromotionRange, int iUnitPromotionModifierconst) const;
 #endif
 
 	bool IsGreatGeneral() const;
@@ -2194,9 +2195,10 @@ protected:
 #if defined(MOD_ROG_CORE)
 	FAutoVariable<int, CvUnit> m_iMeleeDefenseModifier;
 
-	FAutoVariable<int, CvUnit> m_iNearbyUnitClassBonus;
-	FAutoVariable<int, CvUnit> m_iNearbyUnitClassBonusRange;
-	FAutoVariable<UnitClassTypes, CvUnit>  m_iCombatBonusFromNearbyUnitClass;
+	FAutoVariable<int, CvUnit> m_iNearbyUnitPromotionBonus;
+	FAutoVariable<int, CvUnit> m_iNearbyUnitPromotionBonusRange;
+
+	FAutoVariable<PromotionTypes, CvUnit>  m_iCombatBonusFromNearbyUnitPromotion;
 #endif
 
 #if defined(MOD_ROG_CORE)
