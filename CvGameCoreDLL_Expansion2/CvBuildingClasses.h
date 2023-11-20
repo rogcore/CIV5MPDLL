@@ -217,6 +217,7 @@ public:
 #endif
 
 	int GetResourceQuantityFromPOP(int i) const;
+	int GetYieldPerEspionageSpy(int i) const;
 	int GetYieldChangeWorldWonder(int i) const;
 	int GetYieldChangeWorldWonderGlobal(int i) const;
 	int GetYieldFromInternal(int i) const;
@@ -629,6 +630,7 @@ private:
 
 #if defined(MOD_ROG_CORE)
 	int* m_paiSpecificGreatPersonRateModifier;
+	int* m_piYieldPerEspionageSpy;
 	int* m_piYieldChangeWorldWonder;
 	int* m_piYieldChangeWorldWonderGlobal;
 	int* m_piResourceQuantityFromPOP;

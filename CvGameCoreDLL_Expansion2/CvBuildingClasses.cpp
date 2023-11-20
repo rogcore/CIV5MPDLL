@@ -195,7 +195,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_ppaiYieldPerXFeature(NULL),
 
 	m_ppaiSpecialistYieldChangeLocal(NULL),
-
+	m_piYieldPerEspionageSpy(NULL),
 	m_piYieldChangeWorldWonder(NULL),
 	m_piYieldChangeWorldWonderGlobal(NULL),
 
@@ -408,6 +408,7 @@ CvBuildingEntry::~CvBuildingEntry(void)
 #if defined(MOD_ROG_CORE)
 	SAFE_DELETE_ARRAY(m_piResourceQuantityFromPOP);
 	SAFE_DELETE_ARRAY(m_piGreatWorkYieldChange);
+	SAFE_DELETE_ARRAY(m_piYieldPerEspionageSpy);
 	SAFE_DELETE_ARRAY(m_piYieldChangeWorldWonder);
 	SAFE_DELETE_ARRAY(m_piYieldChangeWorldWonderGlobal);
 	SAFE_DELETE_ARRAY(m_paiSpecificGreatPersonRateModifier);
@@ -843,6 +844,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 #if defined(MOD_ROG_CORE)
 	kUtility.SetYields(m_piGreatWorkYieldChange, "Building_GreatWorkYieldChanges", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldPerEspionageSpy, "Building_YieldPerEspionageSpy", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldChangeWorldWonder, "Building_YieldChangeWorldWonder", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldChangeWorldWonderGlobal, "Building_YieldChangeWorldWonderGlobal", "BuildingType", szBuildingType);
 	kUtility.PopulateArrayByValue(m_piResourceQuantityFromPOP, "Resources", "Building_ResourceQuantityFromPOP", "ResourceType", "BuildingType", szBuildingType, "Modifier");
@@ -3339,7 +3341,12 @@ int CvBuildingEntry::GetResourceQuantityFromPOP(int i) const
 	return m_piResourceQuantityFromPOP ? m_piResourceQuantityFromPOP[i] : -1;
 }
 
-
+int CvBuildingEntry::GetYieldPerEspionageSpy(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldPerEspionageSpy ? m_piYieldPerEspionageSpy[i] : -1;
+}
 
 int CvBuildingEntry::GetYieldChangeWorldWonder(int i) const
 {

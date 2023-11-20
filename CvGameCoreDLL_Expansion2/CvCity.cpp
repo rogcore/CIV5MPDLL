@@ -225,6 +225,8 @@ CvCity::CvCity() :
 	, m_iAttacksMade("CvCity::m_iAttacksMade", m_syncArchive)
 
 #if defined(MOD_ROG_CORE)
+	, m_aiYieldPerEspionageSpy()
+	, m_aiBaseYieldRateFromEspionageSpy()
 	, m_aiYieldFromConstruction()
 	, m_aiYieldFromUnitProduction()
 	, m_aiYieldFromBirth()
@@ -1146,6 +1148,8 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 
 
 #if defined(MOD_ROG_CORE)
+	m_aiYieldPerEspionageSpy.resize(NUM_YIELD_TYPES);
+	m_aiBaseYieldRateFromEspionageSpy.resize(NUM_YIELD_TYPES);
 	m_aiYieldFromConstruction.resize(NUM_YIELD_TYPES);
 	m_aiYieldFromUnitProduction.resize(NUM_YIELD_TYPES);
 	m_aiYieldFromBirth.resize(NUM_YIELD_TYPES);
@@ -1182,6 +1186,8 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		m_aiExtraSpecialistYield.setAt(iI, 0);
 		m_aiProductionToYieldModifier.setAt(iI, 0);
 #if defined(MOD_BALANCE_CORE)
+		m_aiYieldPerEspionageSpy[iI] = 0;
+		m_aiBaseYieldRateFromEspionageSpy[iI] = 0;
 		m_aiYieldFromConstruction[iI] = 0;	
 		m_aiYieldFromUnitProduction[iI] = 0;	
 		m_aiYieldFromBirth[iI] = 0;
@@ -7538,6 +7544,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			}
 #if defined(MOD_ROG_CORE)
 
+			ChangeYieldPerEspionageSpy(eYield, pBuildingInfo->GetYieldPerEspionageSpy(eYield)* iChange);
 
 			if ((pBuildingInfo->GetYieldFromUnitProduction(eYield) > 0))
 			{
@@ -9579,6 +9586,7 @@ int CvCity::GetBaseJONSCulturePerTurn() const
 #endif
 
 #if defined(MOD_ROG_CORE)
+	iCulturePerTurn += GetBaseYieldRateFromEspionageSpy(YIELD_CULTURE);
 	iCulturePerTurn += (GetYieldPerPopInEmpireTimes100(YIELD_CULTURE) * GET_PLAYER(getOwner()).getTotalPopulation()) / 100;
 #endif
 
@@ -9742,6 +9750,7 @@ int CvCity::GetFaithPerTurn(bool bStatic) const
 #endif
 
 #if defined(MOD_ROG_CORE)
+	iFaith += GetBaseYieldRateFromEspionageSpy(YIELD_FAITH);
 	iFaith += (GetYieldPerPopInEmpireTimes100(YIELD_FAITH) * GET_PLAYER(getOwner()).getTotalPopulation()) / 100;
 #endif
 
@@ -12469,6 +12478,10 @@ int CvCity::getBaseYieldRate(YieldTypes eIndex, const bool bIgnoreFromOtherYield
 #if defined(MOD_API_UNIFIED_YIELDS)
 	iValue += GetYieldPerTurnFromUnimprovedFeatures(eIndex);
 #endif
+
+#if defined(MOD_ROG_CORE)
+	iValue += GetBaseYieldRateFromEspionageSpy(eIndex);
+#endif
 	iValue += GetBaseYieldRateFromBuildings(eIndex);
 	iValue += GetBaseYieldRateFromSpecialists(eIndex);
 	iValue += GetBaseYieldRateFromMisc(eIndex);
@@ -12700,6 +12713,12 @@ CvString CvCity::getYieldRateInfoTool(YieldTypes eIndex, bool bIgnoreTrade) cons
 		iBaseYieldTimes100 = iBaseValue;
 		iBaseYieldTimes100 /= 100;
 		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_TOTAL_POPULATION", iBaseYieldTimes100, YieldIcon);
+	}
+
+	iBaseValue = GetBaseYieldRateFromEspionageSpy(eIndex);
+	if (iBaseValue != 0)
+	{
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_ESPIONAGE_SPY", iBaseValue, YieldIcon);
 	}
 #endif
 
@@ -13128,6 +13147,86 @@ void CvCity::ChangeYieldPerPopTimes100(YieldTypes eIndex, int iChange)
 
 #if defined(MOD_ROG_CORE)
 //	--------------------------------------------------------------------------------
+/// Extra yield from building
+int CvCity::GetYieldPerEspionageSpy(YieldTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	return m_aiYieldPerEspionageSpy[eIndex];
+}
+
+//	--------------------------------------------------------------------------------
+/// Extra yield from building
+void CvCity::ChangeYieldPerEspionageSpy(YieldTypes eIndex, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+
+	if (iChange != 0)
+	{
+		m_aiYieldPerEspionageSpy[eIndex] = m_aiYieldPerEspionageSpy[eIndex] + iChange;
+		CvAssert(GetYieldPerEspionageSpy(eIndex) >= 0);
+	}
+}
+
+
+
+/// Base yield rate from Espionage Spy
+int CvCity::GetBaseYieldRateFromEspionageSpy(YieldTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	int iValue = 0;
+	int iValueSpy = 0;
+	if (GetYieldPerEspionageSpy(eIndex) != 0  &&  GET_PLAYER(getOwner()).GetEspionage()->GetNumSpies() > 0)
+	{
+
+		CvPlayerEspionage* pkPlayerEspionage = GET_PLAYER(getOwner()).GetEspionage();
+
+		for (uint uiSpy = 0; uiSpy < pkPlayerEspionage->m_aSpyList.size(); ++uiSpy)
+		{
+			CvEspionageSpy* pSpy = &(pkPlayerEspionage->m_aSpyList[uiSpy]);
+
+			CvPlot* pCityPlot = GC.getMap().plot(pSpy->m_iCityX, pSpy->m_iCityY);
+			if (pCityPlot != NULL)
+			{
+				CvCity* pCity = pCityPlot->getPlotCity();
+				if (pCity != NULL && pCity->getOwner() != getOwner())
+				{
+					iValueSpy = iValueSpy + max(0, pCity->getYieldRate(eIndex, false));
+				}
+			}
+		}
+		iValue += (GetYieldPerEspionageSpy(eIndex) * iValueSpy/100);
+	}
+	return (m_aiBaseYieldRateFromEspionageSpy[eIndex] + iValue);
+}
+//	--------------------------------------------------------------------------------
+/// Base yield rate from CS Alliances
+void CvCity::ChangeBaseYieldRateFromEspionageSpy(YieldTypes eIndex, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+
+	if (iChange != 0)
+	{
+		m_aiBaseYieldRateFromEspionageSpy[eIndex] = m_aiBaseYieldRateFromEspionageSpy[eIndex] + iChange;
+		CvAssert(GetBaseYieldRateFromEspionageSpy(eIndex) >= 0);
+	}
+}
+void CvCity::SetBaseYieldRateFromEspionageSpy(YieldTypes eIndex, int iValue)
+{
+	if (GetBaseYieldRateFromEspionageSpy(eIndex) != iValue)
+	{
+		m_aiBaseYieldRateFromEspionageSpy[eIndex] = iValue;
+	}
+}
+
+
 /// Extra yield from building
 int CvCity::GetYieldFromConstruction(YieldTypes eIndex) const
 {
@@ -18329,6 +18428,8 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_aiNumProjects;
 #if defined(MOD_ROG_CORE)
 	kStream >> m_aiSpecialistRateModifier;
+	kStream >> m_aiYieldPerEspionageSpy;
+	kStream >> m_aiBaseYieldRateFromEspionageSpy;
 	kStream >> m_aiYieldFromConstruction;
 	kStream >> m_aiYieldFromUnitProduction;
 	kStream >> m_aiYieldFromBirth;
@@ -18770,6 +18871,8 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_aiNumProjects;
 #if defined(MOD_ROG_CORE)
 	kStream << m_aiSpecialistRateModifier;
+	kStream << m_aiYieldPerEspionageSpy;
+	kStream << m_aiBaseYieldRateFromEspionageSpy;
 	kStream << m_aiYieldFromConstruction;
 	kStream << m_aiYieldFromUnitProduction;
 	kStream << m_aiYieldFromBirth;
