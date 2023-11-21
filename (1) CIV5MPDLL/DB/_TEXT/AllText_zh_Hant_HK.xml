@@ -75,6 +75,12 @@
 		<Row Tag="TXT_KEY_YIELD_SOVEREIGNTY">
 			<Text>权威</Text>
 		</Row>
+<Row Tag="TXT_KEY_YIELD_VIOLENCE">
+			<Text>暴力</Text>
+		</Row>
+                                <Row Tag="TXT_KEY_YIELD_HERESY">
+			<Text>邪教</Text>
+		</Row>
 		<Row Tag="TXT_KEY_YIELD_LOYALTY">
 			<Text>忠诚度</Text>
 		</Row>

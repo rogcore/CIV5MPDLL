@@ -1415,6 +1415,8 @@ int CvCitySpecializationAI::AdjustValueBasedOnBuildings(CvCity* pCity, YieldType
 	case YIELD_CRIME:
 	case YIELD_LOYALTY:
 	case YIELD_SOVEREIGNTY:
+	case YIELD_VIOLENCE:
+	case YIELD_HERESY:
 		break; // Yield unmodified.
 #endif
 	}

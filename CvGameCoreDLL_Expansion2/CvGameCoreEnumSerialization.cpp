@@ -225,6 +225,12 @@ std::string toString(const YieldTypes& v)
 	case YIELD_SOVEREIGNTY:
 		return std::string("YIELD_SOVEREIGNTY");
 		break;
+	case YIELD_VIOLENCE:
+		return std::string("YIELD_VIOLENCE");
+		break;
+	case YIELD_HERESY:
+		return std::string("YIELD_HERESY");
+		break;
 #endif
 
 	default:

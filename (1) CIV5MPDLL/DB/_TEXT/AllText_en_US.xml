@@ -74,6 +74,13 @@
 		<Row Tag="TXT_KEY_YIELD_LOYALTY">
 			<Text>LOYALTY</Text>
 		</Row>
+
+                              <Row Tag="TXT_KEY_YIELD_VIOLENCE">
+			<Text>VIOLENCE</Text>
+		</Row>
+                                <Row Tag="TXT_KEY_YIELD_HERESY">
+			<Text>HERESY</Text>
+		</Row>
 		<Row Tag="TXT_KEY_YIELD_GREAT_GENERAL_POINTS">
 			<Text>GENERAL</Text>
 		</Row>

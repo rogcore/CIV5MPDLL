@@ -12283,9 +12283,12 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 			if (iTempMod != 0 && toolTipSink)
 				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_PUPPET", iTempMod);
 			break;
+
+
+		case YIELD_VIOLENCE:
+		case YIELD_HERESY:
+			break;
 #endif
-
-
 		}
 	}
 
@@ -12655,7 +12658,8 @@ CvString CvCity::getYieldRateInfoTool(YieldTypes eIndex, bool bIgnoreTrade) cons
 #endif
 
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
-	
+
+
 	if (eIndex == YIELD_HEALTH) 
 	{
 		if (plot()->isFreshWater())

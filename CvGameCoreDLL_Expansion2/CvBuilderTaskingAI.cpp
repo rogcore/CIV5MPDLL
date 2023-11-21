@@ -1534,6 +1534,8 @@ void CvBuilderTaskingAI::AddChopDirectives(CvUnit* pUnit, CvPlot* pPlot, int iMo
 			case YIELD_CRIME:
 			case YIELD_LOYALTY:
 			case YIELD_SOVEREIGNTY:
+			case YIELD_VIOLENCE:
+			case YIELD_HERESY:
 				break;
 #endif
 			}

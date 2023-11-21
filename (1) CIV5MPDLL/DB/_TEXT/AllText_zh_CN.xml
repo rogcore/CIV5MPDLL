@@ -71,6 +71,12 @@
 		<Row Tag="TXT_KEY_YIELD_CRIME">
 			<Text>犯罪率</Text>
 		</Row>
+                               <Row Tag="TXT_KEY_YIELD_VIOLENCE">
+			<Text>暴力</Text>
+		</Row>
+                                <Row Tag="TXT_KEY_YIELD_HERESY">
+			<Text>邪教</Text>
+		</Row>
 		<Row Tag="TXT_KEY_YIELD_SOVEREIGNTY">
 			<Text>权威</Text>
 		</Row>
