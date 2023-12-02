@@ -403,7 +403,10 @@
 
 // Event sent when the player enters a new era, see also NewEraPopup.lua and BUTTONPOPUP_NEW_ERA
 //   GameEvents.TeamSetEra.Add(function(eTeam, eEra, bFirst) end)
+//   GameEvents.PlayerSetEra.Add(function(ePlayer, eEra, bFirst) end)
 #define MOD_EVENTS_NEW_ERA                          gCustomMods.isEVENTS_NEW_ERA()
+
+#define MOD_EVENTS_PLAYER_SET_HAS_TECH              gCustomMods.isEVENTS_PLAYER_SET_HAS_TECH()
 
 // Event sent when the team discovers a new Natural Wonder
 //   GameEvents.NaturalWonderDiscovered.Add(function(iTeam, iFeature, iX, iY, bFirst) end)
@@ -605,6 +608,7 @@
 
 // Event sent by ending turn (v94)
 //   GameEvents.PlayerDoneTurn.Add(function(iPlayer) end)
+//   GameEvents.PlayerTurnStart.Add(function(iPlayer) end)
 #define MOD_EVENTS_PLAYER_TURN                      gCustomMods.isEVENTS_PLAYER_TURN()
 
 // Event sent by golden ages (v52)
@@ -1222,6 +1226,7 @@ enum BattleTypeTypes
 #define GAMEEVENT_PlayerCanSpreadReligion		"PlayerCanSpreadReligion",		"iiii"
 #define GAMEEVENT_PlayerCanTransitMinorCity		"PlayerCanTransitMinorCity",	"iiiii"
 #define GAMEEVENT_PlayerDoneTurn				"PlayerDoneTurn",				"i"
+#define GAMEEVENT_PlayerTurnStart				"PlayerTurnStart",				"i"
 #define GAMEEVENT_PlayerGifted					"PlayerGifted",					"iiiiii"
 #define GAMEEVENT_PlayerCompletedQuest			"PlayerCompletedQuest",			"iiiiii"
 #define GAMEEVENT_PlayerGoldenAge				"PlayerGoldenAge",				"ibi"
@@ -1247,6 +1252,8 @@ enum BattleTypeTypes
 #define GAMEEVENT_ResolutionResult				"ResolutionResult",				"iibb"
 #define GAMEEVENT_ResolutionVoting				"ResolutionVoting",				"ii"
 #define GAMEEVENT_TeamSetEra					"TeamSetEra",					"iib"
+#define GAMEEVENT_PlayerSetEra					"PlayerSetEra",					"iib"
+#define GAMEEVENT_PlayerSetHasTech				"PlayerSetHasTech",				"iib"
 #define GAMEEVENT_TerraformingMap				"TerraformingMap",				"ii"
 #define GAMEEVENT_TerraformingPlot				"TerraformingPlot",				"iiiiiiii"
 #define GAMEEVENT_TileFeatureChanged			"TileFeatureChanged",			"iiiii"
@@ -1528,6 +1535,7 @@ public:
 	MOD_OPT_DECL(EVENTS_TILE_REVEALED);
 	MOD_OPT_DECL(EVENTS_CIRCUMNAVIGATION);
 	MOD_OPT_DECL(EVENTS_NEW_ERA);
+	MOD_OPT_DECL(EVENTS_PLAYER_SET_HAS_TECH);
 	MOD_OPT_DECL(EVENTS_NW_DISCOVERY);
 	MOD_OPT_DECL(EVENTS_DIPLO_EVENTS);
 	MOD_OPT_DECL(EVENTS_DIPLO_MODIFIERS);
