@@ -9424,7 +9424,7 @@ void CvCity::DoJONSCultureLevelIncrease()
 		}
 #endif
 
-#if defined(MOD_BALANCE_CORE)
+#if defined(MOD_ROG_CORE)
 		if (MOD_ROG_CORE) {
 			YieldTypes eYield;
 			for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
@@ -9868,11 +9868,7 @@ int CvCity::GetYieldPerTurnFromUnimprovedFeatures(YieldTypes eYield) const
 	{
 		FeatureTypes eFeature = (FeatureTypes) iI;
 
-#if defined(MOD_MORE_NATURAL_WONDER)
-		if (!GC.getFeatureInfo(eFeature)->IsNaturalWonder(true))
-#else
 		if (!GC.getFeatureInfo(eFeature)->IsNaturalWonder())
-#endif
 		{
 			int iBaseYield = kPlayer.getCityYieldFromUnimprovedFeature(eFeature, eYield);
 			iBaseYield += kPlayer.GetPlayerTraits()->GetCityYieldFromUnimprovedFeature(eFeature, eYield);
