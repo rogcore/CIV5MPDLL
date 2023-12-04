@@ -2,6 +2,7 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_zh_CN>
+
         <Row Tag="TXT_KEY_NO_ACTION_BUILDING_EMPIRE_RESOURCE">
 			<Text>[NEWLINE]需要国內拥有{1_FeatureName:textkey}。</Text>
 		</Row>
@@ -69,6 +70,12 @@
 		</Row>
 		<Row Tag="TXT_KEY_YIELD_CRIME">
 			<Text>犯罪率</Text>
+		</Row>
+                               <Row Tag="TXT_KEY_YIELD_VIOLENCE">
+			<Text>暴力</Text>
+		</Row>
+                                <Row Tag="TXT_KEY_YIELD_HERESY">
+			<Text>邪教</Text>
 		</Row>
 		<Row Tag="TXT_KEY_YIELD_SOVEREIGNTY">
 			<Text>权威</Text>
@@ -457,7 +464,9 @@
 		<Row Tag="TXT_KEY_TOURISM_HELP_INFO">
 			<Text>[ICON_TOURISM]魅力由杰作、文物或建筑来产生，是你将你的文化影响力扩张到其它文明的主要途径。 </Text>
 		</Row>
-
+                               <Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_ESPIONAGE_SPY">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自间谍获取</Text>
+		</Row>
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CITY_PRODUCTION_TO">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自产能转换</Text>
 		</Row>

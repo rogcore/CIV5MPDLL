@@ -220,9 +220,9 @@ int CvLuaEnums::pRegister(lua_State* L)
 	RegisterEnum(YIELD_CRIME);
 	RegisterEnum(YIELD_LOYALTY);
 	RegisterEnum(YIELD_SOVEREIGNTY); 
+	RegisterEnum(YIELD_VIOLENCE);
+	RegisterEnum(YIELD_HERESY);
 #endif
-
-
 
 	RegisterEnum(NUM_YIELD_TYPES);
 	EnumEnd(L);

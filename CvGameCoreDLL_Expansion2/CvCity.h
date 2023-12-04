@@ -874,6 +874,12 @@ public:
 	int getDomainFreeExperienceFromGreatWorks(DomainTypes eIndex) const;
 	
 #if defined(MOD_ROG_CORE)
+	int GetYieldPerEspionageSpy(YieldTypes eIndex) const;
+	void ChangeYieldPerEspionageSpy(YieldTypes eYield, int iChange);
+	int GetBaseYieldRateFromEspionageSpy(YieldTypes eIndex) const;
+	void ChangeBaseYieldRateFromEspionageSpy(YieldTypes eIndex, int iChange);
+	void SetBaseYieldRateFromEspionageSpy(YieldTypes eIndex, int iValue);
+
 	int GetYieldFromConstruction(YieldTypes eIndex) const;
 	void ChangeYieldFromConstruction(YieldTypes eIndex, int iChange);
 	int GetYieldFromUnitProduction(YieldTypes eIndex) const;
@@ -1442,6 +1448,8 @@ protected:
 
 
 #if defined(MOD_ROG_CORE)
+	std::vector<int> m_aiYieldPerEspionageSpy;
+	std::vector<int> m_aiBaseYieldRateFromEspionageSpy;
 	std::vector<int> m_aiYieldFromConstruction;
 	std::vector<int> m_aiYieldFromUnitProduction;
 	std::vector<int> m_aiYieldFromBirth;

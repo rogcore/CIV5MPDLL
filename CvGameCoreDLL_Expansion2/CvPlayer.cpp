@@ -11816,6 +11816,8 @@ void CvPlayer::DoYieldBonusFromKill(YieldTypes eYield, UnitTypes eAttackingUnitT
 			case YIELD_CRIME:
 			case YIELD_LOYALTY:
 			case YIELD_SOVEREIGNTY:  
+			case YIELD_VIOLENCE:
+			case YIELD_HERESY:
 				// Not supported, as not accumulated turn-on-turn
 				break;
 #endif
