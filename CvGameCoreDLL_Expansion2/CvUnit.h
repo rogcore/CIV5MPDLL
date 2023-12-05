@@ -781,6 +781,7 @@ public:
 	int evasionProbability() const;
 	int withdrawalProbability() const;
 
+	int getNumNearByEnemyUnitsAdjacent()const;
 	int GetNumEnemyUnitsAdjacent(const CvUnit* pUnitToExclude = NULL) const;
 	bool IsEnemyCityAdjacent() const;
 	bool IsEnemyCityAdjacent(const CvCity* pSpecifyCity) const;
@@ -1228,6 +1229,9 @@ public:
 
 	int GetFlankAttackModifier() const;
 	void ChangeFlankAttackModifier(int iChange);
+
+	int GetRangedFlankAttackModifier() const;
+	void ChangeRangedFlankAttackModifier(int iChange);
 
 	int getExtraOpenDefensePercent() const;
 	void changeExtraOpenDefensePercent(int iChange);
@@ -2140,6 +2144,7 @@ protected:
 	FAutoVariable<int, CvUnit> m_iExtraAttackFortifiedMod;
 	FAutoVariable<int, CvUnit> m_iExtraAttackWoundedMod;
 	int m_iFlankAttackModifier;
+	int m_iRangedFlankAttackModifier;
 	FAutoVariable<int, CvUnit> m_iExtraOpenDefensePercent;
 	FAutoVariable<int, CvUnit> m_iExtraRoughDefensePercent;
 	FAutoVariable<int, CvUnit> m_iPillageChange;

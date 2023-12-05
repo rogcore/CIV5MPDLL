@@ -270,6 +270,7 @@ CvUnit::CvUnit() :
 	, m_iExtraAttackFortifiedMod("CvUnit::m_iExtraAttackFortifiedMod", m_syncArchive)
 	, m_iExtraAttackWoundedMod("CvUnit::m_iExtraAttackWoundedMod", m_syncArchive)
 	, m_iFlankAttackModifier(0)
+	, m_iRangedFlankAttackModifier(0)
 	, m_iExtraOpenDefensePercent("CvUnit::m_iExtraOpenDefensePercent", m_syncArchive)
 	, m_iExtraRoughDefensePercent("CvUnit::m_iExtraRoughDefensePercent", m_syncArchive)
 	, m_iPillageChange("CvUnit::m_iPillageChange", m_syncArchive)
@@ -1236,6 +1237,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iExtraAttackFortifiedMod= 0;
 	m_iExtraAttackWoundedMod= 0;
 	m_iFlankAttackModifier=0;
+	m_iRangedFlankAttackModifier = 0;
 	m_iExtraOpenDefensePercent = 0;
 	m_iExtraRoughDefensePercent = 0;
 	m_iPillageChange = 0;
@@ -15415,6 +15417,16 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 		}
 #endif
 
+		// Unit Ranged Flanking Attack Mod	
+		int iRangedFlankModifier = GetRangedFlankAttackModifier();
+		if (iRangedFlankModifier != 0 )
+		{
+			int iNumAdjacentEnemys = pOtherUnit->getNumNearByEnemyUnitsAdjacent() - 1;
+			if (iNumAdjacentEnemys > 0)
+			{
+				iModifier += iRangedFlankModifier * iNumAdjacentEnemys;
+			}
+		}
 			////////////////////////
 			// KNOWN BATTLE PLOT
 			////////////////////////
@@ -18215,6 +18227,65 @@ int CvUnit::GetNumEnemyUnitsAdjacent(const CvUnit* pUnitToExclude) const
 	return iNumEnemiesAdjacent;
 }
 
+
+int CvUnit::getNumNearByEnemyUnitsAdjacent() const
+{
+	int iNumEnemiesAdjacent = 0;
+
+	TeamTypes eMyTeam = getTeam();
+
+	CvPlot* pLoopPlot;
+	IDInfo* pUnitNode;
+
+	CvUnit* pLoopUnit;
+	TeamTypes eTheirTeam;
+
+	for (int iI = 0; iI < NUM_DIRECTION_TYPES; iI++)
+	{
+		pLoopPlot = plotDirection(getX(), getY(), ((DirectionTypes)iI));
+
+		if (pLoopPlot != NULL)
+		{
+			pUnitNode = pLoopPlot->headUnitNode();
+
+			// Loop through all units on this plot
+			while (pUnitNode != NULL)
+			{
+				pLoopUnit = ::getUnit(*pUnitNode);
+				pUnitNode = pLoopPlot->nextUnitNode(pUnitNode);
+
+				// No NULL, and no unit we want to exclude
+				if (pLoopUnit != NULL)
+				{
+					// Must be a combat Unit
+					if (pLoopUnit->IsCombatUnit() && !pLoopUnit->isEmbarked())
+					{
+						eTheirTeam = pLoopUnit->getTeam();
+
+						// This team which this unit belongs to must be at war with us
+						if (GET_TEAM(eTheirTeam).isAtWar(eMyTeam))
+						{
+							// Must be same domain
+							if (pLoopUnit->getDomainType() == getDomainType())
+							{
+								iNumEnemiesAdjacent++;
+							}
+#if defined(MOD_BUGFIX_HOVERING_PATHFINDER)
+							else if (getDomainType() == DOMAIN_SEA && pLoopUnit->IsHoveringUnit()) {
+
+								// Need to count adjacent hovering units as enemies regardless
+								iNumEnemiesAdjacent++;
+							}
+#endif
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return iNumEnemiesAdjacent;
+}
 //	--------------------------------------------------------------------------------
 /// Is there any enemy city next to us?
 bool CvUnit::IsEnemyCityAdjacent() const
@@ -22524,6 +22595,25 @@ void CvUnit::ChangeFlankAttackModifier(int iChange)
 }
 
 //	--------------------------------------------------------------------------------
+int CvUnit::GetRangedFlankAttackModifier() const
+{
+	VALIDATE_OBJECT
+		return m_iRangedFlankAttackModifier;
+}
+
+
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeRangedFlankAttackModifier(int iChange)
+{
+	VALIDATE_OBJECT
+		if (iChange != 0)
+		{
+			m_iRangedFlankAttackModifier = (m_iRangedFlankAttackModifier + iChange);
+
+			setInfoBarDirty(true);
+		}
+}
+//	--------------------------------------------------------------------------------
 int CvUnit::getExtraOpenDefensePercent() const
 {
 	VALIDATE_OBJECT
@@ -25462,6 +25552,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		changeExtraAttackFortifiedMod(thisPromotion.GetAttackFortifiedMod() * iChange);
 		changeExtraAttackWoundedMod(thisPromotion.GetAttackWoundedMod() * iChange);
 		ChangeFlankAttackModifier(thisPromotion.GetFlankAttackModifier() * iChange);
+		ChangeRangedFlankAttackModifier(thisPromotion.GetRangedFlankAttackModifier() * iChange);
 		changeExtraOpenDefensePercent(thisPromotion.GetOpenDefensePercent() * iChange);
 		changeExtraRoughDefensePercent(thisPromotion.GetRoughDefensePercent() * iChange);
 		changeExtraAttacks(thisPromotion.GetExtraAttacks() * iChange);
@@ -25976,6 +26067,7 @@ void CvUnit::read(FDataStream& kStream)
 
 	kStream >> m_iHealOnPillageCount;
 	kStream >> m_iFlankAttackModifier;
+	kStream >> m_iRangedFlankAttackModifier;
 	if (uiVersion >= 3)
 	{
 		kStream >> m_iGoldenAgeValueFromKills;
@@ -26363,6 +26455,7 @@ void CvUnit::write(FDataStream& kStream) const
 
 	kStream << m_iHealOnPillageCount;
 	kStream << m_iFlankAttackModifier;
+	kStream << m_iRangedFlankAttackModifier;
 	kStream << m_iGoldenAgeValueFromKills;
 
 	kStream << m_iGreatGeneralReceivesMovementCount;
@@ -29681,6 +29774,11 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 
 		if (iValue == 0)
 		{
+			iValue = GetPromotionValue(pkPromotionInfo->GetRangedFlankAttackModifier(), GetRangedFlankAttackModifier(), iFlavorRanged, lowPriority);
+		}
+
+		if (iValue == 0)
+		{
 			iValue = GetPromotionValue(pkPromotionInfo->GetFlankAttackModifier(), maxMoves() > 2 ? 1 : 0, iFlavorMobile, lowPriority);
 		}
 
@@ -30023,6 +30121,15 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 	if(iTemp != 0 && isRanged())
 	{
 		iExtra = getExtraAttackWoundedMod() * 2;
+		iTemp *= (100 + iExtra);
+		iTemp /= 100;
+		iValue += iTemp + (iFlavorOffense * iFlavorRanged) * 2;
+	}
+
+	iTemp = pkPromotionInfo->GetRangedFlankAttackModifier();
+	if (iTemp != 0 && isRanged())
+	{
+		iExtra = GetRangedFlankAttackModifier();
 		iTemp *= (100 + iExtra);
 		iTemp /= 100;
 		iValue += iTemp + (iFlavorOffense * iFlavorRanged) * 2;

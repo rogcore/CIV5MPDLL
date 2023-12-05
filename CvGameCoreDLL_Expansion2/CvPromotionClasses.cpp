@@ -73,6 +73,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iAttackFortifiedMod(0),
 	m_iAttackWoundedMod(0),
 	m_iFlankAttackModifier(0),
+	m_iRangedFlankAttackModifier(0),
 	m_iNearbyEnemyCombatMod(0),
 	m_iNearbyEnemyCombatRange(0),
 	m_iOpenDefensePercent(0),
@@ -640,6 +641,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iAttackFortifiedMod = kResults.GetInt("AttackFortifiedMod");
 	m_iAttackWoundedMod = kResults.GetInt("AttackWoundedMod");
 	m_iFlankAttackModifier = kResults.GetInt("FlankAttackModifier");
+	m_iRangedFlankAttackModifier = kResults.GetInt("RangedFlankAttackModifier");
 	m_iNearbyEnemyCombatMod = kResults.GetInt("NearbyEnemyCombatMod");
 	m_iNearbyEnemyCombatRange = kResults.GetInt("NearbyEnemyCombatRange");
 	m_iOpenDefensePercent = kResults.GetInt("OpenDefense");
@@ -1781,6 +1783,11 @@ int CvPromotionEntry::GetAttackWoundedMod() const
 int CvPromotionEntry::GetFlankAttackModifier() const
 {
 	return m_iFlankAttackModifier;
+}
+
+int CvPromotionEntry::GetRangedFlankAttackModifier() const
+{
+	return m_iRangedFlankAttackModifier;
 }
 
 /// Accessor: Modifier on nearby enemy combat units
