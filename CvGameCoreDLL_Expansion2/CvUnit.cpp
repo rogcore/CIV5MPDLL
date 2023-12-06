@@ -15418,6 +15418,7 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 #endif
 
 		// Unit Ranged Flanking Attack Mod	
+
 			int iNumAdjacentEnemys = pOtherUnit->GetNumEnemyUnitsAdjacent(this);
 			if (iNumAdjacentEnemys > 0)
 			{
@@ -15430,6 +15431,7 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 				iModifier += iRangedFlankModifier;
 			}
 		
+
 			////////////////////////
 			// KNOWN BATTLE PLOT
 			////////////////////////
@@ -22606,14 +22608,6 @@ int CvUnit::GetRangedFlankAttackModifier() const
 
 
 //	--------------------------------------------------------------------------------
-int CvUnit::GetRangedFlankAttackModifier() const
-{
-	VALIDATE_OBJECT
-		return m_iRangedFlankAttackModifier;
-}
-
-
-//	--------------------------------------------------------------------------------
 void CvUnit::ChangeRangedFlankAttackModifier(int iChange)
 {
 	VALIDATE_OBJECT
@@ -22624,6 +22618,7 @@ void CvUnit::ChangeRangedFlankAttackModifier(int iChange)
 			setInfoBarDirty(true);
 		}
 }
+
 
 //	--------------------------------------------------------------------------------
 int CvUnit::GetRangedFlankAttackModifierPercent() const
@@ -22644,6 +22639,7 @@ void CvUnit::ChangeRangedFlankAttackModifierPercent(int iChange)
 			setInfoBarDirty(true);
 		}
 }
+
 //	--------------------------------------------------------------------------------
 int CvUnit::getExtraOpenDefensePercent() const
 {
@@ -29811,7 +29807,6 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 			iValue = GetPromotionValue(pkPromotionInfo->GetRangedFlankAttackModifier(), GetRangedFlankAttackModifier(), iFlavorRanged, lowPriority);
 		}
 
-
 		if (iValue == 0)
 		{
 			iValue = GetPromotionValue(pkPromotionInfo->GetRangedFlankAttackModifierPercent(), GetRangedFlankAttackModifierPercent(), iFlavorRanged, lowPriority);
@@ -30183,6 +30178,7 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 		iTemp /= 100;
 		iValue += iTemp + (iFlavorOffense * iFlavorRanged) * 2;
 	}
+
 
 	iTemp = pkPromotionInfo->GetFlankAttackModifier();
 	if(iTemp > 0)

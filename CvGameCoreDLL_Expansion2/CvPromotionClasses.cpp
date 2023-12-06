@@ -1792,6 +1792,7 @@ int CvPromotionEntry::GetRangedFlankAttackModifier() const
 	return m_iRangedFlankAttackModifier;
 }
 
+
 int CvPromotionEntry::GetRangedFlankAttackModifierPercent() const
 {
 	return m_iRangedFlankAttackModifierPercent;
