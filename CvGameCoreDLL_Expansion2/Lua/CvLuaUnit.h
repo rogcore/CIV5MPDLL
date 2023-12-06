@@ -394,6 +394,7 @@ protected:
 	static int lAttackWoundedModifier(lua_State* L);
 	static int lFlankAttackModifier(lua_State* L);
 	static int lRangedFlankAttackModifier(lua_State* L);
+	static int lRangedFlankAttackModifierPercent(lua_State* L);
 	static int lOpenDefenseModifier(lua_State* L);
 	static int lRoughDefenseModifier(lua_State* L);
 
