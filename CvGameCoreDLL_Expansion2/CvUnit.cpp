@@ -22606,6 +22606,14 @@ int CvUnit::GetRangedFlankAttackModifier() const
 
 
 //	--------------------------------------------------------------------------------
+int CvUnit::GetRangedFlankAttackModifier() const
+{
+	VALIDATE_OBJECT
+		return m_iRangedFlankAttackModifier;
+}
+
+
+//	--------------------------------------------------------------------------------
 void CvUnit::ChangeRangedFlankAttackModifier(int iChange)
 {
 	VALIDATE_OBJECT
