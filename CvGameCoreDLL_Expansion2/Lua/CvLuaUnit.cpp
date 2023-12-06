@@ -522,6 +522,7 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(AttackFortifiedModifier);
 	Method(AttackWoundedModifier);
 	Method(FlankAttackModifier);
+	Method(RangedFlankAttackModifier);
 	Method(RoughDefenseModifier);
 	Method(TerrainAttackModifier);
 	Method(TerrainDefenseModifier);
@@ -701,6 +702,7 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(GetNearbyImprovementModifier);
 	Method(IsFriendlyUnitAdjacent);
 	Method(GetNumEnemyUnitsAdjacent);
+	Method(GetNumNearByEnemyUnitsAdjacent);
 	Method(IsEnemyCityAdjacent);
 
 	Method(GetTransportUnit);
@@ -3909,6 +3911,15 @@ int CvLuaUnit::lFlankAttackModifier(lua_State* L)
 	lua_pushinteger(L, iResult);
 	return 1;
 }
+
+int CvLuaUnit::lRangedFlankAttackModifier(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+
+	const int iResult = pkUnit->GetRangedFlankAttackModifier();
+	lua_pushinteger(L, iResult);
+	return 1;
+}
 //------------------------------------------------------------------------------
 //int openDefenseModifier();
 int CvLuaUnit::lOpenDefenseModifier(lua_State* L)
@@ -5582,6 +5593,14 @@ int CvLuaUnit::lGetNumEnemyUnitsAdjacent(lua_State* L)
 	CvUnit* pkOtherUnit = CvLuaUnit::GetInstance(L, 2);
 
 	const int iResult = pkUnit->GetNumEnemyUnitsAdjacent(pkOtherUnit);
+	lua_pushinteger(L, iResult);
+	return 1;
+}
+
+int CvLuaUnit::lGetNumNearByEnemyUnitsAdjacent(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	const int iResult = pkUnit->getNumNearByEnemyUnitsAdjacent();
 	lua_pushinteger(L, iResult);
 	return 1;
 }

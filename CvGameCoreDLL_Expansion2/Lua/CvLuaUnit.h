@@ -393,6 +393,7 @@ protected:
 	static int lAttackFortifiedModifier(lua_State* L);
 	static int lAttackWoundedModifier(lua_State* L);
 	static int lFlankAttackModifier(lua_State* L);
+	static int lRangedFlankAttackModifier(lua_State* L);
 	static int lOpenDefenseModifier(lua_State* L);
 	static int lRoughDefenseModifier(lua_State* L);
 
@@ -623,6 +624,7 @@ protected:
 	static int lGetNearbyImprovementModifier(lua_State* L);
 	static int lIsFriendlyUnitAdjacent(lua_State* L);
 	static int lGetNumEnemyUnitsAdjacent(lua_State* L);
+	static int lGetNumNearByEnemyUnitsAdjacent(lua_State* L);
 	static int lIsEnemyCityAdjacent(lua_State* L);
 
 	static int lGetTransportUnit(lua_State* L);

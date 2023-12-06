@@ -107,6 +107,7 @@ public:
 	int  GetAttackFortifiedMod() const;
 	int  GetAttackWoundedMod() const;
 	int  GetFlankAttackModifier() const;
+	int  GetRangedFlankAttackModifier() const;
 	int  GetNearbyEnemyCombatMod() const;
 	int  GetNearbyEnemyCombatRange() const;
 	int  GetOpenDefensePercent() const;
@@ -552,6 +553,7 @@ protected:
 	int m_iAttackFortifiedMod;
 	int m_iAttackWoundedMod;
 	int m_iFlankAttackModifier;
+	int m_iRangedFlankAttackModifier;
 	int m_iNearbyEnemyCombatMod;
 	int m_iNearbyEnemyCombatRange;
 	int m_iOpenDefensePercent;
