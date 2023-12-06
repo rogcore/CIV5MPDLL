@@ -15418,15 +15418,20 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 #endif
 
 		// Unit Ranged Flanking Attack Mod	
-		int iRangedFlankModifier = GetRangedFlankAttackModifier();
-		if (iRangedFlankModifier != 0 )
-		{
-			int iNumAdjacentEnemys = pOtherUnit->getNumNearByEnemyUnitsAdjacent() - 1;
+
+			int iNumAdjacentEnemys = pOtherUnit->GetNumEnemyUnitsAdjacent(this);
 			if (iNumAdjacentEnemys > 0)
 			{
-				iModifier += iRangedFlankModifier * iNumAdjacentEnemys;
+				int iRangedFlankModifier = (GC.getBONUS_PER_ADJACENT_FRIEND_RANGED()+ GetRangedFlankAttackModifier()) * iNumAdjacentEnemys;
+				int iFlankAttackModifierPercent = GetRangedFlankAttackModifierPercent();
+				if (iFlankAttackModifierPercent >= 0)
+				{
+				  iRangedFlankModifier = iRangedFlankModifier * (100 + iFlankAttackModifierPercent) / 100;
+				}
+				iModifier += iRangedFlankModifier;
 			}
-		}
+		
+
 			////////////////////////
 			// KNOWN BATTLE PLOT
 			////////////////////////
@@ -22613,6 +22618,28 @@ void CvUnit::ChangeRangedFlankAttackModifier(int iChange)
 			setInfoBarDirty(true);
 		}
 }
+
+
+//	--------------------------------------------------------------------------------
+int CvUnit::GetRangedFlankAttackModifierPercent() const
+{
+	VALIDATE_OBJECT
+		return m_iRangedFlankAttackModifierPercent;
+}
+
+
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeRangedFlankAttackModifierPercent(int iChange)
+{
+	VALIDATE_OBJECT
+		if (iChange != 0)
+		{
+			m_iRangedFlankAttackModifierPercent = (m_iRangedFlankAttackModifierPercent + iChange);
+
+			setInfoBarDirty(true);
+		}
+}
+
 //	--------------------------------------------------------------------------------
 int CvUnit::getExtraOpenDefensePercent() const
 {
@@ -25553,6 +25580,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		changeExtraAttackWoundedMod(thisPromotion.GetAttackWoundedMod() * iChange);
 		ChangeFlankAttackModifier(thisPromotion.GetFlankAttackModifier() * iChange);
 		ChangeRangedFlankAttackModifier(thisPromotion.GetRangedFlankAttackModifier() * iChange);
+		ChangeRangedFlankAttackModifierPercent(thisPromotion.GetRangedFlankAttackModifierPercent() * iChange);
 		changeExtraOpenDefensePercent(thisPromotion.GetOpenDefensePercent() * iChange);
 		changeExtraRoughDefensePercent(thisPromotion.GetRoughDefensePercent() * iChange);
 		changeExtraAttacks(thisPromotion.GetExtraAttacks() * iChange);
@@ -26068,6 +26096,7 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iHealOnPillageCount;
 	kStream >> m_iFlankAttackModifier;
 	kStream >> m_iRangedFlankAttackModifier;
+	kStream >> m_iRangedFlankAttackModifierPercent;
 	if (uiVersion >= 3)
 	{
 		kStream >> m_iGoldenAgeValueFromKills;
@@ -26456,6 +26485,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iHealOnPillageCount;
 	kStream << m_iFlankAttackModifier;
 	kStream << m_iRangedFlankAttackModifier;
+	kStream << m_iRangedFlankAttackModifierPercent;
 	kStream << m_iGoldenAgeValueFromKills;
 
 	kStream << m_iGreatGeneralReceivesMovementCount;
@@ -29779,6 +29809,11 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 
 		if (iValue == 0)
 		{
+			iValue = GetPromotionValue(pkPromotionInfo->GetRangedFlankAttackModifierPercent(), GetRangedFlankAttackModifierPercent(), iFlavorRanged, lowPriority);
+		}
+
+		if (iValue == 0)
+		{
 			iValue = GetPromotionValue(pkPromotionInfo->GetFlankAttackModifier(), maxMoves() > 2 ? 1 : 0, iFlavorMobile, lowPriority);
 		}
 
@@ -30134,6 +30169,16 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 		iTemp /= 100;
 		iValue += iTemp + (iFlavorOffense * iFlavorRanged) * 2;
 	}
+
+	iTemp = pkPromotionInfo->GetRangedFlankAttackModifierPercent();
+	if (iTemp != 0 && isRanged())
+	{
+		iExtra = GetRangedFlankAttackModifierPercent();
+		iTemp *= (100 + iExtra);
+		iTemp /= 100;
+		iValue += iTemp + (iFlavorOffense * iFlavorRanged) * 2;
+	}
+
 
 	iTemp = pkPromotionInfo->GetFlankAttackModifier();
 	if(iTemp > 0)

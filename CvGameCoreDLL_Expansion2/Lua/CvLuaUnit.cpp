@@ -523,6 +523,7 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(AttackWoundedModifier);
 	Method(FlankAttackModifier);
 	Method(RangedFlankAttackModifier);
+	Method(RangedFlankAttackModifierPercent);
 	Method(RoughDefenseModifier);
 	Method(TerrainAttackModifier);
 	Method(TerrainDefenseModifier);
@@ -3917,6 +3918,15 @@ int CvLuaUnit::lRangedFlankAttackModifier(lua_State* L)
 	CvUnit* pkUnit = GetInstance(L);
 
 	const int iResult = pkUnit->GetRangedFlankAttackModifier();
+	lua_pushinteger(L, iResult);
+	return 1;
+}
+
+int CvLuaUnit::lRangedFlankAttackModifierPercent(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+
+	const int iResult = pkUnit->GetRangedFlankAttackModifierPercent();
 	lua_pushinteger(L, iResult);
 	return 1;
 }

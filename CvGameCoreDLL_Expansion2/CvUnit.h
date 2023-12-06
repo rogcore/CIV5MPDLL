@@ -1233,6 +1233,9 @@ public:
 	int GetRangedFlankAttackModifier() const;
 	void ChangeRangedFlankAttackModifier(int iChange);
 
+	int GetRangedFlankAttackModifierPercent() const;
+	void ChangeRangedFlankAttackModifierPercent(int iChange);
+
 	int getExtraOpenDefensePercent() const;
 	void changeExtraOpenDefensePercent(int iChange);
 
@@ -2145,6 +2148,7 @@ protected:
 	FAutoVariable<int, CvUnit> m_iExtraAttackWoundedMod;
 	int m_iFlankAttackModifier;
 	int m_iRangedFlankAttackModifier;
+	int m_iRangedFlankAttackModifierPercent;
 	FAutoVariable<int, CvUnit> m_iExtraOpenDefensePercent;
 	FAutoVariable<int, CvUnit> m_iExtraRoughDefensePercent;
 	FAutoVariable<int, CvUnit> m_iPillageChange;
