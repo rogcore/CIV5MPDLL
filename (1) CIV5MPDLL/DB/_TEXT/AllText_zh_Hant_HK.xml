@@ -2,6 +2,9 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_zh_Hant_HK>
+    <Row Tag="TXT_KEY_NOTIFICATION_SPY_EVICTED_FPRBIDDEN_YOU">
+      <Text>您的間諜{1_SpyRank}{2_SpyName}從{3_CityName}離開，因為這座城市不再支持行動。</Text>
+    </Row>
 		<Row Tag="TXT_KEY_NO_ACTION_BUILDING_EMPIRE_RESOURCE">
 			<Text>[NEWLINE]需要國內拥有{1_FeatureName:textkey}。</Text>
 		</Row>

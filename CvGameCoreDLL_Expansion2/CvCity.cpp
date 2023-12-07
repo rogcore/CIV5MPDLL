@@ -7112,6 +7112,24 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 
 							// There's a spy! Remove it!
 							GET_PLAYER(eLoopPlayer).GetEspionage()->ExtractSpyFromCity(iAssignedSpy);
+
+							// Notify the spy's owner
+							CvNotifications* pNotify = GET_PLAYER(eLoopPlayer).GetNotifications();
+							if (!pNotify)
+								continue;
+
+							CvEspionageSpy* pSpy = pEspionage->GetSpyByID(iAssignedSpy);
+							Localization::String strSummary(GetLocalizedText("TXT_KEY_NOTIFICATION_SPY_EVICTED_TRADE_S"));
+
+							// spy owner gets a different notification
+							if (eLoopPlayer != getOwner() && GET_PLAYER(eLoopPlayer).isHuman())
+							{
+								Localization::String strNotification = Localization::Lookup("TXT_KEY_NOTIFICATION_SPY_EVICTED_FPRBIDDEN_YOU");
+								strNotification << pEspionage->GetSpyRankName(pSpy->m_eRank);
+								strNotification << pSpy->GetSpyName(&GET_PLAYER(eLoopPlayer));
+								strNotification << getNameKey();
+								pNotify->Add(NOTIFICATION_SPY_EVICTED, strNotification.toUTF8(), strSummary.toUTF8(), -1, -1, eLoopPlayer);
+							}
 						}
 					}
 				}
@@ -7143,10 +7161,28 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 							continue;
 
 						// There's a spy! Remove it!
-						GET_PLAYER(eLoopPlayer).GetEspionage()->ExtractSpyFromCity(iAssignedSpy);				
+						GET_PLAYER(eLoopPlayer).GetEspionage()->ExtractSpyFromCity(iAssignedSpy);	
+
+
+						// Notify the spy's owner
+						CvNotifications* pNotify = GET_PLAYER(eLoopPlayer).GetNotifications();
+						if (!pNotify)
+							continue;
+
+						CvEspionageSpy* pSpy = pEspionage->GetSpyByID(iAssignedSpy);
+						Localization::String strSummary( GetLocalizedText("TXT_KEY_NOTIFICATION_SPY_EVICTED_TRADE_S"));
+
+						// spy owner gets a different notification
+						if (eLoopPlayer != getOwner() && GET_PLAYER(eLoopPlayer).isHuman())
+						{
+							Localization::String strNotification =Localization::Lookup("TXT_KEY_NOTIFICATION_SPY_EVICTED_FPRBIDDEN_YOU");
+							strNotification << pEspionage->GetSpyRankName(pSpy->m_eRank);
+							strNotification << pSpy->GetSpyName(&GET_PLAYER(eLoopPlayer));
+							strNotification << getNameKey();
+							pNotify->Add(NOTIFICATION_SPY_EVICTED, strNotification.toUTF8(), strSummary.toUTF8(), -1, -1, eLoopPlayer);
+						}
 					}
 				}
-
 			}
 
 
@@ -14420,8 +14456,6 @@ int CvCity::getStrengthValue(bool bForRangeStrike) const
 			}
 		}
 #endif
-
-
 
 		CvAssertMsg(iValue > 0, "City strength should always be greater than zero. Please show Jon this and send your last 5 autosaves.");
 

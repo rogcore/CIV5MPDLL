@@ -2,6 +2,9 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_en_US>
+    <Row Tag="TXT_KEY_NOTIFICATION_SPY_EVICTED_FPRBIDDEN_YOU">
+      <Text>Your spy {1_SpyRank}{2_SpyName}fled {3_CityName}，because this city no longer supports action。</Text>
+    </Row>
 		<Row Tag="TXT_KEY_NO_ACTION_BUILDING_EMPIRE_RESOURCE">
 			<Text>[NEWLINE]Need domestic ownership{1_FeatureName:textkey}。</Text>
 		</Row>

@@ -1336,6 +1336,18 @@ CvCity* CvPlayerEspionage::GetCityWithSpy(uint uiSpyIndex)
 	return pCity;
 }
 
+CvEspionageSpy* CvPlayerEspionage::GetSpyByID(uint uiSpyIndex)
+{
+	CvAssertMsg(uiSpyIndex < m_aSpyList.size(), "uiSpyIndex is out of bounds");
+	if (uiSpyIndex >= m_aSpyList.size())
+	{
+		return NULL;
+	}
+
+	return &m_aSpyList[uiSpyIndex];
+
+}
+
 
 int CvPlayerEspionage::GetSpyIndexInCity(CvCity* pCity)
 {
