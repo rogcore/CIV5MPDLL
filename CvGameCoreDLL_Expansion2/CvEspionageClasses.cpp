@@ -1376,6 +1376,18 @@ bool CvPlayerEspionage::CanEverMoveSpyTo(CvCity* pCity)
 		return false;
 	}
 
+
+	if (GET_PLAYER(pCity->getOwner()).isForbiddenForeignSpyGlobal() && (m_pPlayer->GetID() != pCity->getOwner()))
+	{
+		return false;
+	}
+
+
+	if (pCity->isForbiddenForeignSpy() && (m_pPlayer->GetID() != pCity->getOwner()))
+	{
+		return false;
+	}
+
 #if defined(MOD_EVENTS_ESPIONAGE)
 	if (MOD_EVENTS_ESPIONAGE) {
 		if (GAMEEVENTINVOKE_TESTALL(GAMEEVENT_EspionageCanMoveSpyTo, m_pPlayer->GetID(), pCity->getOwner(), pCity->GetID()) == GAMEEVENTRETURN_FALSE) {

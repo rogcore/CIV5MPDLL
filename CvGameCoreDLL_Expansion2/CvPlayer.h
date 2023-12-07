@@ -1207,6 +1207,10 @@ public:
 	bool isBorderObstacle() const;
 	void changeBorderObstacleCount(int iChange);
 
+	int getForbiddenForeignSpyGlobalCount() const;
+	bool isForbiddenForeignSpyGlobal() const;
+	void changeForbiddenForeignSpyGlobalCount(int iChange);
+
 	int getNetID() const;
 	void setNetID(int iNetID);
 	bool isConnected() const;
@@ -2458,6 +2462,7 @@ protected:
 	int m_iNavalCombatExperienceTimes100;
 #endif
 	int m_iBorderObstacleCount;
+	int m_iForbiddenForeignSpyGlobalCount;
 	FAutoVariable<int, CvPlayer> m_iPopRushHurryCount;
 	FAutoVariable<int, CvPlayer> m_iTotalImprovementsBuilt;
 	FAutoVariable<int, CvPlayer> m_iNextOperationID;

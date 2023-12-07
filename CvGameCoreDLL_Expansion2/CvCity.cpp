@@ -223,7 +223,8 @@ CvCity::CvCity() :
 	, m_aiNumProjects()
 	, m_iNumAttacks("CvCity::m_iNumAttacks", m_syncArchive)
 	, m_iAttacksMade("CvCity::m_iAttacksMade", m_syncArchive)
-
+	, m_iAddsFreshWater(0)
+	, m_iForbiddenForeignSpyCount(0)
 #if defined(MOD_ROG_CORE)
 	, m_aiYieldPerEspionageSpy()
 	, m_aiBaseYieldRateFromEspionageSpy()
@@ -1016,6 +1017,8 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_iBaseTourism = 0;
 	m_iBaseTourismBeforeModifiers = 0;
 	m_aiNumProjects.resize(GC.getNumProjectInfos());
+	m_iAddsFreshWater = 0;
+	m_iForbiddenForeignSpyCount = 0;
 #if defined(MOD_ROG_CORE)
 	m_aiSpecialistRateModifier.resize(GC.getNumSpecialistInfos());
 	m_iExtraDamageHeal = 0;
@@ -7077,7 +7080,76 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 						GET_PLAYER((PlayerTypes)iMinorLoop).GetMinorCivAI()->ChangeFriendshipWithMajor(getOwner(), iMinorFriendshipChange);
 					}
 				}
-			}		
+			}
+
+
+			if (pBuildingInfo->IsForbiddenForeignSpyGlobal())
+			{
+				int iLoopCity = 0;
+				for (CvCity* pLoopCity = owningPlayer.firstCity(&iLoopCity); pLoopCity != NULL; pLoopCity = owningPlayer.nextCity(&iLoopCity))
+				{
+					// Spies in the city? YOU'RE OUTTA HERE!~
+					CvCityEspionage* pCityEspionage = pLoopCity->GetCityEspionage();
+					if (pCityEspionage)
+					{
+						for (int iPlayerLoop = 0; iPlayerLoop < MAX_MAJOR_CIVS; iPlayerLoop++)
+						{
+							PlayerTypes eLoopPlayer = (PlayerTypes)iPlayerLoop;
+
+							if (!GET_PLAYER(eLoopPlayer).isAlive())
+								continue;
+
+							if (eLoopPlayer == getOwner())
+								continue;
+
+							CvPlayerEspionage* pEspionage = GET_PLAYER(eLoopPlayer).GetEspionage();
+							if (!pEspionage)
+								continue;
+
+							int iAssignedSpy = pCityEspionage->m_aiSpyAssignment[iPlayerLoop];
+							if (iAssignedSpy == -1)
+								continue;
+
+							// There's a spy! Remove it!
+							GET_PLAYER(eLoopPlayer).GetEspionage()->ExtractSpyFromCity(iAssignedSpy);
+						}
+					}
+				}
+			}
+
+
+			if (pBuildingInfo->IsForbiddenForeignSpy())
+			{
+				// Spies in the city? YOU'RE OUTTA HERE!~
+				CvCityEspionage* pCityEspionage = GetCityEspionage();
+				if (pCityEspionage)
+				{
+					for (int iPlayerLoop = 0; iPlayerLoop < MAX_MAJOR_CIVS; iPlayerLoop++)
+					{
+						PlayerTypes eLoopPlayer = (PlayerTypes)iPlayerLoop;
+
+						if (!GET_PLAYER(eLoopPlayer).isAlive())
+							continue;
+
+						if (eLoopPlayer == getOwner())
+							continue;
+
+						CvPlayerEspionage* pEspionage = GET_PLAYER(eLoopPlayer).GetEspionage();
+						if (!pEspionage)
+							continue;
+
+						int iAssignedSpy = pCityEspionage->m_aiSpyAssignment[iPlayerLoop];
+						if (iAssignedSpy == -1)
+							continue;
+
+						// There's a spy! Remove it!
+						GET_PLAYER(eLoopPlayer).GetEspionage()->ExtractSpyFromCity(iAssignedSpy);				
+					}
+				}
+
+			}
+
+
 #endif
 			// Capital
 			if(pBuildingInfo->IsCapital())
@@ -7236,7 +7308,8 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		changeLandTileMovementReduce(pBuildingInfo->GetLandTileMovementReduce()* iChange);
 		changeLandTileTurnDamage(pBuildingInfo->GetLandTileTurnDamage()* iChange);
 #endif
-
+		changeAddsFreshWater(pBuildingInfo->IsAddsFreshWater()* iChange);
+		changeForbiddenForeignSpyCount(pBuildingInfo->IsForbiddenForeignSpy()* iChange);
 		changeExtraAttacks(pBuildingInfo->GetExtraAttacks()* iChange);
 
 #if !defined(MOD_API_EXTENSIONS)
@@ -8250,20 +8323,51 @@ bool CvCity::isCoastal(int iMinWaterSize) const
 
 #if defined(MOD_API_EXTENSIONS)
 //	--------------------------------------------------------------------------------
-bool CvCity::isAddsFreshWater() const {
-	VALIDATE_OBJECT
+int CvCity::getAddsFreshWater() const
+{
+	return m_iAddsFreshWater;
+}
+//	--------------------------------------------------------------------------------
+bool CvCity::isAddsFreshWater() const
+{
+	return (getAddsFreshWater() > 0);
+}
 
-	for (int iI = 0; iI < GC.getNumBuildingInfos(); iI++) {
-		if (m_pCityBuildings->GetNumBuilding((BuildingTypes)iI) > 0) {
-			if (GC.getBuildingInfo((BuildingTypes)iI)->IsAddsFreshWater()) {
-				return true;
-			}
-		}
+//	--------------------------------------------------------------------------------
+void CvCity::changeAddsFreshWater(int iChange)
+{
+	if (iChange != 0)
+	{
+		m_iAddsFreshWater = (m_iAddsFreshWater + iChange);
+		CvAssert(getAddsFreshWater() >= 0);
 	}
-
-	return false;
 }
 #endif
+
+
+
+//	--------------------------------------------------------------------------------
+int CvCity::getForbiddenForeignSpyCount() const
+{
+	return m_iForbiddenForeignSpyCount;
+}
+
+//	--------------------------------------------------------------------------------
+bool CvCity::isForbiddenForeignSpy() const
+{
+	return (getForbiddenForeignSpyCount() > 0);
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::changeForbiddenForeignSpyCount(int iChange)
+{
+	if (iChange != 0)
+	{
+		m_iForbiddenForeignSpyCount = (m_iForbiddenForeignSpyCount + iChange);
+		CvAssert(getForbiddenForeignSpyCount() >= 0);
+	}
+}
+
 
 //	--------------------------------------------------------------------------------
 int CvCity::foodConsumption(bool /*bNoAngry*/, int iExtra) const
@@ -18209,11 +18313,11 @@ void CvCity::read(FDataStream& kStream)
 #if defined(MOD_BUILDINGS_CITY_AUTOMATON_WORKERS)
 	// SEE ABOVE - MOD_SERIALIZE_READ(90, kStream, m_iCityAutomatonWorkersChange, 0);
 #endif
-
+	kStream >> m_iAddsFreshWater;
+	kStream >> m_iForbiddenForeignSpyCount;
 #ifdef MOD_ROG_CORE
 	kStream >> m_iCityBuildingRangeStrikeModifier;
 	kStream >> m_iExtraDamageHeal;
-
 	kStream >> m_iNumAttacks;
 	kStream >> m_iAttacksMade;
 	kStream >> m_iNukeInterceptionChance;
@@ -18667,11 +18771,11 @@ void CvCity::write(FDataStream& kStream) const
 #if defined(MOD_BUILDINGS_CITY_AUTOMATON_WORKERS)
 	// SEE ABOVE - MOD_SERIALIZE_WRITE(kStream, m_iCityAutomatonWorkersChange);
 #endif
-
-
+	kStream << m_iAddsFreshWater;
+	kStream << m_iForbiddenForeignSpyCount;
 #ifdef MOD_ROG_CORE
-	kStream << m_iExtraDamageHeal;
 	kStream << m_iCityBuildingRangeStrikeModifier;
+	kStream << m_iExtraDamageHeal;
 	kStream << m_iNumAttacks;
 	kStream << m_iAttacksMade;
 	kStream << m_iNukeInterceptionChance;
