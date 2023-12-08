@@ -184,8 +184,8 @@ CvBuildingEntry::CvBuildingEntry(void):
 
 #if defined(MOD_ROG_CORE)
 	m_piResourceQuantityFromPOP(NULL),
-
-
+	m_piYieldPerFriend(NULL),
+	m_piYieldPerAlly(NULL),
 	m_ppiResourceYieldChangeGlobal(),
 	m_ppaiImprovementYieldChange(NULL),
 	m_ppaiImprovementYieldChangeGlobal(NULL),
@@ -409,6 +409,8 @@ CvBuildingEntry::~CvBuildingEntry(void)
 
 #if defined(MOD_ROG_CORE)
 	SAFE_DELETE_ARRAY(m_piResourceQuantityFromPOP);
+	SAFE_DELETE_ARRAY(m_piYieldPerFriend);
+	SAFE_DELETE_ARRAY(m_piYieldPerAlly);
 	SAFE_DELETE_ARRAY(m_piGreatWorkYieldChange);
 	SAFE_DELETE_ARRAY(m_piYieldPerEspionageSpy);
 	SAFE_DELETE_ARRAY(m_piYieldChangeWorldWonder);
@@ -852,6 +854,9 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	kUtility.SetYields(m_piYieldChangeWorldWonder, "Building_YieldChangeWorldWonder", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldChangeWorldWonderGlobal, "Building_YieldChangeWorldWonderGlobal", "BuildingType", szBuildingType);
 	kUtility.PopulateArrayByValue(m_piResourceQuantityFromPOP, "Resources", "Building_ResourceQuantityFromPOP", "ResourceType", "BuildingType", szBuildingType, "Modifier");
+	kUtility.SetYields(m_piYieldPerFriend, "Building_YieldPerFriend", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldPerAlly, "Building_YieldPerAlly", "BuildingType", szBuildingType);
+
 #endif
 
 	//ResourceYieldChanges
@@ -3353,6 +3358,20 @@ int CvBuildingEntry::GetResourceQuantityFromPOP(int i) const
 	CvAssertMsg(i < GC.getNumResourceInfos(), "Index out of bounds");
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_piResourceQuantityFromPOP ? m_piResourceQuantityFromPOP[i] : -1;
+}
+
+int CvBuildingEntry::GetYieldPerFriend(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldPerFriend ? m_piYieldPerFriend[i] : -1;
+}
+
+int CvBuildingEntry::GetYieldPerAlly(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldPerAlly ? m_piYieldPerAlly[i] : -1;
 }
 
 int CvBuildingEntry::GetYieldPerEspionageSpy(int i) const

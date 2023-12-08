@@ -402,6 +402,8 @@ CvPlayer::CvPlayer() :
 	, m_iCapitalGrowthMod("CvPlayer::m_iCapitalGrowthMod", m_syncArchive)
 	, m_iNumPlotsBought("CvPlayer::m_iNumPlotsBought", m_syncArchive)
 	, m_iPlotGoldCostMod("CvPlayer::m_iPlotGoldCostMod", m_syncArchive)
+	, m_iCSAllies()
+	, m_iCSFriends()
 #if defined(MOD_TRAITS_CITY_WORKING) || defined(MOD_BUILDINGS_CITY_WORKING) || defined(MOD_POLICIES_CITY_WORKING) || defined(MOD_TECHS_CITY_WORKING)
 	, m_iCityWorkingChange(0)
 #endif
@@ -967,7 +969,8 @@ void CvPlayer::uninit()
 	m_iEspionageModifier = 0;
 	m_iSpyStartingRank = 0;
 
-	
+	m_iCSAllies = 0;
+	m_iCSFriends = 0;
 #if defined(MOD_ROG_CORE)
 	m_piDomainFreeExperience.clear();
 	m_piUnitTypePrmoteHealGlobal.clear();
@@ -5055,6 +5058,14 @@ void CvPlayer::doTurn()
 
 	DoUpdateUprisings();
 	DoUpdateCityRevolts();
+
+
+	if (!isMinorCiv() && !isBarbarian())
+	{
+		RefreshCSAlliesFriends();
+	}
+
+	
 
 	bool bHasActiveDiploRequest = false;
 	if(isAlive() && isMajorCiv())
@@ -17875,6 +17886,57 @@ int CvPlayer::getOverflowResearch() const
 }
 
 
+
+int CvPlayer::GetNumCSAllies() const
+{
+	return m_iCSAllies;
+}
+void CvPlayer::SetNumCSAllies(int iChange)
+{
+	if (m_iCSAllies != iChange)
+	{
+		m_iCSAllies = iChange;
+	}
+}
+
+int CvPlayer::GetNumCSFriends() const
+{
+	return m_iCSFriends;
+}
+void CvPlayer::SetNumCSFriends(int iChange)
+{
+	if (m_iCSFriends != iChange)
+	{
+		m_iCSFriends = iChange;
+	}
+}
+
+void CvPlayer::RefreshCSAlliesFriends()
+{
+	int iFriends = 0;
+	int iAllies = 0;
+	// Loop through all minors and get the total number we've met.
+	for (int iMinorLoop = MAX_MAJOR_CIVS; iMinorLoop < MAX_CIV_PLAYERS; iMinorLoop++)
+	{
+		PlayerTypes eMinor = (PlayerTypes)iMinorLoop;
+
+		if (GET_PLAYER(eMinor).isAlive() && GET_PLAYER(eMinor).isMinorCiv())
+		{
+			if (GET_PLAYER(eMinor).GetMinorCivAI()->IsAllies(GetID()))
+			{
+				iAllies++;
+			}
+			else if (GET_PLAYER(eMinor).GetMinorCivAI()->IsFriends(GetID()))
+			{
+				iFriends++;
+			}
+		}
+	}
+	SetNumCSAllies(iAllies);
+	SetNumCSFriends(iFriends);
+}
+
+
 //	--------------------------------------------------------------------------------
 void CvPlayer::setOverflowResearch(int iNewValue)
 {
@@ -27687,6 +27749,8 @@ void CvPlayer::Read(FDataStream& kStream)
 
 	kStream >> m_aiCityYieldChange;
 
+	kStream >> m_iCSAllies;
+	kStream >> m_iCSFriends;
 #if defined(MOD_ROG_CORE)
 	kStream >> m_aiDomainFreeExperiencePerGreatWorkGlobal;
 	kStream >> m_piDomainFreeExperience;
@@ -28381,6 +28445,8 @@ void CvPlayer::Write(FDataStream& kStream) const
 
 	kStream << m_aiCityYieldChange;
 
+	kStream << m_iCSAllies;
+	kStream << m_iCSFriends;
 #if defined(MOD_ROG_CORE)
 	kStream << m_aiDomainFreeExperiencePerGreatWorkGlobal;
 	kStream << m_piDomainFreeExperience;

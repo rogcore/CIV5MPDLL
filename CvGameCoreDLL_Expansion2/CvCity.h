@@ -880,6 +880,19 @@ public:
 	int getDomainFreeExperienceFromGreatWorks(DomainTypes eIndex) const;
 	
 #if defined(MOD_ROG_CORE)
+	int GetBaseYieldRateFromCSAlliance(YieldTypes eIndex) const;
+	void ChangeBaseYieldRateFromCSAlliance(YieldTypes eIndex, int iChange);
+	void SetBaseYieldRateFromCSAlliance(YieldTypes eIndex, int iValue);
+
+	int GetBaseYieldRateFromCSFriendship(YieldTypes eIndex) const;
+	void ChangeBaseYieldRateFromCSFriendship(YieldTypes eIndex, int iChange);
+	void SetBaseYieldRateFromCSFriendship(YieldTypes eIndex, int iValue);
+
+	int GetYieldPerAlly(YieldTypes eIndex) const;
+	void ChangeYieldPerAlly(YieldTypes eYield, int iChange);
+	int GetYieldPerFriend(YieldTypes eIndex) const;
+	void ChangeYieldPerFriend(YieldTypes eYield, int iChange);
+
 	int GetYieldPerEspionageSpy(YieldTypes eIndex) const;
 	void ChangeYieldPerEspionageSpy(YieldTypes eYield, int iChange);
 	int GetBaseYieldRateFromEspionageSpy(YieldTypes eIndex) const;
@@ -1453,6 +1466,10 @@ protected:
 
 
 #if defined(MOD_ROG_CORE)
+	std::vector<int> m_aiBaseYieldRateFromCSAlliance;
+	std::vector<int> m_aiBaseYieldRateFromCSFriendship;
+	std::vector<int> m_aiYieldPerAlly;
+	std::vector<int> m_aiYieldPerFriend;
 	std::vector<int> m_aiYieldPerEspionageSpy;
 	std::vector<int> m_aiBaseYieldRateFromEspionageSpy;
 	std::vector<int> m_aiYieldFromConstruction;
