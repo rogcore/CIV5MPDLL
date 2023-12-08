@@ -1170,6 +1170,7 @@ void CvPlayer::uninit()
 #endif
 
 	m_iBorderObstacleCount = 0;
+	m_iForbiddenForeignSpyGlobalCount = 0;
 	m_iPopRushHurryCount = 0;
 	m_uiStartTime = 0;
 	m_iTotalImprovementsBuilt = 0;
@@ -9939,7 +9940,7 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	changeWorkerSpeedModifier(pBuildingInfo->GetWorkerSpeedModifier() * iChange);
 	ChangeSpecialistCultureChange(pBuildingInfo->GetSpecialistExtraCulture() * iChange);
 	changeBorderObstacleCount(pBuildingInfo->IsPlayerBorderObstacle() * iChange);
-
+	changeForbiddenForeignSpyGlobalCount(pBuildingInfo->IsForbiddenForeignSpyGlobal() * iChange);
 	changeSpaceProductionModifier(pBuildingInfo->GetGlobalSpaceProductionModifier() * iChange);
 
 	changeNumTradeRouteBonus(pBuildingInfo->GetNumTradeRouteBonus() * iChange);
@@ -19510,6 +19511,28 @@ void CvPlayer::changeBorderObstacleCount(int iChange)
 	}
 }
 
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::getForbiddenForeignSpyGlobalCount() const
+{
+	return m_iForbiddenForeignSpyGlobalCount;
+}
+
+//	--------------------------------------------------------------------------------
+bool CvPlayer::isForbiddenForeignSpyGlobal() const
+{
+	return (getForbiddenForeignSpyGlobalCount() > 0);
+}
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::changeForbiddenForeignSpyGlobalCount(int iChange)
+{
+	if (iChange != 0)
+	{
+		m_iForbiddenForeignSpyGlobalCount = (m_iForbiddenForeignSpyGlobalCount + iChange);
+		CvAssert(getForbiddenForeignSpyGlobalCount() >= 0);
+	}
+}
 //	--------------------------------------------------------------------------------
 int CvPlayer::getNetID() const
 {
@@ -19569,6 +19592,10 @@ bool CvPlayer::isMinorCiv() const
 {
 	return CvPreGame::isMinorCiv(m_eID);
 }
+
+
+
+
 
 
 #if defined(MOD_API_EXTENSIONS)
@@ -27566,6 +27593,7 @@ void CvPlayer::Read(FDataStream& kStream)
 #endif
 	kStream >> m_iMoveAfterCreated;
 	kStream >> m_iBorderObstacleCount;
+	kStream >> m_iForbiddenForeignSpyGlobalCount;
 	kStream >> m_iNextOperationID;
 	kStream >> m_iCostNextPolicy;
 	kStream >> m_iNumBuilders;
@@ -28277,6 +28305,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 #endif
 	kStream << m_iMoveAfterCreated;
 	kStream << m_iBorderObstacleCount;
+	kStream << m_iForbiddenForeignSpyGlobalCount;
 	kStream << m_iNextOperationID;
 	kStream << m_iCostNextPolicy;
 	kStream << m_iNumBuilders;

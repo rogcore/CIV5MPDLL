@@ -1336,6 +1336,18 @@ CvCity* CvPlayerEspionage::GetCityWithSpy(uint uiSpyIndex)
 	return pCity;
 }
 
+CvEspionageSpy* CvPlayerEspionage::GetSpyByID(uint uiSpyIndex)
+{
+	CvAssertMsg(uiSpyIndex < m_aSpyList.size(), "uiSpyIndex is out of bounds");
+	if (uiSpyIndex >= m_aSpyList.size())
+	{
+		return NULL;
+	}
+
+	return &m_aSpyList[uiSpyIndex];
+
+}
+
 
 int CvPlayerEspionage::GetSpyIndexInCity(CvCity* pCity)
 {
@@ -1372,6 +1384,18 @@ bool CvPlayerEspionage::CanEverMoveSpyTo(CvCity* pCity)
 
 	// check to see if the plot can be seen
 	if(!pPlot->isRevealed(m_pPlayer->getTeam()))
+	{
+		return false;
+	}
+
+
+	if (GET_PLAYER(pCity->getOwner()).isForbiddenForeignSpyGlobal() && (m_pPlayer->GetID() != pCity->getOwner()))
+	{
+		return false;
+	}
+
+
+	if (pCity->isForbiddenForeignSpy() && (m_pPlayer->GetID() != pCity->getOwner()))
 	{
 		return false;
 	}

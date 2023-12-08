@@ -390,8 +390,14 @@ public:
 
 	bool isCoastal(int iMinWaterSize = -1) const;
 #if defined(MOD_API_EXTENSIONS)
+	int getAddsFreshWater() const;
+	void changeAddsFreshWater(int iChange);
 	bool isAddsFreshWater() const;
 #endif
+
+	int getForbiddenForeignSpyCount() const;
+	void changeForbiddenForeignSpyCount(int iChange);
+	bool isForbiddenForeignSpy() const;
 
 	int foodConsumption(bool bNoAngry = false, int iExtra = 0) const;
 	int foodDifference(bool bBottom = true) const;
@@ -1386,7 +1392,8 @@ protected:
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	int m_iConversionModifier;
 #endif
-
+	int m_iAddsFreshWater;
+	int m_iForbiddenForeignSpyCount;
 #if defined(MOD_ROG_CORE)
 	FAutoVariable<int, CvCity> m_iExtraDamageHeal;
 	FAutoVariable<int, CvCity> m_iCityBuildingRangeStrikeModifier;

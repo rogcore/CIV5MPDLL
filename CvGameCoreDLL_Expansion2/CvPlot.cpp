@@ -473,36 +473,25 @@ void CvPlot::doTurn()
 		{
 			if (bOutBreakLv1)
 			{
-				int iRange = 2;
-				for (int iDX = -iRange; iDX <= iRange; iDX++)
+				GC.getGame().setPlotExtraYield(getX(), getY(), YIELD_FOOD, 1);
+
+				if (getImprovementType() != NULL && !isCity() && !IsImprovementPillaged())
 				{
-					for (int iDY = -iRange; iDY <= iRange; iDY++)
+					CvImprovementEntry* pkImprovement = GC.getImprovementInfo(getImprovementType());
+					SetImprovementPillaged(true);
+
+					if (pkImprovement && pkImprovement->IsDestroyedWhenPillaged())
 					{
-						CvPlot* pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, 1);
-						if (pLoopPlot != NULL)
-						{
-							GC.getGame().setPlotExtraYield(pLoopPlot->getX(), pLoopPlot->getY(), YIELD_FOOD, 1);
-
-							if (pLoopPlot->getImprovementType() != NULL && !pLoopPlot->isCity() && !pLoopPlot->IsImprovementPillaged())
-							{
-								CvImprovementEntry* pkImprovement = GC.getImprovementInfo(pLoopPlot->getImprovementType());
-								pLoopPlot->SetImprovementPillaged(true);
-
-								if (pkImprovement && pkImprovement->IsDestroyedWhenPillaged())
-								{
-									pLoopPlot->setImprovementType(NO_IMPROVEMENT);
-									pLoopPlot->SetImprovementPillaged(false);
-								}
-							}
-							for (int iUnitLoop = 0; iUnitLoop < pLoopPlot->getNumUnits(); iUnitLoop++)
-							{
-								CvUnit* loopUnit = pLoopPlot->getUnitByIndex(iUnitLoop);
-								if (loopUnit != NULL && loopUnit->getDomainType() != DOMAIN_AIR && loopUnit->getDomainType() != DOMAIN_HOVER)
-								{
-									loopUnit->changeDamage(50);
-								}
-							}
-						}
+						setImprovementType(NO_IMPROVEMENT);
+						SetImprovementPillaged(false);
+					}
+				}
+				for (int iUnitLoop = 0; iUnitLoop < getNumUnits(); iUnitLoop++)
+				{
+					CvUnit* loopUnit = getUnitByIndex(iUnitLoop);
+					if (loopUnit != NULL && loopUnit->getDomainType() != DOMAIN_AIR && loopUnit->getDomainType() != DOMAIN_HOVER)
+					{
+						loopUnit->changeDamage(50);
 					}
 				}
 				SetBreakTurns(10);
@@ -513,7 +502,7 @@ void CvPlot::doTurn()
 					GET_TEAM(GC.getGame().getActiveTeam()).AddNotification(NOTIFICATION_GENERIC, strBuffer, strSummary, getX(), getY());
 				}
 			}
-
+				
 			else if (bOutBreakLv2)
 			{
 				int iRange = 2;
@@ -521,7 +510,7 @@ void CvPlot::doTurn()
 				{
 					for (int iDY = -iRange; iDY <= iRange; iDY++)
 					{
-						CvPlot* pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, 2);
+						CvPlot* pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, 1);
 						if (pLoopPlot != NULL)
 						{
 							GC.getGame().setPlotExtraYield(pLoopPlot->getX(), pLoopPlot->getY(), YIELD_FOOD, 1);
@@ -566,17 +555,16 @@ void CvPlot::doTurn()
 
 			else if (bOutBreakLv3)
 			{
-				int iRange =3;
+				int iRange =2;
 				for (int iDX = -iRange; iDX <= iRange; iDX++)
 				{
 					for (int iDY = -iRange; iDY <= iRange; iDY++)
 					{
-						CvPlot* pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, 3);
+						CvPlot* pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, 2);
 						if (pLoopPlot != NULL)
 						{
-							GC.getGame().setPlotExtraYield(pLoopPlot->getX(), pLoopPlot->getY(), YIELD_FOOD, 2);
-							GC.getGame().setPlotExtraYield(pLoopPlot->getX(), pLoopPlot->getY(), YIELD_PRODUCTION, 2);
-							GC.getGame().setPlotExtraYield(pLoopPlot->getX(), pLoopPlot->getY(), YIELD_GOLD, 2);
+							GC.getGame().setPlotExtraYield(pLoopPlot->getX(), pLoopPlot->getY(), YIELD_FOOD, 1);
+							GC.getGame().setPlotExtraYield(pLoopPlot->getX(), pLoopPlot->getY(), YIELD_PRODUCTION, 1);
 
 							if (pLoopPlot->getImprovementType() != NULL && !pLoopPlot->isCity() && !pLoopPlot->IsImprovementPillaged())
 							{

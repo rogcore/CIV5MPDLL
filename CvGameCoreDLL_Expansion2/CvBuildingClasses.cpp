@@ -217,6 +217,8 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_bMapCentering(false),
 	m_bNeverCapture(false),
 	m_bNukeImmune(false),
+	m_bIsForbiddenForeignSpy(false),
+	m_bIsForbiddenForeignSpyGlobal(false),
 	m_bExtraLuxuries(false),
 	m_bDiplomaticVoting(false),
 	m_bAllowsWaterRoutes(false),
@@ -528,6 +530,8 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_bMapCentering = kResults.GetBool("MapCentering");
 	m_bNeverCapture = kResults.GetBool("NeverCapture");
 	m_bNukeImmune = kResults.GetBool("NukeImmune");
+	m_bIsForbiddenForeignSpy = kResults.GetBool("ForbiddenForeignSpy");
+	m_bIsForbiddenForeignSpyGlobal = kResults.GetBool("ForbiddenForeignSpyGlobal");
 	m_bCityWall = kResults.GetBool("CityWall");
 	m_bExtraLuxuries = kResults.GetBool("ExtraLuxuries");
 	m_bDiplomaticVoting = kResults.GetBool("DiplomaticVoting");
@@ -2674,6 +2678,16 @@ bool CvBuildingEntry::IsNeverCapture() const
 bool CvBuildingEntry::IsNukeImmune() const
 {
 	return m_bNukeImmune;
+}
+
+bool CvBuildingEntry::IsForbiddenForeignSpy() const
+{
+	return m_bIsForbiddenForeignSpy;
+}
+
+bool CvBuildingEntry::IsForbiddenForeignSpyGlobal() const
+{
+	return m_bIsForbiddenForeignSpyGlobal;
 }
 
 /// Does the building add an additional of each luxury in city radius
