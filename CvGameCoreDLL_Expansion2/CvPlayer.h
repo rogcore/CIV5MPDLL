@@ -1077,6 +1077,16 @@ public:
 	int getMaxConscript() const;
 	void changeMaxConscript(int iChange);
 
+
+	int GetNumCSAllies() const;
+	void SetNumCSAllies(int iValue);
+
+	int GetNumCSFriends() const;
+	void SetNumCSFriends(int iValue);
+
+	void RefreshCSAlliesFriends();
+
+
 	int getOverflowResearch() const;
 	void setOverflowResearch(int iNewValue);
 	void changeOverflowResearch(int iChange);
@@ -2451,6 +2461,9 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iScenarioScore4;
 	FAutoVariable<int, CvPlayer> m_iScoreFromFutureTech;
 	FAutoVariable<int, CvPlayer> m_iCombatExperience;
+
+	int m_iCSAllies;
+	int m_iCSFriends;
 
 	std::vector<int> m_piNumBuildings;
 

@@ -216,6 +216,8 @@ public:
 	int GetLandTileTurnDamage() const;
 #endif
 
+	int GetYieldPerFriend(int i) const;
+	int GetYieldPerAlly(int i) const;
 	int GetResourceQuantityFromPOP(int i) const;
 	int GetYieldPerEspionageSpy(int i) const;
 	int GetYieldChangeWorldWonder(int i) const;
@@ -636,6 +638,8 @@ private:
 	int* m_piYieldChangeWorldWonder;
 	int* m_piYieldChangeWorldWonderGlobal;
 	int* m_piResourceQuantityFromPOP;
+	int* m_piYieldPerFriend;
+	int* m_piYieldPerAlly;
 #endif
 
 #if defined(MOD_ROG_CORE)

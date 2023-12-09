@@ -6531,6 +6531,7 @@ void CvMinorCivAI::SetAlly(PlayerTypes eNewAlly)
 
 	PlayerTypes eOldAlly = GetAlly();
 
+
 	int iPlotVisRange = GC.getPLOT_VISIBILITY_RANGE();
 
 	if(eOldAlly != NO_PLAYER)
@@ -6603,6 +6604,15 @@ void CvMinorCivAI::SetAlly(PlayerTypes eNewAlly)
 
 	// Alter who gets this guy's resources
 	DoUpdateAlliesResourceBonus(eNewAlly, eOldAlly);
+
+	if (eNewAlly != NO_PLAYER)
+	{
+		GET_PLAYER(eNewAlly).RefreshCSAlliesFriends();
+	}
+	if (eOldAlly != NO_PLAYER)
+	{
+		GET_PLAYER(eOldAlly).RefreshCSAlliesFriends();
+	}
 
 	// Declare war on Ally's enemies
 	if(eNewAlly != NO_PLAYER)
@@ -6900,6 +6910,12 @@ void CvMinorCivAI::DoFriendshipChangeEffects(PlayerTypes ePlayer, int iOldFriend
 		else
 			SetAlly(NO_PLAYER);	// We KNOW no one else can be higher, so set the Ally to NO_PLAYER
 	}
+
+	if (ePlayer != NO_PLAYER)
+	{
+		GET_PLAYER(ePlayer).RefreshCSAlliesFriends();
+	}
+
 }
 
 
