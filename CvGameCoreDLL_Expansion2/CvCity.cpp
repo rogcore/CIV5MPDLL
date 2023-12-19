@@ -206,6 +206,8 @@ CvCity::CvCity() :
 
 #if defined(MOD_ROG_CORE)
 	, m_iExtraDamageHeal("CvCity::m_iExtraDamageHeal", m_syncArchive)
+	, m_iBombardRange("CvCity::m_iBombardRange", m_syncArchive)
+	, m_iBombardIndirect(0)
 	, m_iCityBuildingRangeStrikeModifier("CvCity::m_iCityBuildingRangeStrikeModifier", m_syncArchive)
 
 	, m_iResetDamageValue("CvCity::m_iResetDamageValue", m_syncArchive)
@@ -1026,6 +1028,8 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 #if defined(MOD_ROG_CORE)
 	m_aiSpecialistRateModifier.resize(GC.getNumSpecialistInfos());
 	m_iExtraDamageHeal = 0;
+	m_iBombardRange = 0;
+	m_iBombardIndirect = 0;
 	m_iCityBuildingRangeStrikeModifier = 0;
 
 	m_iResetDamageValue = 0;
@@ -7349,6 +7353,10 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 
 #if defined(MOD_ROG_CORE)
 		changeExtraDamageHeal(pBuildingInfo->GetExtraDamageHeal()* iChange);
+
+		changeExtraBombardRange(pBuildingInfo->GetBombardRange()* iChange);
+		changeBombardIndirect(pBuildingInfo->IsBombardIndirect()* iChange);
+
 		changeCityBuildingRangeStrikeModifier(pBuildingInfo->CityRangedStrikeModifier()* iChange);
 
 		changeResetDamageValue(pBuildingInfo->GetResetDamageValue()* iChange);
@@ -8394,6 +8402,45 @@ void CvCity::changeAddsFreshWater(int iChange)
 	{
 		m_iAddsFreshWater = (m_iAddsFreshWater + iChange);
 		CvAssert(getAddsFreshWater() >= 0);
+	}
+}
+
+
+
+//	--------------------------------------------------------------------------------
+int CvCity::getExtraBombardRange() const
+{
+	VALIDATE_OBJECT
+	return m_iBombardRange;
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::changeExtraBombardRange(int iChange)
+{
+	VALIDATE_OBJECT
+		if (iChange != 0)
+		{
+			m_iBombardRange += iChange;
+		}
+}
+
+int CvCity::getBombardIndirect() const
+{
+	return m_iBombardIndirect;
+}
+//	--------------------------------------------------------------------------------
+bool CvCity::isBombardIndirect() const
+{
+	return (getBombardIndirect() > 0);
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::changeBombardIndirect(int iChange)
+{
+	if (iChange != 0)
+	{
+		m_iBombardIndirect = (m_iBombardIndirect + iChange);
+		CvAssert(getBombardIndirect() >= 0);
 	}
 }
 #endif
@@ -18509,6 +18556,8 @@ void CvCity::read(FDataStream& kStream)
 #ifdef MOD_ROG_CORE
 	kStream >> m_iCityBuildingRangeStrikeModifier;
 	kStream >> m_iExtraDamageHeal;
+	kStream >> m_iBombardRange;
+	kStream >> m_iBombardIndirect;
 	kStream >> m_iNumAttacks;
 	kStream >> m_iAttacksMade;
 	kStream >> m_iNukeInterceptionChance;
@@ -18971,17 +19020,15 @@ void CvCity::write(FDataStream& kStream) const
 #ifdef MOD_ROG_CORE
 	kStream << m_iCityBuildingRangeStrikeModifier;
 	kStream << m_iExtraDamageHeal;
+	kStream << m_iBombardRange;
+	kStream << m_iBombardIndirect;
 	kStream << m_iNumAttacks;
 	kStream << m_iAttacksMade;
 	kStream << m_iNukeInterceptionChance;
 
-
 	kStream << m_aiYieldPerPopInEmpire;
-
 	kStream << m_iResetDamageValue;
 	kStream << m_iReduceDamageValue;
-
-
 
 	kStream << m_iWaterTileDamage;
 	kStream << m_iWaterTileMovementReduce;
@@ -19660,7 +19707,7 @@ void CvCity::changeLandTileTurnDamage(int iChange)
 }
 #endif
 
-#if defined(MOD_EVENTS_CITY_BOMBARD)
+
 //	--------------------------------------------------------------------------------
 int CvCity::getBombardRange() const
 {
@@ -19673,21 +19720,29 @@ int CvCity::getBombardRange(bool& bIndirectFireAllowed) const
 {
 	VALIDATE_OBJECT
 	
-	if (MOD_EVENTS_CITY_BOMBARD) {
-		int iValue = 0;
-		if (GAMEEVENTINVOKE_VALUE(iValue, GAMEEVENT_GetBombardRange, getOwner(), GetID()) == GAMEEVENTRETURN_VALUE) {
-			// Defend against modder stupidity!
-			if (::abs(iValue) <= GC.getMAX_CITY_ATTACK_RANGE()) {
-				bIndirectFireAllowed = (iValue < 0);
-				return ::abs(iValue);
-			}
+	if (MOD_EVENTS_CITY_BOMBARD)
+	{
+		//TeamTypes eTeam = getTeam();
+		int iValue= GC.getCITY_ATTACK_RANGE() + getExtraBombardRange() + GET_TEAM(getTeam()).GetBombardRange();
+		if (iValue<0)
+		{
+			iValue =0;
 		}
+		if (iValue > GC.getMAX_CITY_ATTACK_RANGE())
+		{
+			iValue = GC.getMAX_CITY_ATTACK_RANGE();
+		}
+		bIndirectFireAllowed = isBombardIndirect();
+		if (GET_TEAM(getTeam()).isBombardIndirect())
+		{
+			bIndirectFireAllowed = true;
+		}
+		return iValue;
 	}
-	
+
 	bIndirectFireAllowed = GC.getCAN_CITY_USE_INDIRECT_FIRE();
 	return GC.getCITY_ATTACK_RANGE();
 }
-#endif
 
 //	--------------------------------------------------------------------------------
 bool CvCity::canRangeStrike() const
@@ -19721,15 +19776,12 @@ bool CvCity::CanRangeStrikeNow() const
 		return false;
 	}
 
-#if defined(MOD_EVENTS_CITY_BOMBARD)
+
 	bool bIndirectFireAllowed; // By reference, yuck!!!
 	int iRange = getBombardRange(bIndirectFireAllowed);
 	
 	if (iRange == 0) return false;
-#else
-	int iRange = GC.getCITY_ATTACK_RANGE();
-	bool bIndirectFireAllowed = GC.getCAN_CITY_USE_INDIRECT_FIRE();
-#endif
+
 	CvPlot* pPlot = plot();
 	int iX = getX();
 	int iY = getY();
@@ -19751,11 +19803,8 @@ bool CvCity::CanRangeStrikeNow() const
 
 			if(!bIndirectFireAllowed)
 			{
-#if defined MOD_BUGFIX_NAVAL_TARGETING
+
 				if (!pPlot->canSeePlot(pTargetPlot, eTeam, iRange, NO_DIRECTION, DOMAIN_LAND))
-#else
-				if (!pPlot->canSeePlot(pTargetPlot, eTeam, iRange, NO_DIRECTION))
-#endif
 				{
 					bCanRangeStrike = false;
 				}
@@ -19843,31 +19892,21 @@ bool CvCity::canRangeStrikeAt(int iX, int iY) const
 		return false;
 	}
 
-#if defined(MOD_EVENTS_CITY_BOMBARD)
 	bool bIndirectFireAllowed; // By reference, yuck!!!
 	int iAttackRange = getBombardRange(bIndirectFireAllowed);
 	
 	if (iAttackRange == 0) return false;
-#else
-	int iAttackRange = GC.getCITY_ATTACK_RANGE();
-#endif
+
 
 	if(plotDistance(plot()->getX(), plot()->getY(), pTargetPlot->getX(), pTargetPlot->getY()) > iAttackRange)
 	{
 		return false;
 	}
 
-#if defined(MOD_EVENTS_CITY_BOMBARD)
+
 	if(!bIndirectFireAllowed)
-#else
-	if(!GC.getCAN_CITY_USE_INDIRECT_FIRE())
-#endif
 	{
-#if defined MOD_BUGFIX_NAVAL_TARGETING
 		if (!plot()->canSeePlot(pTargetPlot, getTeam(), iAttackRange, NO_DIRECTION, DOMAIN_LAND))
-#else
-		if (!plot()->canSeePlot(pTargetPlot, getTeam(), iAttackRange, NO_DIRECTION))
-#endif
 		{
 			return false;
 		}
@@ -20153,13 +20192,10 @@ void CvCity::DoNearbyEnemy()
 	if(!canRangeStrike())
 		return;
 
-#if defined(MOD_EVENTS_CITY_BOMBARD)
 	int iSearchRange = getBombardRange();
 	
 	if (iSearchRange == 0) return;
-#else
-	int iSearchRange = GC.getCITY_ATTACK_RANGE();
-#endif
+
 	CvPlot* pBestPlot = NULL;
 
 	bool bFoundEnemy = false;

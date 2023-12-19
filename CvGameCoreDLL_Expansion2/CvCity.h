@@ -1001,6 +1001,14 @@ public:
 	int getExtraDamageHeal() const;
 	void changeExtraDamageHeal(int iChange);
 
+	int getExtraBombardRange() const;
+	void changeExtraBombardRange(int iChange);
+
+	int getBombardIndirect() const;
+	void changeBombardIndirect(int iChange);
+	bool isBombardIndirect() const;
+
+
 	int getCityBuildingRangeStrikeModifier() const;
 	void changeCityBuildingRangeStrikeModifier(int iValue);
 
@@ -1409,6 +1417,8 @@ protected:
 	int m_iForbiddenForeignSpyCount;
 #if defined(MOD_ROG_CORE)
 	FAutoVariable<int, CvCity> m_iExtraDamageHeal;
+	FAutoVariable<int, CvCity> m_iBombardRange;
+	int m_iBombardIndirect;
 	FAutoVariable<int, CvCity> m_iCityBuildingRangeStrikeModifier;
 
 	FAutoVariable<int, CvCity> m_iResetDamageValue;
