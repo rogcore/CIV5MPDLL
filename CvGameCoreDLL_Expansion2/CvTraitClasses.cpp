@@ -120,6 +120,7 @@ CvTraitEntry::CvTraitEntry() :
 	m_iTradeBuildingModifier(0),
 #endif
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iNumCityAdjacentFeatureModifier(0),
 	m_iPromotionWhenKilledUnit(NO_PROMOTION),
 	m_iPromotionRadiusWhenKilledUnit(0),
 	m_iAttackBonusAdjacentWhenUnitKilled(0),
@@ -210,7 +211,8 @@ CvTraitEntry::CvTraitEntry() :
 	m_piGoldenAgeGreatPersonRateModifier(NULL),
 	m_ppiCityYieldFromUnimprovedFeature(NULL),
 #endif
-	m_ppiUnimprovedFeatureYieldChanges(NULL)
+	m_ppiUnimprovedFeatureYieldChanges(NULL),
+	m_ppiCityYieldModifierFromAdjacentFeature(NULL)
 {
 }
 
@@ -234,6 +236,7 @@ CvTraitEntry::~CvTraitEntry()
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiCityYieldFromUnimprovedFeature);
 #endif
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiUnimprovedFeatureYieldChanges);
+	CvDatabaseUtility::SafeDelete2DArray(m_ppiCityYieldModifierFromAdjacentFeature);
 }
 
 /// Accessor:: Modifier to experience needed for new level
@@ -684,6 +687,10 @@ int CvTraitEntry::GetTradeBuildingModifier() const
 }
 
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+int CvTraitEntry::GetNumCityAdjacentFeatureModifier() const
+{
+	return m_iNumCityAdjacentFeatureModifier;
+}
 int CvTraitEntry::GetPromotionWhenKilledUnit() const
 {
 	return m_iPromotionWhenKilledUnit;
@@ -1160,6 +1167,16 @@ int CvTraitEntry::GetUnimprovedFeatureYieldChanges(FeatureTypes eIndex1, YieldTy
 	return m_ppiUnimprovedFeatureYieldChanges ? m_ppiUnimprovedFeatureYieldChanges[eIndex1][eIndex2] : 0;
 }
 
+/// Accessor:: Extra City Yield Modifier from Adjacent Feature
+int CvTraitEntry::GetCityYieldModifierFromAdjacentFeature(FeatureTypes eIndex1, YieldTypes eIndex2) const
+{
+	CvAssertMsg(eIndex1 < GC.getNumFeatureInfos(), "Index out of bounds");
+	CvAssertMsg(eIndex1 > -1, "Index out of bounds");
+	CvAssertMsg(eIndex2 < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(eIndex2 > -1, "Index out of bounds");
+	return m_ppiCityYieldModifierFromAdjacentFeature ? m_ppiCityYieldModifierFromAdjacentFeature[eIndex1][eIndex2] : 0;
+}
+
 /// Accessor:: Additional moves for a class of combat unit
 int CvTraitEntry::GetMovesChangeUnitCombat(const int unitCombatID) const
 {
@@ -1598,15 +1615,19 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 		m_iPrereqTech = GC.getInfoTypeForString(szTextVal, true);
 	}
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	szTextVal = kResults.GetText("PromotionWhenKilledUnit");
+	if(szTextVal)
+	{
+		m_iPromotionWhenKilledUnit = GC.getInfoTypeForString(szTextVal, true);
+	}
+	m_iPromotionRadiusWhenKilledUnit = kResults.GetInt("PromotionRadiusWhenKilledUnit");
+	m_iAttackBonusAdjacentWhenUnitKilled = kResults.GetInt("AttackBonusAdjacentWhenUnitKilled");
+	m_iKilledAttackBonusDecreasePerTurn = kResults.GetInt("KilledAttackBonusDecreasePerTurn");
 	szTextVal = kResults.GetText("TriggersIdeologyTech");
 	if(szTextVal)
 	{
 		m_iTriggersIdeologyTech = GC.getInfoTypeForString(szTextVal, true);
 	}
-	m_iPromotionWhenKilledUnit = kResults.GetInt("PromotionWhenKilledUnit");
-	m_iPromotionRadiusWhenKilledUnit = kResults.GetInt("PromotionRadiusWhenKilledUnit");
-	m_iAttackBonusAdjacentWhenUnitKilled = kResults.GetInt("AttackBonusAdjacentWhenUnitKilled");
-	m_iKilledAttackBonusDecreasePerTurn = kResults.GetInt("KilledAttackBonusDecreasePerTurn");
 	m_iNaturalWonderCorruptionScoreChange = kResults.GetInt("NaturalWonderCorruptionScoreChange");
 	m_iNaturalWonderCorruptionRadius = kResults.GetInt("NaturalWonderCorruptionRadius");
 	m_iCultureBonusUnitStrengthModify = kResults.GetInt("CultureBonusUnitStrengthModify");
@@ -2132,6 +2153,30 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 		}
 	}
 
+	//CityYieldModifierFromAdjacentFeature
+	{
+		kUtility.Initialize2DArray(m_ppiCityYieldModifierFromAdjacentFeature, "Features", "Yields");
+
+		std::string strKey("Trait_CityYieldModifierFromAdjacentFeature");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Features.ID as FeatureID, Yields.ID as YieldID, Yield from Trait_CityYieldModifierFromAdjacentFeature inner join Features on Features.Type = FeatureType inner join Yields on Yields.Type = YieldType where TraitType = ?");
+		}
+
+		pResults->Bind(1, szTraitType);
+
+		while(pResults->Step())
+		{
+			const int FeatureID = pResults->GetInt(0);
+			const int YieldID = pResults->GetInt(1);
+			const int yield = pResults->GetInt(2);
+
+			m_ppiCityYieldModifierFromAdjacentFeature[FeatureID][YieldID] = yield;
+			m_iNumCityAdjacentFeatureModifier++;
+		}
+	}
+
 	// NoTrain
 	{
 		int iUnitClassLoop;
@@ -2421,14 +2466,18 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_iTradeReligionModifier += trait->GetTradeReligionModifier();
 			m_iTradeBuildingModifier += trait->GetTradeBuildingModifier();
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+			m_bHasCityAdjacentFeatureModifier = trait->GetNumCityAdjacentFeatureModifier() > 0;
+			if(trait->GetPromotionWhenKilledUnit() != NO_PROMOTION)
+			{
+				m_iPromotionWhenKilledUnit = trait->GetPromotionWhenKilledUnit();
+			}
+			m_iPromotionRadiusWhenKilledUnit += trait->GetPromotionRadiusWhenKilledUnit();
+			m_iAttackBonusAdjacentWhenUnitKilled += trait->GetAttackBonusAdjacentWhenUnitKilled();
+			m_iKilledAttackBonusDecreasePerTurn += trait->GetKilledAttackBonusDecreasePerTurn();
 			if(trait->GetTriggersIdeologyTech() != NO_TECH)
 			{
 				m_iTriggersIdeologyTech = trait->GetTriggersIdeologyTech();
 			}
-			m_iPromotionWhenKilledUnit += trait->GetPromotionWhenKilledUnit();
-			m_iPromotionRadiusWhenKilledUnit += trait->GetPromotionRadiusWhenKilledUnit();
-			m_iAttackBonusAdjacentWhenUnitKilled += trait->GetAttackBonusAdjacentWhenUnitKilled();
-			m_iKilledAttackBonusDecreasePerTurn += trait->GetKilledAttackBonusDecreasePerTurn();
 			m_iNaturalWonderCorruptionScoreChange += trait->GetNaturalWonderCorruptionScoreChange();
 			m_iNaturalWonderCorruptionRadius += trait->GetNaturalWonderCorruptionRadius();
 			m_iCultureBonusUnitStrengthModify += trait->GetCultureBonusUnitStrengthModify();
@@ -2641,6 +2690,13 @@ void CvPlayerTraits::InitPlayerTraits()
 						m_ppiCityYieldFromUnimprovedFeature[iFeatureLoop] = yields;
 					}
 #endif
+					iChange = trait->GetCityYieldModifierFromAdjacentFeature((FeatureTypes)iFeatureLoop, (YieldTypes)iYield);
+					if(iChange > 0)
+					{
+						Firaxis::Array<int, NUM_YIELD_TYPES> yields = m_ppiCityYieldModifierFromAdjacentFeature[iFeatureLoop];
+						yields[iYield] = (m_ppiCityYieldModifierFromAdjacentFeature[iFeatureLoop][iYield] + iChange);
+						m_ppiCityYieldModifierFromAdjacentFeature[iFeatureLoop] = yields;
+					}
 				}
 
 				for(int iImprovementLoop = 0; iImprovementLoop < GC.getNumImprovementInfos(); iImprovementLoop++)
@@ -2836,6 +2892,7 @@ void CvPlayerTraits::Uninit()
 	m_ppiCityYieldFromUnimprovedFeature.clear();
 #endif
 	m_ppaaiUnimprovedFeatureYieldChange.clear();
+	m_ppiCityYieldModifierFromAdjacentFeature.clear();
 	m_aFreeResourceXCities.clear();
 }
 
@@ -2928,6 +2985,7 @@ void CvPlayerTraits::Reset()
 	m_iTradeReligionModifier = 0;
 	m_iTradeBuildingModifier = 0;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_bHasCityAdjacentFeatureModifier = false;
 	m_iPromotionWhenKilledUnit = NO_PROMOTION;
 	m_iPromotionRadiusWhenKilledUnit = 0;
 	m_iAttackBonusAdjacentWhenUnitKilled = 0;
@@ -3004,6 +3062,8 @@ void CvPlayerTraits::Reset()
 #endif
 	m_ppaaiUnimprovedFeatureYieldChange.clear();
 	m_ppaaiUnimprovedFeatureYieldChange.resize(GC.getNumFeatureInfos());
+	m_ppiCityYieldModifierFromAdjacentFeature.clear();
+	m_ppiCityYieldModifierFromAdjacentFeature.resize(GC.getNumFeatureInfos());
 
 #ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
 	for (int i = 0; i < NUM_YIELD_TYPES; i++)
@@ -3085,6 +3145,7 @@ void CvPlayerTraits::Reset()
 			m_ppiCityYieldFromUnimprovedFeature[iFeature] = yield;
 #endif
 			m_ppaaiUnimprovedFeatureYieldChange[iFeature] = yield;
+			m_ppiCityYieldModifierFromAdjacentFeature[iFeature] = yield;
 		}
 	}
 
@@ -3387,7 +3448,7 @@ int CvPlayerTraits::GetGoldenAgeGreatPersonRateModifier(GreatPersonTypes eGreatP
 
 int CvPlayerTraits::GetCityYieldFromUnimprovedFeature(FeatureTypes eFeature, YieldTypes eYield) const
 {
-	CvAssertMsg(eFeature < GC.getNumFeatureInfos(),  "Invalid eImprovement parameter in call to CvPlayerTraits::GetCityYieldFromUnimprovedFeature()");
+	CvAssertMsg(eFeature < GC.getNumFeatureInfos(),  "Invalid eFeature parameter in call to CvPlayerTraits::GetCityYieldFromUnimprovedFeature()");
 	CvAssertMsg(eYield < NUM_YIELD_TYPES,  "Invalid eYield parameter in call to CvPlayerTraits::GetCityYieldFromUnimprovedFeature()");
 
 	if(eFeature == NO_FEATURE)
@@ -3402,7 +3463,7 @@ int CvPlayerTraits::GetCityYieldFromUnimprovedFeature(FeatureTypes eFeature, Yie
 /// Extra yield from a feature without improvement
 int CvPlayerTraits::GetUnimprovedFeatureYieldChange(FeatureTypes eFeature, YieldTypes eYield) const
 {
-	CvAssertMsg(eFeature < GC.getNumFeatureInfos(),  "Invalid eImprovement parameter in call to CvPlayerTraits::GetUnimprovedFeatureYieldChange()");
+	CvAssertMsg(eFeature < GC.getNumFeatureInfos(),  "Invalid eFeature parameter in call to CvPlayerTraits::GetUnimprovedFeatureYieldChange()");
 	CvAssertMsg(eYield < NUM_YIELD_TYPES,  "Invalid eYield parameter in call to CvPlayerTraits::GetUnimprovedFeatureYieldChange()");
 
 	if(eFeature == NO_FEATURE)
@@ -3411,6 +3472,20 @@ int CvPlayerTraits::GetUnimprovedFeatureYieldChange(FeatureTypes eFeature, Yield
 	}
 
 	return m_ppaaiUnimprovedFeatureYieldChange[(int)eFeature][(int)eYield];
+}
+
+/// Extra City Yield Modifier from Adjacent Feature
+int CvPlayerTraits::GetCityYieldModifierFromAdjacentFeature(FeatureTypes eFeature, YieldTypes eYield) const
+{
+	CvAssertMsg(eFeature < GC.getNumFeatureInfos(),  "Invalid eFeature parameter in call to CvPlayerTraits::GetUnimprovedFeatureYieldChange()");
+	CvAssertMsg(eYield < NUM_YIELD_TYPES,  "Invalid eYield parameter in call to CvPlayerTraits::GetUnimprovedFeatureYieldChange()");
+
+	if(eFeature == NO_FEATURE)
+	{
+		return 0;
+	}
+
+	return m_ppiCityYieldModifierFromAdjacentFeature[(int)eFeature][(int)eYield];
 }
 
 /// Do all new units get a specific promotion?
@@ -4361,6 +4436,7 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 		m_iTradeBuildingModifier = 0;
 	}
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	kStream >> m_bHasCityAdjacentFeatureModifier;
 	kStream >> m_iPromotionWhenKilledUnit;
 	kStream >> m_iPromotionRadiusWhenKilledUnit;
 	kStream >> m_iAttackBonusAdjacentWhenUnitKilled;
@@ -4606,6 +4682,7 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	kStream >> m_ppiCityYieldFromUnimprovedFeature;
 #endif
 	kStream >> m_ppaaiUnimprovedFeatureYieldChange;
+	kStream >> m_ppiCityYieldModifierFromAdjacentFeature;
 
 	if (uiVersion >= 11)
 	{
@@ -4754,6 +4831,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_iTradeReligionModifier;
 	kStream << m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	kStream << m_bHasCityAdjacentFeatureModifier;
 	kStream << m_iPromotionWhenKilledUnit;
 	kStream << m_iPromotionRadiusWhenKilledUnit;
 	kStream << m_iAttackBonusAdjacentWhenUnitKilled;
@@ -4891,6 +4969,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_ppiCityYieldFromUnimprovedFeature;
 #endif
 	kStream << m_ppaaiUnimprovedFeatureYieldChange;
+	kStream << m_ppiCityYieldModifierFromAdjacentFeature;
 
 	kStream << (int)m_aUniqueLuxuryAreas.size();
 	for (unsigned int iI = 0; iI < m_aUniqueLuxuryAreas.size(); iI++)
