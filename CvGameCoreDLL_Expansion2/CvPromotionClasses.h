@@ -301,7 +301,7 @@ public:
 	bool IsAlwaysHeal() const;
 	bool IsHealOutsideFriendly() const;
 	bool IsHillsDoubleMove() const;
-
+	int GetMutuallyExclusiveGroup() const;
 	bool IsIgnoreTerrainCost() const;
 #if defined(MOD_API_PLOT_BASED_DAMAGE)
 	bool IsIgnoreTerrainDamage() const;
@@ -743,7 +743,7 @@ protected:
 	int m_iOnCapitalLandDefenseMod;
 	int m_iOutsideCapitalLandDefenseMod;
 #endif
-
+	int m_iMutuallyExclusiveGroup;
 
 	bool m_bCannotBeChosen;
 	bool m_bLostWithUpgrade;

@@ -31,7 +31,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iPrereqOrPromotion11(NO_PROMOTION),
 	m_iPrereqOrPromotion12(NO_PROMOTION),
 	m_iPrereqOrPromotion13(NO_PROMOTION),
-
+	m_iMutuallyExclusiveGroup(0),
 	m_iTechPrereq(NO_TECH),
 	m_iInvisibleType(NO_INVISIBLE),
 	m_iSeeInvisibleType(NO_INVISIBLE),
@@ -428,6 +428,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_bHealOutsideFriendly = kResults.GetBool("HealOutsideFriendly");
 	m_bHillsDoubleMove = kResults.GetBool("HillsDoubleMove");
 	m_bIgnoreTerrainCost = kResults.GetBool("IgnoreTerrainCost");
+	m_iMutuallyExclusiveGroup = kResults.GetInt("MutuallyExclusiveGroup");
 #if defined(MOD_API_PLOT_BASED_DAMAGE)
 	m_bIgnoreTerrainDamage = kResults.GetBool("IgnoreTerrainDamage");
 	m_bIgnoreFeatureDamage = kResults.GetBool("IgnoreFeatureDamage");
@@ -2563,6 +2564,14 @@ bool CvPromotionEntry::IsIgnoreTerrainCost() const
 {
 	return m_bIgnoreTerrainCost;
 }
+
+
+
+int CvPromotionEntry::GetMutuallyExclusiveGroup() const
+{
+	return m_iMutuallyExclusiveGroup;
+}
+
 
 #if defined(MOD_API_PLOT_BASED_DAMAGE)
 /// Accessor: Ignores terrain damage
