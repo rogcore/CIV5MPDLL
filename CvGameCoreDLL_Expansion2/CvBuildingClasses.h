@@ -438,12 +438,14 @@ public:
 	int GetHurryModifier(int i) const;
 	bool IsBuildingClassNeededInCity(int i) const;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	int GetMinNumReligions() const;
 	int GetCityStateTradeRouteProductionModifierGlobal() const;
 	int GetLandmarksTourismPercentGlobal() const;
 	int GetGreatWorksTourismModifierGlobal() const;
 	int GetTradeRouteSeaGoldBonusGlobal() const;
 	int GetTradeRouteLandGoldBonusGlobal() const;
 	bool IsAnyWater() const;
+	bool IsRiverOrCoastal() const;
 	bool IsBuildingClassNeededGlobal(int i) const;
 #endif
 	int GetNumFreeUnit() const;
@@ -458,6 +460,8 @@ public:
 	int* GetSpecialistYieldChangeArray(int i) const;
 	int GetImprovementYieldModifier(int i, int j) const;
 	int* GetImprovementYieldModifierArray(int i) const;
+	int GetFeatureYieldModifier(int i, int j) const;
+	int* GetFeatureYieldModifierArray(int i) const;
 	int GetResourceYieldModifier(int i, int j) const;
 	int* GetResourceYieldModifierArray(int i) const;
 	int GetTerrainYieldChange(int i, int j) const;
@@ -832,12 +836,14 @@ private:
 
 	bool* m_pbBuildingClassNeededInCity;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	int m_iMinNumReligions;
 	int m_iCityStateTradeRouteProductionModifierGlobal;
 	int m_iLandmarksTourismPercentGlobal;
 	int m_iGreatWorksTourismModifierGlobal;
 	int m_iTradeRouteSeaGoldBonusGlobal;
 	int m_iTradeRouteLandGoldBonusGlobal;
 	bool m_bAnyWater;
+	bool m_bRiverOrCoastal;
 	bool* m_pbBuildingClassNeededGlobal;
 #endif
 	int m_iNumFreeUnit;
@@ -848,6 +854,7 @@ private:
 	int** m_ppaiFeatureYieldChange;
 	int** m_ppaiSpecialistYieldChange;
 	int** m_ppaiImprovementYieldModifier;
+	int** m_ppaiFeatureYieldModifier;
 	int** m_ppaiResourceYieldModifier;
 	int** m_ppaiTerrainYieldChange;
 #if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)

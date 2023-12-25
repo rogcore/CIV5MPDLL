@@ -294,12 +294,14 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_paiHurryModifier(NULL),
 	m_pbBuildingClassNeededInCity(NULL),
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	m_iMinNumReligions(0),
 	m_iCityStateTradeRouteProductionModifierGlobal(0),
 	m_iLandmarksTourismPercentGlobal(0),
 	m_iGreatWorksTourismModifierGlobal(0),
 	m_iTradeRouteSeaGoldBonusGlobal(0),
 	m_iTradeRouteLandGoldBonusGlobal(0),
 	m_bAnyWater(false),
+	m_bRiverOrCoastal(false),
 	m_pbBuildingClassNeededGlobal(NULL),
 #endif
 	m_bArtInfoEraVariation(false),
@@ -309,6 +311,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_ppaiFeatureYieldChange(NULL),
 	m_ppaiSpecialistYieldChange(NULL),
 	m_ppaiImprovementYieldModifier(NULL),
+	m_ppaiFeatureYieldModifier(NULL),
 	m_ppaiResourceYieldModifier(NULL),
 	m_ppaiTerrainYieldChange(NULL),
 #if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
@@ -428,6 +431,7 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiFeatureYieldChange);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiSpecialistYieldChange);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiImprovementYieldModifier);
+	CvDatabaseUtility::SafeDelete2DArray(m_ppaiFeatureYieldModifier);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiResourceYieldModifier);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiTerrainYieldChange);
 
@@ -517,12 +521,14 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iExtraAttacks = kResults.GetInt("ExtraAttacks");
 
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	m_iMinNumReligions = kResults.GetInt("MinNumReligions");
 	m_iCityStateTradeRouteProductionModifierGlobal = kResults.GetInt("CityStateTradeRouteProductionModifierGlobal");
 	m_iLandmarksTourismPercentGlobal = kResults.GetInt("LandmarksTourismPercentGlobal");
 	m_iGreatWorksTourismModifierGlobal = kResults.GetInt("GreatWorksTourismModifierGlobal");
 	m_iTradeRouteSeaGoldBonusGlobal = kResults.GetInt("TradeRouteSeaGoldBonusGlobal");
 	m_iTradeRouteLandGoldBonusGlobal = kResults.GetInt("TradeRouteLandGoldBonusGlobal");
 	m_bAnyWater = kResults.GetBool("AnyWater");
+	m_bRiverOrCoastal = kResults.GetBool("RiverOrCoastal");
 #endif
 	m_bMountain = kResults.GetBool("Mountain");
 	m_bHill = kResults.GetBool("Hill");
@@ -1366,7 +1372,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	}
 
 
-	//ResourceYieldModifiers
+	//ImprovementYieldModifiers
 	{
 		kUtility.Initialize2DArray(m_ppaiImprovementYieldModifier, "Improvements", "Yields");
 
@@ -1386,6 +1392,29 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 			const int yield = pResults->GetInt(2);
 
 			m_ppaiImprovementYieldModifier[ImprovementID][YieldID] = yield;
+		}
+	}
+
+	//FeatureYieldModifiers
+	{
+		kUtility.Initialize2DArray(m_ppaiFeatureYieldModifier, "Features", "Yields");
+
+		std::string strKey("Building_FeatureYieldModifiers");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Features.ID as FeatureID, Yields.ID as YieldID, Yield from Building_FeatureYieldModifiers inner join Features on Features.Type = FeatureType inner join Yields on Yields.Type = YieldType where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType);
+
+		while (pResults->Step())
+		{
+			const int FeatureID = pResults->GetInt(0);
+			const int YieldID = pResults->GetInt(1);
+			const int yield = pResults->GetInt(2);
+
+			m_ppaiFeatureYieldModifier[FeatureID][YieldID] = yield;
 		}
 	}
 
@@ -3588,6 +3617,11 @@ bool CvBuildingEntry::IsBuildingClassNeededInCity(int i) const
 }
 
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+int CvBuildingEntry::GetMinNumReligions() const
+{
+	return m_iMinNumReligions;
+}
+
 int CvBuildingEntry::GetCityStateTradeRouteProductionModifierGlobal() const
 {
 	return m_iCityStateTradeRouteProductionModifierGlobal;
@@ -3616,6 +3650,10 @@ int CvBuildingEntry::GetTradeRouteLandGoldBonusGlobal() const
 bool CvBuildingEntry::IsAnyWater() const
 {
 	return m_bAnyWater;
+}
+bool CvBuildingEntry::IsRiverOrCoastal() const
+{
+	return m_bRiverOrCoastal;
 }
 /// Can it only built if there is a building of this class Global?
 bool CvBuildingEntry::IsBuildingClassNeededGlobal(int i) const
@@ -3711,6 +3749,24 @@ int* CvBuildingEntry::GetImprovementYieldModifierArray(int i) const
 	CvAssertMsg(i < GC.getNumImprovementInfos(), "Index out of bounds");
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_ppaiImprovementYieldModifier[i];
+}
+
+/// Modifier to Feature yield
+int CvBuildingEntry::GetFeatureYieldModifier(int i, int j) const
+{
+	CvAssertMsg(i < GC.getNumFeatureInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(j > -1, "Index out of bounds");
+	return m_ppaiFeatureYieldModifier ? m_ppaiFeatureYieldModifier[i][j] : -1;
+}
+
+/// Array of modifiers to Feature yield
+int* CvBuildingEntry::GetFeatureYieldModifierArray(int i) const
+{
+	CvAssertMsg(i < GC.getNumFeatureInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_ppaiFeatureYieldModifier[i];
 }
 
 /// Modifier to resource yield
