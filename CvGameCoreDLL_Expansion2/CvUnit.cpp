@@ -21639,12 +21639,14 @@ void CvUnit::MoveToEnemyPlotDamage(CvPlot* pWhere)
 		if (pWhere->isWater())
 		{
 			int iTempdamage = pWhere->getWorkingCity()->getWaterTileDamage();
+			iTempdamage += GET_PLAYER(pOwner->getOwner()).GetWaterTileDamageGlobal();
 			changeDamage(iTempdamage, pOwner->getOwner(), 0.0f);
 		}
 
 		else
 		{
 			int iTempdamage = pWhere->getWorkingCity()->getLandTileDamage();
+			iTempdamage += GET_PLAYER(pOwner->getOwner()).GetWaterTileDamageGlobal();
 			changeDamage(iTempdamage, pOwner->getOwner(), 0.0f);
 		}
 	}
@@ -23219,7 +23221,8 @@ int CvUnit::GetReverseGreatGeneralModifier()const
 #if defined(MOD_BUGFIX_MINOR)
 										// Don't assume the first one found is the worst!
 										// Combat modifiers are negative, as applied against the defender (and not for the attacker)
-										if (iMod < iMaxMod) {
+										if (iMod < iMaxMod) 
+										{
 											iMaxMod = iMod;
 										}
 #else
