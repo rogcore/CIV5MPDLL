@@ -389,6 +389,7 @@ CvUnit::CvUnit() :
 	, m_iNoDefensiveBonusCount("CvUnit::m_iNoDefensiveBonusCount", m_syncArchive)
 	, m_iNoCaptureCount("CvUnit::m_iNoCaptureCount", m_syncArchive)
 	, m_iNukeImmuneCount("CvUnit::m_iNukeImmuneCount", m_syncArchive)
+    , m_iCanDoNukeDamageCount("CvUnit::m_iCanDoNukeDamageCount", m_syncArchive)
 	, m_iHiddenNationalityCount("CvUnit::m_iHiddenNationalityCount", m_syncArchive)
 	, m_iAlwaysHostileCount("CvUnit::m_iAlwaysHostileCount", m_syncArchive)
 	, m_iNoRevealMapCount("CvUnit::m_iNoRevealMapCount", m_syncArchive)
@@ -471,6 +472,10 @@ CvUnit::CvUnit() :
 	, m_iExtraPopConsume(0)
 	, m_iAttackBonusFromDeathUnit(0)
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	, m_iCaptureEmenyExtraMax(0)
+	, m_iCaptureEmenyPercent(0)
+	, m_iMovePercentCaptureCity(0)
+	, m_iHealPercentCaptureCity(0)
 	, m_iInsightEnemyDamageModifier(0)
 	, m_iHeightModPerX(0)
 	, m_iHeightModLimited(0)
@@ -1385,6 +1390,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iNoDefensiveBonusCount = 0;
 	m_iNoCaptureCount = 0;
 	m_iNukeImmuneCount = 0;
+	m_iCanDoNukeDamageCount = 0;
 	m_iAlwaysHealCount = 0;
 	m_iHiddenNationalityCount = 0;
 	m_iAlwaysHostileCount = 0;
@@ -1439,6 +1445,10 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iExtraPopConsume = 0;
 	m_iAttackBonusFromDeathUnit = 0;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	m_iCaptureEmenyExtraMax = 0;
+	m_iCaptureEmenyPercent = 0;
+	m_iHealPercentCaptureCity = 0;
+	m_iMovePercentCaptureCity = 0;
 	m_iInsightEnemyDamageModifier = 0;
 	m_iHeightModPerX = 0;
 	m_iHeightModLimited = 0;
@@ -5688,7 +5698,12 @@ int CvUnit::GetCaptureChance(CvUnit *pEnemy)
 			{
 				int iMyCombat = m_pUnitInfo->GetCombat();
 				int iComputedChance = GC.getCOMBAT_CAPTURE_MIN_CHANCE() + (int)(((float)iMyCombat / (float)iTheirCombat) * GC.getCOMBAT_CAPTURE_RATIO_MULTIPLIER());
-				iRtnValue = min(GC.getCOMBAT_CAPTURE_MAX_CHANCE(), iComputedChance);
+				int iCaptureDefeatedEnemyChance = GetCaptureEmenyPercent();
+				if(iCaptureDefeatedEnemyChance != 0)
+				{
+					iComputedChance = iComputedChance * iCaptureDefeatedEnemyChance / 100;
+				}
+				iRtnValue = min(GC.getCOMBAT_CAPTURE_MAX_CHANCE() + GetCaptureEmenyExtraMax(), iComputedChance);
 			}
 		}
 	}
@@ -6782,7 +6797,48 @@ int CvUnit::GetAttackBonusFromDeathUnit() const
 	return m_iAttackBonusFromDeathUnit;
 }
 //	--------------------------------------------------------------------------------
+int CvUnit::GetAttackModifierFromWorldCongress() const
+{
+	return GC.getGame().GetGameLeagues()->GetGlobalAttackModifier();
+}
+//	--------------------------------------------------------------------------------
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeCaptureEmenyExtraMax(int iValue)
+{
+	m_iCaptureEmenyExtraMax += iValue;
+}
+const int CvUnit::GetCaptureEmenyExtraMax() const
+{
+	return m_iCaptureEmenyExtraMax;
+}
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeCaptureEmenyPercent(int iValue)
+{
+	m_iCaptureEmenyPercent += iValue;
+}
+const int CvUnit::GetCaptureEmenyPercent() const
+{
+	return m_iCaptureEmenyPercent;
+}
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeMovePercentCaptureCity(int iValue)
+{
+	m_iMovePercentCaptureCity += iValue;
+}
+const int CvUnit::GetMovePercentCaptureCity() const
+{
+	return m_iMovePercentCaptureCity;
+}
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeHealPercentCaptureCity(int iValue)
+{
+	m_iHealPercentCaptureCity += iValue;
+}
+const int CvUnit::GetHealPercentCaptureCity() const
+{
+	return m_iHealPercentCaptureCity;
+}
 //	--------------------------------------------------------------------------------
 void CvUnit::ChangeInsightEnemyDamageModifier(int iValue)
 {
@@ -14593,6 +14649,9 @@ int CvUnit::GetMaxAttackStrength(const CvPlot* pFromPlot, const CvPlot* pToPlot,
 	iTempModifier = GetAttackBonusFromDeathUnit();
 	iModifier += iTempModifier;
 
+	iTempModifier = GetAttackModifierFromWorldCongress();
+	iModifier += iTempModifier;
+
 #if defined(MOD_ROG_CORE)
 	int NumOriginalCapitalAttackMod = getNumOriginalCapitalAttackMod();
 	if(NumOriginalCapitalAttackMod != 0)
@@ -15387,6 +15446,8 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 
 	//modifier from Death Unit(SP Jp UA)
 	iModifier += GetAttackBonusFromDeathUnit();
+
+	iModifier += GetAttackModifierFromWorldCongress();
 
 	// If the empire is unhappy, then Units get a combat penalty
 #if defined(MOD_GLOBAL_CS_RAZE_RARELY)
@@ -18212,6 +18273,29 @@ int CvUnit::getNukeImmuneCount() const
 	return m_iNukeImmuneCount;
 }
 
+//	--------------------------------------------------------------------------------
+bool CvUnit::isCanDoNukeDamage() const
+{
+	VALIDATE_OBJECT
+	return (getCanDoNukeDamageCount() > 0);
+}
+
+
+//	--------------------------------------------------------------------------------
+void CvUnit::changeCanDoNukeDamageCount(int iValue)
+{
+	VALIDATE_OBJECT
+	m_iCanDoNukeDamageCount += iValue;
+	CvAssert(getCanDoNukeDamageCount() >= 0);
+
+}
+
+//	--------------------------------------------------------------------------------
+int CvUnit::getCanDoNukeDamageCount() const
+{
+	VALIDATE_OBJECT
+	return m_iCanDoNukeDamageCount;
+}
 //	--------------------------------------------------------------------------------
 bool CvUnit::isHiddenNationality() const
 {
@@ -21555,12 +21639,14 @@ void CvUnit::MoveToEnemyPlotDamage(CvPlot* pWhere)
 		if (pWhere->isWater())
 		{
 			int iTempdamage = pWhere->getWorkingCity()->getWaterTileDamage();
+			iTempdamage += GET_PLAYER(pOwner->getOwner()).GetWaterTileDamageGlobal();
 			changeDamage(iTempdamage, pOwner->getOwner(), 0.0f);
 		}
 
 		else
 		{
 			int iTempdamage = pWhere->getWorkingCity()->getLandTileDamage();
+			iTempdamage += GET_PLAYER(pOwner->getOwner()).GetWaterTileDamageGlobal();
 			changeDamage(iTempdamage, pOwner->getOwner(), 0.0f);
 		}
 	}
@@ -23135,7 +23221,8 @@ int CvUnit::GetReverseGreatGeneralModifier()const
 #if defined(MOD_BUGFIX_MINOR)
 										// Don't assume the first one found is the worst!
 										// Combat modifiers are negative, as applied against the defender (and not for the attacker)
-										if (iMod < iMaxMod) {
+										if (iMod < iMaxMod) 
+										{
 											iMaxMod = iMod;
 										}
 #else
@@ -25612,6 +25699,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		changeNoDefensiveBonusCount((thisPromotion.IsNoDefensiveBonus()) ? iChange : 0);
 		changeNoCaptureCount((thisPromotion.IsNoCapture()) ? iChange : 0);
 		changeNukeImmuneCount((thisPromotion.IsNukeImmune()) ? iChange: 0);
+		changeCanDoNukeDamageCount((thisPromotion.IsCanDoNukeDamage()) ? iChange : 0);
 		changeHiddenNationalityCount((thisPromotion.IsHiddenNationality()) ? iChange: 0);
 		changeAlwaysHostileCount((thisPromotion.IsAlwaysHostile()) ? iChange: 0);
 		changeNoRevealMapCount((thisPromotion.IsNoRevealMap()) ? iChange: 0);
@@ -25638,6 +25726,10 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeCapitalDefenseFalloff((thisPromotion.GetCapitalDefenseFalloff()) * iChange);
 		ChangeCityAttackPlunderModifier((thisPromotion.GetCityAttackPlunderModifier()) *  iChange);
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+		ChangeCaptureEmenyExtraMax((thisPromotion.GetCaptureEmenyExtraMax()) * iChange);
+		ChangeCaptureEmenyPercent((thisPromotion.GetCaptureEmenyPercent()) * iChange);
+		ChangeMovePercentCaptureCity((thisPromotion.GetMovePercentCaptureCity()) * iChange);
+		ChangeHealPercentCaptureCity((thisPromotion.GetHealPercentCaptureCity()) * iChange);
 		ChangeInsightEnemyDamageModifier((thisPromotion.GetInsightEnemyDamageModifier()) * iChange);
 		ChangeHeightModPerX((thisPromotion.GetHeightModPerX()) * iChange);
 		ChangeHeightModLimited((thisPromotion.GetHeightModLimited()) * iChange);
@@ -26200,6 +26292,10 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iExtraPopConsume;
 	kStream >> m_iAttackBonusFromDeathUnit;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	kStream >> m_iCaptureEmenyExtraMax;
+	kStream >> m_iCaptureEmenyPercent;
+	kStream >> m_iMovePercentCaptureCity;
+	kStream >> m_iHealPercentCaptureCity;
 	kStream >> m_iInsightEnemyDamageModifier;
 	kStream >> m_iHeightModPerX;
 	kStream >> m_iHeightModLimited;
@@ -26589,6 +26685,10 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iCityAttackPlunderModifier;
 	kStream << m_iExtraPopConsume;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	kStream << m_iCaptureEmenyExtraMax;
+	kStream << m_iCaptureEmenyPercent;
+	kStream << m_iMovePercentCaptureCity;
+	kStream << m_iHealPercentCaptureCity;
 	kStream << m_iAttackBonusFromDeathUnit;
 	kStream << m_iInsightEnemyDamageModifier;
 	kStream << m_iHeightModPerX;

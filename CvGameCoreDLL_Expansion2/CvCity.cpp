@@ -2127,7 +2127,6 @@ void CvCity::doTurn()
 
 		doDecay();
 
-		doMeltdown();
 
 		{
 			AI_PERF_FORMAT_NESTED("City-AI-perf.csv", ("doImprovement, Turn %03d, %s, %s", GC.getGame().getElapsedGameTurns(), GetPlayer()->getCivilizationShortDescription(), getName().c_str()) );
@@ -12087,12 +12086,30 @@ int CvCity::GetYieldPerTurnFromReligion(ReligionTypes eReligion, YieldTypes eYie
 	int iYieldPerTurn = 0;
 	const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eReligion, NO_PLAYER);
 
-	// Only do this for food and production, other yields from religion are handled at the player level
-	if (pReligion && (eYield == YIELD_FOOD || eYield == YIELD_PRODUCTION))
+	if (pReligion)
 	{
-		if (GetCityReligions()->IsHolyCityForReligion(eReligion))
+		if(GetCityReligions()->IsHolyCityForReligion(eReligion))
 		{
-			iYieldPerTurn += pReligion->m_Beliefs.GetHolyCityYieldChange(eYield);
+			// Only do this for food and production, other yields from religion are handled at the player level
+			if (eYield == YIELD_FOOD || eYield == YIELD_PRODUCTION)
+			{
+				iYieldPerTurn += pReligion->m_Beliefs.GetHolyCityYieldChange(eYield);
+			}
+			int iHolyCityYieldPerForeignFollowers = pReligion->m_Beliefs.GetHolyCityYieldPerForeignFollowers(eYield);
+			if(iHolyCityYieldPerForeignFollowers > 0 && GET_PLAYER(getOwner()).HasReligion(eReligion))
+			{
+				int iFollowers = GET_PLAYER(getOwner()).GetReligions()->GetNumForeignFollowers(false /*bAtPeace*/);
+				iYieldPerTurn += iHolyCityYieldPerForeignFollowers * iFollowers /100;
+			}
+		}
+		int iCityYieldPerOtherReligion = pReligion->m_Beliefs.GetCityYieldPerOtherReligion(eYield);
+		if(iCityYieldPerOtherReligion != 0)
+		{
+			int iOtherReligions = GetCityReligions()->GetNumReligionsWithFollowers() -1;
+			if(iOtherReligions > 0)
+			{
+				iYieldPerTurn += iCityYieldPerOtherReligion * iOtherReligions;
+			}
 		}
 	}
 
@@ -18565,44 +18582,6 @@ void CvCity::doDecay()
 	}
 }
 
-//	--------------------------------------------------------------------------------
-void CvCity::doMeltdown()
-{
-	VALIDATE_OBJECT
-	AI_PERF_FORMAT("City-AI-perf.csv", ("CvCity::doMeltdown, Turn %03d, %s, %s", GC.getGame().getElapsedGameTurns(), GetPlayer()->getCivilizationShortDescription(), getName().c_str()) );
-
-	int iNumBuildingInfos = GC.getNumBuildingInfos();
-	for(int iI = 0; iI < iNumBuildingInfos; iI++)
-	{
-		const BuildingTypes eBuilding = static_cast<BuildingTypes>(iI);
-		CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(eBuilding);
-		if(NULL != pkBuildingInfo && m_pCityBuildings->GetNumBuilding((BuildingTypes)iI) > 0)
-		{
-			if(pkBuildingInfo->GetNukeExplosionRand() != 0)
-			{
-				if(GC.getGame().getJonRandNum(pkBuildingInfo->GetNukeExplosionRand(), "Meltdown!!!") == 0)
-				{
-					if(m_pCityBuildings->GetNumRealBuilding((BuildingTypes)iI) > 0)
-					{
-						m_pCityBuildings->SetNumRealBuilding(((BuildingTypes)iI), 0);
-					}
-
-					CvUnitCombat::ApplyNuclearExplosionDamage(plot(), 1);
-
-					if(getOwner() == GC.getGame().getActivePlayer())
-					{
-						Localization::String localizedText = Localization::Lookup("TXT_KEY_MISC_MELTDOWN_CITY");
-						localizedText << getNameKey();
-
-						DLLUI->AddCityMessage(0, GetIDInfo(), getOwner(), false, GC.getEVENT_MESSAGE_TIME(), localizedText.toUTF8()/*, "AS2D_MELTDOWN", MESSAGE_TYPE_MINOR_EVENT, NULL, (ColorTypes)GC.getInfoTypeForString("COLOR_RED"), getX(), getY(), true, true*/);
-					}
-
-					break;
-				}
-			}
-		}
-	}
-}
 
 //	--------------------------------------------------------------------------------
 CvCityStrategyAI* CvCity::GetCityStrategyAI() const
@@ -19553,14 +19532,14 @@ bool CvCity::isValidBuildingLocation(BuildingTypes eBuilding) const
 	// Requires Hills
 	if(pkBuildingInfo->IsHill())
 	{
-		if(!plot()->isHills())
+		if(!(plot()->isHills() || plot()->isMountain()))
 			return false;
 	}
 
 	// Requires Flat
 	if(pkBuildingInfo->IsFlat())
 	{
-		if(plot()->isHills())
+		if(plot()->isHills() || plot()->isMountain())
 			return false;
 	}
 

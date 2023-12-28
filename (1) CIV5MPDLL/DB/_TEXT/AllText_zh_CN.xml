@@ -326,7 +326,18 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_COLL_DAMAGE_ENEMY_DEATH">
 			<Text>你的{1_UnitName}攻击时的穿透伤害将敌方{2_EnUName}消灭了！</Text>
 		</Row>
-
+		<Row Tag="TXT_KEY_NOTIFICATION_NUKED_DAMAGE">
+			<Text>在防御中，你的{2_UnitName}受到敌方{1_EnUName}攻击时的[COLOR_NEGATIVE_TEXT]{3_Damage}[ENDCOLOR]点核火力伤害！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_NUKED_DAMAGE_ENEMY">
+			<Text>你的{1_UnitName}攻击时对敌方{2_EnUName}造成了[COLOR_NEGATIVE_TEXT]{3_Damage}[ENDCOLOR]点核火力伤害！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_NUKED_DAMAGE_DEATH">
+			<Text>在防御中，你的{2_UnitName}被敌方{1_EnUName}攻击时的核火力伤害消灭了！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_NUKED_DAMAGE_ENEMY_DEATH">
+			<Text>你的{1_UnitName}攻击时的核火力伤害将敌方{2_EnUName}消灭了！</Text>
+		</Row>
 		<Row Tag="TXT_KEY_NOTIFICATION_BOMBER_CITY_BUILDING_DESTROYED_ATTACKING">
 			<Text>[COLOR_NEGATIVE_TEXT]{1_num}[ENDCOLOR] 建筑在此次袭击中被摧毁！</Text>
 		</Row>
@@ -400,6 +411,19 @@
 		</Row>
 		<Row Tag="TXT_KEY_RESOLUTION_COLD_WAR_HELP">
 			<Text>意识形态分歧已将世界推入冷战，经济和政治派系正在根据各自秉持的意识形态而形成。[NEWLINE][NEWLINE]如果决议通过，所有文明只能与和他们意识形态相同的文明或结盟的城邦建立[ICON_INTERNATIONAL_TRADE]国际商路。并且，与结盟城邦的[ICON_INFLUENCE]影响力不再衰退。[NEWLINE][NEWLINE]在有文明研发完成原子理论之后即可提案。</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GLOBAL_ATTACK_MODIFIER">
+			<Text>所有军事单位攻击时战斗力变化{1_NumModifier}%</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GLOBAL_WAR_CASUTIES_CHANGES">
+			<Text>全球战争伤亡和攻占城市后的人口损失变化{1_NumModifier}%</Text>
+		</Row>
+		<Row Tag="TXT_KEY_RESOLUTION_WAR_CONVENTION">
+			<Text>战争公约</Text>
+		</Row>
+		<Row Tag="TXT_KEY_RESOLUTION_WAR_CONVENTION_HELP">
+			<Text>随着国际人道主义的发展，世界人民都要求各国军队在交战中保持基本原则和底线。[NEWLINE][NEWLINE]如果决议通过，全球战争伤亡和攻占城市后的人口损失减少20%，所有军事单位攻击战斗力减少10%。[NEWLINE][NEWLINE]在有文明研发完成原子理论之后即可提案。</Text>
 		</Row>
 
 		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_REPORT">

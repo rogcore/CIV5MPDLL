@@ -1517,13 +1517,10 @@ bool CvPlot::isFreshWater() const
 	CvPlot* pLoopPlot;
 	int iDX, iDY;
 
-	if(isWater() || isImpassable() || isMountain())
-		return false;
+	if(isWater()) return false;
+	if((isImpassable() || isMountain()) && !isCity()) return false;
 
-	if(isRiver())
-	{
-		return true;
-	}
+	if(isRiver()) return true;
 
 	for(iDX = -1; iDX <= 1; iDX++)
 	{
@@ -4138,6 +4135,28 @@ bool CvPlot::isFriendlyCity(const CvUnit& kUnit, bool) const
 
 	return false;
 }
+
+//	--------------------------------------------------------------------------------
+bool CvPlot::isDangerCity(const CvUnit& kUnit) const
+{
+	CvCity* pCity = getPlotCity();
+	if(!pCity)
+	{
+		return false;
+	}
+	//Give up low-health cities
+	if(pCity->getDamage() > pCity->GetMaxHitPoints() /3 && kUnit.GetBaseCombatStrength() /2 > pCity->getStrengthValue() /100)
+	{
+		return true;
+	}
+	//Give up the newly acquired city
+	if(pCity->getPopulation() < 5 && pCity->IsResistance() && pCity->IsOccupied())
+	{
+		return true;
+	}
+	return false;
+}
+//	--------------------------------------------------------------------------------
 
 #if defined(MOD_GLOBAL_PASSABLE_FORTS)
 bool CvPlot::isPassableImprovement() const

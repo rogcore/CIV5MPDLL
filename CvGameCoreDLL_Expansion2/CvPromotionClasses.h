@@ -260,6 +260,10 @@ public:
 	int GetCapitalDefenseFalloff() const;
 	int GetCityAttackPlunderModifier() const;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	int GetCaptureEmenyExtraMax() const;
+	int GetCaptureEmenyPercent() const;
+	int GetMovePercentCaptureCity() const;
+	int GetHealPercentCaptureCity() const;
 	int GetNumUpgradePromotions() const;
 	std::pair<PromotionTypes, PromotionTypes>* GetUpgradePromotions() const;
 	int GetInsightEnemyDamageModifier() const;
@@ -347,6 +351,7 @@ public:
 	bool IsOnlyDefensive() const;
 	bool IsNoDefensiveBonus() const;
 	bool IsNukeImmune() const;
+	bool IsCanDoNukeDamage() const;
 	bool IsHiddenNationality() const;
 	bool IsAlwaysHostile() const;
 	bool IsNoRevealMap() const;
@@ -609,6 +614,10 @@ protected:
 	int m_iCapitalDefenseFalloff;
 	int m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	int m_iCaptureEmenyExtraMax;
+	int m_iCaptureEmenyPercent;
+	int m_iMovePercentCaptureCity;
+	int m_iHealPercentCaptureCity;
 	int m_iNumUpgradePromotions;
 	std::pair<PromotionTypes, PromotionTypes>* m_pUpgradePromotions;
 	int m_iInsightEnemyDamageModifier;
@@ -803,6 +812,7 @@ protected:
 	bool m_bOnlyDefensive;
 	bool m_bNoDefensiveBonus;
 	bool m_bNukeImmune;
+	bool m_bCanDoNukeDamage;
 	bool m_bHiddenNationality;
 	bool m_bAlwaysHostile;
 	bool m_bNoRevealMap;
